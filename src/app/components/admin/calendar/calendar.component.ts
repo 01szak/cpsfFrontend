@@ -7,7 +7,7 @@ import {NgForOf} from '@angular/common';
   selector: 'app-calendar',
   imports: [
     ReactiveFormsModule,
-    NgForOf
+    NgForOf,
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
@@ -19,11 +19,16 @@ export class CalendarComponent {
 
 
 
-  addNumbersToDaysInMonth(month :string) {
+  addNumbersToDaysInMonth(month :string):Array<number> {
     let days : number = this.checkHowManyDaysInMonth(month)
+    this.daysInAMonth = new Array<number>();
     for (let i = 1; i < days; i++) {
-      this.daysInAMonth.push(i + 1);
+      this.daysInAMonth = Array.from({length: days}, (_, i) => i);
     }
+    return this.daysInAMonth;
+  }
+  addCamperPlace(){
+      this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
   }
 
   checkHowManyDaysInMonth(month: string):number {
@@ -88,4 +93,6 @@ export class CalendarComponent {
     }
 
   }
+
+  protected readonly console = console;
 }
