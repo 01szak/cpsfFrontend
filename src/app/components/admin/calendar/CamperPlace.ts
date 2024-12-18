@@ -1,11 +1,11 @@
 
 export class CamperPlace {
-  camperPlaceNumber?: number;
-  price?: number;
-  type?: CamperPlaceType;
+  private camperPlaceNumber: number;
+  private price?: number;
+  private type?: CamperPlaceType;
   isOccupied: boolean = false;
 
-  constructor(camperPlaceNumber?: number, price?: number, type?: CamperPlaceType) {
+  constructor(camperPlaceNumber: number, price?: number, type?: CamperPlaceType) {
 
     this.camperPlaceNumber = camperPlaceNumber;
     this.price = price;
@@ -14,6 +14,9 @@ export class CamperPlace {
   }
 
 
+  get getCamperPlaceNumber(): number {
+    return this.camperPlaceNumber;
+  }
 }
 const enum CamperPlaceType {
   "STANDARD",

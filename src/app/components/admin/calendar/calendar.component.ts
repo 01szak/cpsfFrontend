@@ -15,31 +15,77 @@ import {NgForOf} from '@angular/common';
 export class CalendarComponent {
   months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   camperPlaces: Array<CamperPlace> = [];
-  daysInAMonth?: number;
+  daysInAMonth: Array<number> = [];
 
-  addCamperPlaceToTheCalendar() {
-    const calendar = document.getElementById("calendar") as HTMLTableElement | null;
-    const firstRow = document.getElementById("mainRow") as HTMLTableRowElement | null;
 
-    if (!calendar || !firstRow) {
-      console.error("Table or header row not found");
-      return;
+
+  addNumbersToDaysInMonth(month :string) {
+    let days : number = this.checkHowManyDaysInMonth(month)
+    for (let i = 1; i < days; i++) {
+      this.daysInAMonth.push(i + 1);
     }
-
-    this.daysInAMonth = firstRow.cells.length;
-
-    const newRow = calendar.insertRow();
-
-    const headerCell = newRow.insertCell();
-    headerCell.outerHTML = `<th>${this.camperPlaces.length + 1}</th>`;
-
-    for (let i = 1; i < this.daysInAMonth; i++) {
-      const newCell = newRow.insertCell();
-      newCell.textContent = "";
-    }
-    this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
-    console.log(this.camperPlaces);
   }
 
+  checkHowManyDaysInMonth(month: string):number {
+    function isLeapYear(): boolean {
+      let currentDate = new Date()
+      return currentDate.getFullYear() % 4 === 0;
+    }
 
+    let days: number = 0;
+
+    switch (month) {
+      case 'January': {
+        days = 31;
+        return days;
+      }
+      case 'February': {
+        isLeapYear() ? days = 29 : days = 28;
+        return days;
+      }
+      case 'March': {
+        days = 31;
+        return days;
+      }
+      case 'April': {
+        days = 30;
+        return days;
+      }
+      case 'May': {
+        days = 31;
+        return days;
+      }
+      case 'June': {
+        days = 30;
+        return days;
+      }
+      case 'July': {
+        days = 31;
+        return days;
+      }
+      case 'August': {
+        days = 31;
+        return days;
+      }
+      case 'September': {
+        days = 30;
+        return days;
+      }
+      case 'October': {
+        days = 31;
+        return days;
+      }
+      case 'November': {
+        days = 30;
+        return days;
+      }
+      case 'December': {
+        days = 31;
+       return days;
+      }
+      default:
+        return days;
+    }
+
+  }
 }
