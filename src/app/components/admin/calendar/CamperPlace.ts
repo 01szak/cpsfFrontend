@@ -13,6 +13,7 @@ export class CamperPlace {
 
   }
 
+
 }
 const enum CamperPlaceType {
   "STANDARD",

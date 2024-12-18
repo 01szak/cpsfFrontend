@@ -8,31 +8,14 @@
 
 </head>
 <body>
-<div style="margin-left: 86.2%; margin-bottom: 1%;">
-<!--  <form action>-->
-<!--    <select class="button" id="monthSelector" >-->
-<!--      <option value="january">January</option>-->
-<!--      <option value="february">February</option>-->
-<!--      <option value="march">March</option>-->
-<!--      <option value="april">April</option>-->
-<!--      <option value="may">May</option>-->
-<!--      <option value="june">June</option>-->
-<!--      <option value="july">July</option>-->
-<!--      <option value="august">August</option>-->
-<!--      <option value="september">September</option>-->
-<!--      <option value="october">October</option>-->
-<!--      <option value="november">November</option>-->
-<!--      <option value="december">December</option>-->
-<!--    </select>-->
-<!--  </form>-->
-  <form>
+  <div>
     <select id="monthSelector">
-<option *ngFor="let month of months" [value]="month.value"></option>
+      <option *ngFor="let month of months; index as i;">
+        {{ month }}
+      </option>
     </select>
-
-  </form>
-</div>
-<div  class="divTable">
+  </div>
+<div class="divTable">
   <table id="calendar">
     <tr id="mainRow">
       <th></th>

@@ -1,11 +1,13 @@
 import {Component} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-calendar',
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgForOf
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
@@ -36,6 +38,7 @@ export class CalendarComponent {
       newCell.textContent = "";
     }
     this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
+    console.log(this.camperPlaces);
   }
 
 
