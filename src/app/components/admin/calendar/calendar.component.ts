@@ -1,37 +1,39 @@
 import {Component} from '@angular/core';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-calendar',
   imports: [
     ReactiveFormsModule,
-    NgForOf,
+    CommonModule,
+    FormsModule
   ],
   templateUrl: './calendar.component.html',
-  styleUrl: './calendar.component.css'
+  styleUrl: './calendar.component.css',
+  standalone: true
 })
 export class CalendarComponent {
   months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   camperPlaces: Array<CamperPlace> = [];
   daysInAMonth: Array<number> = [];
+  selectedMonth: string = ''
 
-
-
-  addNumbersToDaysInMonth(month :string):Array<number> {
-    let days : number = this.checkHowManyDaysInMonth(month)
+  addNumbersToDaysInMonth(): Array<number> {
+    let days: number = this.checkHowManyDaysInMonth()
     this.daysInAMonth = new Array<number>();
     for (let i = 1; i < days; i++) {
       this.daysInAMonth = Array.from({length: days}, (_, i) => i);
     }
     return this.daysInAMonth;
   }
-  addCamperPlace(){
-      this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
+
+  addCamperPlace() {
+    this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
   }
 
-  checkHowManyDaysInMonth(month: string):number {
+  checkHowManyDaysInMonth(): number {
     function isLeapYear(): boolean {
       let currentDate = new Date()
       return currentDate.getFullYear() % 4 === 0;
@@ -39,7 +41,7 @@ export class CalendarComponent {
 
     let days: number = 0;
 
-    switch (month) {
+    switch (this.selectedMonth) {
       case 'January': {
         days = 31;
         return days;
@@ -86,7 +88,7 @@ export class CalendarComponent {
       }
       case 'December': {
         days = 31;
-       return days;
+        return days;
       }
       default:
         return days;
@@ -94,5 +96,4 @@ export class CalendarComponent {
 
   }
 
-  protected readonly console = console;
 }

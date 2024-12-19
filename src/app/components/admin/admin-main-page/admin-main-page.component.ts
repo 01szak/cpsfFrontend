@@ -7,7 +7,8 @@ import {CalendarComponent} from '../calendar/calendar.component';
     CalendarComponent
   ],
   templateUrl: './admin-main-page.component.html',
-  styleUrl: './admin-main-page.component.css'
+  styleUrl: './admin-main-page.component.css',
+  standalone: true
 })
 export class AdminMainPageComponent {
 

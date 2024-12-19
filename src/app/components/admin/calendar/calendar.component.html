@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Calendar</title>
-
-</head>
-<body>
 <div>
-  <select id="monthSelector" (change)="addNumbersToDaysInMonth($event.target.value)" >
-    <option *ngFor="let month of months" [value]="month" >
+  <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()" >
+    <option *ngFor="let month of months" [value]="month">
       {{ month }}
     </option>
   </select>
@@ -20,22 +11,22 @@
     <tr id="mainRow">
       <th></th>
       <th *ngFor="let day of daysInAMonth; index as i">
-        {{day}}
+        {{ day }}
       </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{ camperPlace.getCamperPlaceNumber }}</th>
-<!--    nie wiem jak wygenerować ilość elementów w zależności od ilości dni-->
+      <!--    nie wiem jak wygenerować ilość elementów w zależności od ilości dni-->
       <td *ngFor="let day of daysInAMonth"></td>
     </tr>
   </table>
 </div>
 <div>
   <br>
-    <button (click)="addCamperPlace(); console.log(camperPlaces.length)">add</button>
-    <button>update</button>
+  <!--  taki console.log w html :) -->
+  {{ camperPlaces.length }}
+  <button (click)="addCamperPlace()">add</button>
+  <button>update</button>
 </div>
-</body>
-</html>
 
 
 
