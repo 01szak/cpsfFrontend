@@ -11,7 +11,7 @@
     <tr id="mainRow">
       <th></th>
       <th *ngFor="let day of daysInAMonth; index as i">
-        {{ day }}
+        {{ day + 1 }}
       </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{ camperPlace.getCamperPlaceNumber }}</th>

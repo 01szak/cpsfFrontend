@@ -19,6 +19,8 @@ export class CalendarComponent {
   camperPlaces: Array<CamperPlace> = [];
   daysInAMonth: Array<number> = [];
   selectedMonth: string = ''
+  storage: Storage = window.localStorage;
+
 
   addNumbersToDaysInMonth(): Array<number> {
     let days: number = this.checkHowManyDaysInMonth()
@@ -29,11 +31,15 @@ export class CalendarComponent {
     return this.daysInAMonth;
   }
 
+
+
   addCamperPlace() {
     this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
+    this.storage.setItem("camperPlaces", this.camperPlaces.toString());
   }
 
   checkHowManyDaysInMonth(): number {
+
     function isLeapYear(): boolean {
       let currentDate = new Date()
       return currentDate.getFullYear() % 4 === 0;
@@ -42,6 +48,7 @@ export class CalendarComponent {
     let days: number = 0;
 
     switch (this.selectedMonth) {
+
       case 'January': {
         days = 31;
         return days;
@@ -95,5 +102,4 @@ export class CalendarComponent {
     }
 
   }
-
 }
