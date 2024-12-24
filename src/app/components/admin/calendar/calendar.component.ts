@@ -2,13 +2,22 @@ import {Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule} from '@angular/common';
+import {MatButton, MatMiniFabButton} from '@angular/material/button';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import * as url from 'node:url';
+import {ConfigService} from '../../../service/ConfigService';
+import {Preform} from '../../../Preform';
+import * as http from 'node:http';
 
 @Component({
   selector: 'app-calendar',
   imports: [
     ReactiveFormsModule,
     CommonModule,
-    FormsModule
+    FormsModule,
+    MatButton,
+
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
@@ -16,11 +25,30 @@ import {CommonModule} from '@angular/common';
 })
 export class CalendarComponent {
   months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  camperPlaces: Array<CamperPlace> = [];
   daysInAMonth: Array<number> = [];
   selectedMonth: string = ''
   storage: Storage = window.localStorage;
+  data = new Preform<CamperPlace>();
+  camperPlaces: Array<CamperPlace> = [];
 
+  constructor(private ConfigService: ConfigService) {
+  }
+
+  ngOnInit(): void {
+    this.loadCamperPlaces();
+  }
+
+  loadCamperPlaces(): void {
+    this.ConfigService.getAllCamperPlaces().subscribe({
+      next: (data: any[]) => {
+        this.camperPlaces = data;
+      },
+      error: (error) => {
+        console.error('failed to load camper places', error);
+      },
+    });
+
+  }
 
   addNumbersToDaysInMonth(): Array<number> {
     let days: number = this.checkHowManyDaysInMonth()
@@ -32,11 +60,10 @@ export class CalendarComponent {
   }
 
 
-
-  addCamperPlace() {
-    this.camperPlaces.push(new CamperPlace(this.camperPlaces.length + 1));
-    this.storage.setItem("camperPlaces", this.camperPlaces.toString());
-  }
+  // addCamperPlace() {
+  //   this.camperPlaces.push(this.camperPlaces);
+  //   this.storage.setItem("camperPlaces", this.camperPlaces.toString());
+  // }
 
   checkHowManyDaysInMonth(): number {
 
@@ -101,5 +128,9 @@ export class CalendarComponent {
         return days;
     }
 
+  }
+
+  deleteCamperPlace() {
+    this.camperPlaces.pop();
   }
 }

@@ -30,20 +30,25 @@ td:hover {
 
 }
 
-button {
-  padding: 0.2% 0.4%;
-  font-size: 12px;
-  border: solid lightgrey 1px;
-  border-radius: 12px; /* Zaokrąglenie przycisku */
-  background-color: white;
-  color: black;
-  cursor: pointer;
+/*button {*/
+/*  padding: 0.2% 0.4%;*/
+/*  font-size: 12px;*/
+/*  border: solid lightgrey 1px;*/
+/*  border-radius: 12px; !* Zaokrąglenie przycisku *!*/
+/*  background-color: white;*/
+/*  color: black;*/
+/*  cursor: pointer;*/
 
+/*}*/
+.deleteButton{
+background-color:orangered;
+  color: white;
+}
+.deleteButton:hover {
+  background-color: red;
 }
 
 button:hover {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);;
-
-
 }
 

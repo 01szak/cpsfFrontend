@@ -1,9 +1,8 @@
-
 <div>
   <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()" >
-    <option *ngFor="let month of months" [value]="month">
+    <option *ngFor="let month of months" [value]="month" selected>
       {{ month }}
-    </option>
+    </option >
   </select>
 </div>
 <div>
@@ -14,7 +13,7 @@
         {{ day + 1 }}
       </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
-      <th>{{ camperPlace.getCamperPlaceNumber }}</th>
+      <th>{{ camperPlace.getCamperPlaceNumber | json }}</th>
       <!--    nie wiem jak wygenerować ilość elementów w zależności od ilości dni-->
       <td *ngFor="let day of daysInAMonth"></td>
     </tr>
@@ -24,8 +23,12 @@
   <br>
   <!--  taki console.log w html :) -->
   {{ camperPlaces.length }}
-  <button (click)="addCamperPlace()">add</button>
+<!--  <button (click)="addCamperPlace()">add</button>-->
   <button>update</button>
+  <button mat-raised-button (click)="deleteCamperPlace()" style=>
+    delete
+  </button>
+
 </div>
 
 
