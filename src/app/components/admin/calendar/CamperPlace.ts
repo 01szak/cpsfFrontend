@@ -1,22 +1,24 @@
+import {Reservation} from './Reservation';
 
 export class CamperPlace {
-  private camperPlaceNumber: number;
-  private price?: number;
-  private type?: CamperPlaceType;
-  isOccupied: boolean = false;
+  private id: number;
+  private isOccupied: boolean = false;
+  private type: CamperPlaceType;
+  private price: number;
+  private reservations?: Array<Reservation>;
 
-  constructor(camperPlaceNumber: number, price?: number, type?: CamperPlaceType) {
 
-    this.camperPlaceNumber = camperPlaceNumber;
-    this.price = price;
+  constructor(id: number, isOccupied: boolean, type: CamperPlaceType, price: number, reservations?: Array<Reservation>) {
+    this.id = id;
+    this.isOccupied = isOccupied;
     this.type = type;
-
+    this.price = price;
+    this.reservations = reservations;
+  }
+  get getId(): string{
+    return this.id.toString();
   }
 
-
-  get getCamperPlaceNumber(): number {
-    return this.camperPlaceNumber;
-  }
 }
 const enum CamperPlaceType {
   "STANDARD",

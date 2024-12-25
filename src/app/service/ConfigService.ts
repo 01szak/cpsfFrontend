@@ -7,8 +7,8 @@ import {CamperPlace} from '../components/admin/calendar/CamperPlace';
 export class ConfigService {
 
   constructor(private http: HttpClient) {}
-    getAllCamperPlaces(): Observable<any[]>{
-      return this.http.get<any[]>('http://localhost:8080/camperPlace/findAll');
+    getAllCamperPlaces(): Observable<CamperPlace[]>{
+      return this.http.get<CamperPlace[]>('http://localhost:8080/camperPlace/findAll');
     }
 
 }

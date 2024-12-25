@@ -2,13 +2,11 @@ import {Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule} from '@angular/common';
-import {MatButton, MatMiniFabButton} from '@angular/material/button';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import * as url from 'node:url';
+import {MatButton} from '@angular/material/button';
+
 import {ConfigService} from '../../../service/ConfigService';
 import {Preform} from '../../../Preform';
-import * as http from 'node:http';
+
 
 @Component({
   selector: 'app-calendar',
@@ -26,28 +24,31 @@ import * as http from 'node:http';
 export class CalendarComponent {
   months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   daysInAMonth: Array<number> = [];
-  selectedMonth: string = ''
   storage: Storage = window.localStorage;
   data = new Preform<CamperPlace>();
   camperPlaces: Array<CamperPlace> = [];
+  currentMonth: string = this.months[new Date().getMonth()];
+  selectedMonth: string = this.currentMonth;
 
   constructor(private ConfigService: ConfigService) {
   }
 
   ngOnInit(): void {
     this.loadCamperPlaces();
+    this.addNumbersToDaysInMonth();
   }
 
   loadCamperPlaces(): void {
     this.ConfigService.getAllCamperPlaces().subscribe({
-      next: (data: any[]) => {
+      next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
+         console.log(data);
+         console.log(this.currentMonth);
       },
       error: (error) => {
         console.error('failed to load camper places', error);
       },
     });
-
   }
 
   addNumbersToDaysInMonth(): Array<number> {
