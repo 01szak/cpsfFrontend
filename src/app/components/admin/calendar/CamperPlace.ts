@@ -17,3 +17,7 @@ export class CamperPlace {
 
 
 }
+ export interface CamperPlaceToJSONParser{
+  type: string;
+  price: number;
+}

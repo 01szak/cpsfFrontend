@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {CamperPlace} from '../components/admin/calendar/CamperPlace';
+import {CamperPlace, CamperPlaceToJSONParser} from '../components/admin/calendar/CamperPlace';
 
 @Injectable({ providedIn: 'root' })
 export class CamperPlaceService {
@@ -10,8 +10,9 @@ export class CamperPlaceService {
     getAllCamperPlaces(): Observable<CamperPlace[]>{
       return this.http.get<CamperPlace[]>('http://localhost:8080/camperPlace/findAll');
     }
-    addCamperPlace(camperPlace : CamperPlace): Observable<CamperPlace>{
+    addCamperPlace(camperPlace : CamperPlaceToJSONParser): Observable<CamperPlace>{
     const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});
+
        return this.http.post<CamperPlace>('http://localhost:8080/camperPlace/create',JSON.stringify(camperPlace), {headers: headers});
     }
     getCamperPlaceTypes(): Observable<string[]>{
