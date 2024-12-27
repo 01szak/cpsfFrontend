@@ -1,11 +1,12 @@
-import {Component} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule} from '@angular/common';
-import {MatButton} from '@angular/material/button';
 
-import {ConfigService} from '../../../service/ConfigService';
+import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {Preform} from '../../../Preform';
+import {Reservation} from './Reservation';
+import {PopupService} from '../../../service/PopupService';
 
 
 @Component({
@@ -14,8 +15,6 @@ import {Preform} from '../../../Preform';
     ReactiveFormsModule,
     CommonModule,
     FormsModule,
-    MatButton,
-
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
@@ -29,9 +28,17 @@ export class CalendarComponent {
   camperPlaces: Array<CamperPlace> = [];
   currentMonth: string = this.months[new Date().getMonth()];
   selectedMonth: string = this.currentMonth;
+  camperPlaceTypes: Array<string> = [];
 
-  constructor(private ConfigService: ConfigService) {
+  constructor(private camperPlaceService: CamperPlaceService,private popupService: PopupService) {
   }
+  openPopup() {
+    this.popupService.openPopup();
+  }
+  closePopup() {
+    this.popupService.closePopup();
+  }
+
 
   ngOnInit(): void {
     this.loadCamperPlaces();
@@ -39,11 +46,9 @@ export class CalendarComponent {
   }
 
   loadCamperPlaces(): void {
-    this.ConfigService.getAllCamperPlaces().subscribe({
+    this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
-         console.log(data);
-         console.log(this.currentMonth);
       },
       error: (error) => {
         console.error('failed to load camper places', error);
@@ -61,10 +66,7 @@ export class CalendarComponent {
   }
 
 
-  // addCamperPlace() {
-  //   this.camperPlaces.push(this.camperPlaces);
-  //   this.storage.setItem("camperPlaces", this.camperPlaces.toString());
-  // }
+
 
   checkHowManyDaysInMonth(): number {
 
