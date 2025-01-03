@@ -5,10 +5,10 @@ import {CamperPlace, CamperPlaceToJSONParser} from '../components/admin/calendar
 
 @Injectable({ providedIn: 'root' })
 export class CamperPlaceService {
-
+  api = '/api/camperPlace'
   constructor(private http: HttpClient) {}
     getAllCamperPlaces(): Observable<CamperPlace[]>{
-      return this.http.get<CamperPlace[]>('http://localhost:8080/camperPlace/findAll');
+      return this.http.get<CamperPlace[]>(this.api  + '/findAll');
     }
     addCamperPlace(camperPlace : CamperPlaceToJSONParser): Observable<CamperPlace>{
     const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});

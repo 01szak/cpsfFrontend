@@ -1,0 +1,24 @@
+html{
+  margin: 0;
+}
+
+mat-card {
+background: rgba(222, 224, 234, 0.2);
+  backdrop-filter: blur(10px); /* Rozmycie tła */
+  border-radius: 8px; /* Zaokrąglone krawędzie */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Opcjonalne: cień dla karty */
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-bottom: 3%;
+  max-width: fit-content;
+  margin-inline: auto;
+  margin-top: 100px;
+}
+
+.bottomButtons{
+  position: absolute; /* Ustawia pozycję relatywnie do karty */
+  bottom: 2px; /* Odstęp od dolnej krawędzi karty */
+  right: 16px; /* Odstęp od prawej krawędzi karty */
+  display: flex; /* Umożliwia układ w wierszu */
+  gap: 8px; /* Odstęp między przyciskami */
+}

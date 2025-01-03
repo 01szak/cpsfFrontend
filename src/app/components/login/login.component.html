@@ -1,0 +1,26 @@
+
+<mat-card>
+  <mat-card-content>
+
+      <mat-card-header>Login</mat-card-header>
+      <br>
+    <mat-hint style="color: red; font-size: small" >{{errorMassage}}</mat-hint>
+    <br>
+
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matNativeControl type="email" id="loginEmail" name="loginEmail" [(ngModel)]="this.request.email">
+      </mat-form-field>
+      <br>
+      <mat-form-field>
+        <input matNativeControl type="password" id="password" name="password" [(ngModel)]="this.request.password">
+
+      </mat-form-field>
+      <br>
+      <div class="bottomButtons">
+        <button mat-button [routerLink]="'/register'">register</button>
+        <button mat-flat-button type="button" (click)="onSubmitLogin()" >submit</button>
+      </div>
+
+  </mat-card-content>
+</mat-card>
