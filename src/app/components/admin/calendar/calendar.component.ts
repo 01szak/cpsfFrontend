@@ -10,7 +10,7 @@ import {PopupService} from '../../../service/PopupService';
 
 
 @Component({
-  selector: 'app-calendar',
+  selector: 'calendar',
   imports: [
     ReactiveFormsModule,
     CommonModule,

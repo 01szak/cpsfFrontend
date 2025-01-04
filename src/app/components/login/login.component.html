@@ -4,7 +4,7 @@
 
       <mat-card-header>Login</mat-card-header>
       <br>
-    <mat-hint style="color: red; font-size: small" >{{errorMassage}}</mat-hint>
+    <mat-hint style="color: red; font-size: small" >{{errorMessage}}</mat-hint>
     <br>
 
       <mat-form-field>
@@ -18,9 +18,10 @@
       </mat-form-field>
       <br>
       <div class="bottomButtons">
-        <button mat-button [routerLink]="'/register'">register</button>
+        <a mat-button [routerLink]="'/register'">register</a>
         <button mat-flat-button type="button" (click)="onSubmitLogin()" >submit</button>
       </div>
 
   </mat-card-content>
 </mat-card>
+<footer></footer>

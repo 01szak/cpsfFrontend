@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet} from '@angular/router';
-import {FooterComponent} from './components/footer/footer.component';
+import {FooterComponent} from './components/admin/footer/footer.component';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatCardHeader, MatCardTitle} from '@angular/material/card';
 

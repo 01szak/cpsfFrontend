@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-users',
+  selector: 'users',
   imports: [],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
@@ -9,4 +9,7 @@ import { Component } from '@angular/core';
 })
 export class UsersComponent {
 
+}
+export enum UserTypes{
+  ADMIN,GUEST
 }

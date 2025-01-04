@@ -1,19 +1,18 @@
 import { Component } from '@angular/core';
 import {CalendarComponent} from '../calendar/calendar.component';
-import {FooterComponent} from "../../footer/footer.component";
+import {FooterComponent} from "../footer/footer.component";
 import {RouterOutlet} from '@angular/router';
-
 @Component({
-  selector: 'admin-main-page',
+  selector: 'admin-page',
   imports: [
     CalendarComponent,
     FooterComponent,
-    RouterOutlet
+    RouterOutlet,
   ],
-  templateUrl: './admin-main-page.component.html',
-  styleUrl: './admin-main-page.component.css',
+  templateUrl: './admin-page.component.html',
+  styleUrl: './admin-page.component.css',
   standalone: true
 })
-export class AdminMainPageComponent {
+export class AdminPageComponent {
 
 }

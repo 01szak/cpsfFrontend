@@ -1,48 +1,52 @@
 import {Routes} from '@angular/router';
-import {AdminMainPageComponent} from './components/admin/admin-main-page/admin-main-page.component';
-import {ReservationsComponent} from './components/admin/reservations/reservations.component';
-import {StatisticsComponent} from './components/admin/statistics/statistics.component';
-import {UsersComponent} from './components/admin/users/users.component';
 import {LoginComponent} from './components/login/login.component';
-import {AuthorizedContentComponent} from './components/authorized-content/authorized-content.component';
+import {RegisterComponent} from './components/register/register.component';
+import {AdminPageComponent} from './components/admin/admin-main-page/admin-page.component';
+import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
+import {CalendarComponent} from './components/admin/calendar/calendar.component';
+import {StatisticsComponent} from './components/admin/statistics/statistics.component';
+import {ReservationsComponent} from './components/admin/reservations/reservations.component';
+import {UsersComponent} from './components/admin/users/users.component';
 
 export const routes: Routes = [
   {
-    path: "",
+    path: 'login',
     component: LoginComponent
   },
   {
-    path: "login",
+    path: '',
     component: LoginComponent
   },
   {
-    path: "**",
-    redirectTo: "login"
+    path: 'register',
+    component: RegisterComponent
   },
 
   {
-    path: "authorized-content",
-    component: AuthorizedContentComponent
+    path: 'admin-page',
+    component: AdminPageComponent,
+    children:[{
+      path: 'calendar',
+      component: CalendarComponent
+    },
+      {
+        path: 'statistics',
+        component: StatisticsComponent
+      },
+      {
+        path: 'reservations',
+        component: ReservationsComponent
+      },
+      {
+        path: 'users',
+        component: UsersComponent
+      },
+    ]
   },
   {
-    path: "register",
-    component: ReservationsComponent
-  },
-  {
-    path: "adminMainPage",
-    component: AdminMainPageComponent
-  },
-  {
-    path: "reservations",
-    component: ReservationsComponent
-  },
-
-  {
-    path: "statistics",
-    component: StatisticsComponent
-  },
-  {
-    path: "users",
-    component: UsersComponent
+    path: 'guest-page',
+    component: GuestPageComponent
   }
-];
+
+
+]

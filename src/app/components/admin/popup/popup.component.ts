@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {CamperPlaceService} from '../../service/CamperPlaceService';
+import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {NgForOf} from '@angular/common';
-import {CamperPlace} from '../admin/calendar/CamperPlace';
-import {Reservation} from '../admin/calendar/Reservation';
+import {CamperPlace} from '../calendar/CamperPlace';
+import {Reservation} from '../calendar/Reservation';
 import {FormsModule} from '@angular/forms';
-import {CamperPlaceToJSONParser} from '../admin/calendar/CamperPlace'
+import {CamperPlaceToJSONParser} from '../calendar/CamperPlace'
 
 @Component({
   selector: 'app-popup',

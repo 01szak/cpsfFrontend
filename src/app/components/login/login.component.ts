@@ -3,14 +3,13 @@ import {MatFormField, MatHint} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
-import {MatButton} from '@angular/material/button';
-import {RouterLink} from '@angular/router';
+import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {AuthenticatorRequest, LoginService} from '../../service/LoginService';
 import {NgIf} from '@angular/common';
-import {AuthorizedContentComponent} from '../authorized-content/authorized-content.component';
-import {AdminMainPageComponent} from '../admin/admin-main-page/admin-main-page.component';
-import {Router} from '@angular/router';
+import {AdminPageComponent} from '../admin/admin-main-page/admin-page.component';
+import {Router, RouterLink} from '@angular/router';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -26,9 +25,10 @@ import {Router} from '@angular/router';
     MatCardContent,
     MatCardHeader,
     NgIf,
-    AuthorizedContentComponent,
-    AdminMainPageComponent,
-
+    AdminPageComponent,
+    RouterLink,
+    RouterOutlet,
+    MatAnchor,
 
   ],
   templateUrl: './login.component.html',
@@ -40,12 +40,12 @@ export class LoginComponent {
   @Output() onSubmitLoginEvent = new EventEmitter();
   @Output() onSubmitRegisterEvent = new EventEmitter();
 
-  constructor(private loginService: LoginService,private router: Router) {
+  constructor(private loginService: LoginService, private router: Router) {
   }
 
   active: string = "login";
   isLogged: boolean = false;
-  errorMassage: string = "";
+  errorMessage: string = "";
 
   onLoginTab(): void {
     this.active = 'login';
@@ -62,13 +62,13 @@ export class LoginComponent {
     this.onSubmitLoginEvent.emit({"email": this.request.email, "password": this.request.password});
     this.loginService.login(this.request).subscribe({
       next: (req) => {
-        this.isLogged === true;
+        this.isLogged = true;
         console.log(JSON.stringify(req));
-        this.router.createUrlTree(['/authorized-content']);
+        this.router.navigateByUrl("/admin-page/calendar")
       },
       error: (error: Error) => {
-      console.log(this.request)
-       this.errorMassage = "Wrong email or password"
+        console.log(this.request)
+        this.errorMessage = "Wrong email or password"
 
       }
     });
