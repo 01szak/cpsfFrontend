@@ -13,10 +13,10 @@ export class CamperPlaceService {
     addCamperPlace(camperPlace : CamperPlaceToJSONParser): Observable<CamperPlace>{
     const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});
 
-       return this.http.post<CamperPlace>('http://localhost:8080/camperPlace/create',JSON.stringify(camperPlace), {headers: headers});
+       return this.http.post<CamperPlace>('/api/camperPlace/create',JSON.stringify(camperPlace), {headers: headers});
     }
     getCamperPlaceTypes(): Observable<string[]>{
-      return this.http.get<string[]>('http://localhost:8080/camperPlace/getCamperPlaceTypes');
+      return this.http.get<string[]>('/api/camperPlace/getCamperPlaceTypes');
     }
 
 }
