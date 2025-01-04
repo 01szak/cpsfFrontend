@@ -63,7 +63,7 @@
 
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "src/localhost:8080/"
+            "proxyConfig": "src/proxy.conf.json"
 
           },
           "configurations": {

@@ -6,9 +6,9 @@ import {MatLabel} from '@angular/material/form-field';
 import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {AuthenticatorRequest, LoginService} from '../../service/LoginService';
-import {NgIf} from '@angular/common';
+import {CommonModule, NgIf} from '@angular/common';
 import {AdminPageComponent} from '../admin/admin-main-page/admin-page.component';
-import {Router, RouterLink} from '@angular/router';
+import {Router, RouterLink, RouterModule} from '@angular/router';
 import {RouterOutlet} from '@angular/router';
 
 @Component({
@@ -24,12 +24,9 @@ import {RouterOutlet} from '@angular/router';
     MatCard,
     MatCardContent,
     MatCardHeader,
-    NgIf,
-    AdminPageComponent,
-    RouterLink,
-    RouterOutlet,
+    CommonModule,
     MatAnchor,
-
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -64,7 +61,7 @@ export class LoginComponent {
       next: (req) => {
         this.isLogged = true;
         console.log(JSON.stringify(req));
-        this.router.navigateByUrl("/admin-page/calendar")
+        this.router.navigate(["/admin-page/calendar"])
       },
       error: (error: Error) => {
         console.log(this.request)
