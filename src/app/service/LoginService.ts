@@ -12,7 +12,7 @@ export class LoginService {
 
   login(request: AuthenticatorRequest): Observable<any> {
 
-    return this.http.post<AuthenticatorRequest>('http://localhost:8080/auth/login',request);
+    return this.http.post<AuthenticatorRequest>('/api/auth/login',request);
   }
 }
 
