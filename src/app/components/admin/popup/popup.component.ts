@@ -3,8 +3,6 @@ import {MatButton} from '@angular/material/button';
 import {MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {NgForOf} from '@angular/common';
-import {CamperPlace} from '../calendar/CamperPlace';
-import {Reservation} from '../calendar/Reservation';
 import {FormsModule} from '@angular/forms';
 import {CamperPlaceToJSONParser} from '../calendar/CamperPlace'
 
@@ -20,13 +18,14 @@ import {CamperPlaceToJSONParser} from '../calendar/CamperPlace'
 
   ],
   templateUrl: './popup.component.html',
+  standalone: true,
   styleUrl: './popup.component.css'
 })
 export class PopupComponent {
   camperPlaceTypes: Array<string> = [];
   newCamperPlace: CamperPlaceToJSONParser = {
     type:"",
-    price: 0
+    price: 0.00
   };
   constructor(public dialog: MatDialog, public camperPlaceService: CamperPlaceService) {
   }

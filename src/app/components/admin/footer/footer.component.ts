@@ -1,10 +1,15 @@
 import { Component } from '@angular/core';
 import {RouterLink} from '@angular/router';
+import {MatDrawerContainer,MatDrawer} from '@angular/material/sidenav';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-footer',
   imports: [
-    RouterLink
+    RouterLink,
+    MatDrawerContainer,
+    MatDrawer,
+    MatButton
   ],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
@@ -12,4 +17,7 @@ import {RouterLink} from '@angular/router';
 })
 export class FooterComponent {
 
+  logout():void{
+    localStorage.removeItem('jwtToken');
+  }
 }

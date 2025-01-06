@@ -1,8 +1,19 @@
-<div class="sideBar">
-  <button class="iconButton"><i class="fa-solid fa-bars"></i></button>
-  <a class="sideBarButton" routerLink="calendar">home</a>
-  <a class="sideBarButton" routerLink="statistics">statistics</a>
-  <a class="sideBarButton" routerLink="reservations">reservations</a>
-  <a class="sideBarButton" routerLink="users">users</a>
-  <a class="iconButton" style="margin-left: 95%;"><i class="fa-solid fa-right-from-bracket"></i></a>
-</div>
+<mat-drawer-container class="container">
+  <mat-drawer #drawer class="drawer" mode="push">
+    <div class="routers">
+      <a class="icon left" routerLink="../" (click)="logout()"><i class="fa-solid fa-right-to-bracket"></i></a>
+      <a class="footerButton" routerLink="calendar">CALENDAR</a>
+      <a class="footerButton" routerLink="reservations">RESERVATIONS</a>
+      <a class="footerButton" routerLink="users">USERS</a>
+      <a class="footerButton" routerLink="statistics">STATISTICS</a>
+      <a class="icon right" (click)="drawer.toggle()"><i class="fa-solid fa-arrow-left"></i></a>
+    </div>
+  </mat-drawer>
+
+  <div>
+    <a class="icon outside " (click)="drawer.toggle()">
+      <i class="fa-solid fa-arrow-right"></i>
+    </a>
+  </div>
+
+</mat-drawer-container>

@@ -66,7 +66,7 @@ export class LoginComponent {
       error: (error: Error) => {
         console.log(this.request)
         this.errorMessage = "Wrong email or password"
-
+          console.error(error);
       }
     });
   }

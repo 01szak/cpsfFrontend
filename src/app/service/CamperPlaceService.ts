@@ -5,18 +5,18 @@ import {CamperPlace, CamperPlaceToJSONParser} from '../components/admin/calendar
 
 @Injectable({ providedIn: 'root' })
 export class CamperPlaceService {
-  api = '/api/camperPlace'
+  api  = '/api/camperPlace/';
   constructor(private http: HttpClient) {}
     getAllCamperPlaces(): Observable<CamperPlace[]>{
-      return this.http.get<CamperPlace[]>(this.api  + '/findAll');
+      return this.http.get<CamperPlace[]>(this.api  + 'findAll');
     }
     addCamperPlace(camperPlace : CamperPlaceToJSONParser): Observable<CamperPlace>{
     const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});
 
-       return this.http.post<CamperPlace>('/api/camperPlace/create',JSON.stringify(camperPlace), {headers: headers});
+       return this.http.post<CamperPlace>(this.api + 'create',JSON.stringify(camperPlace), {headers: headers});
     }
     getCamperPlaceTypes(): Observable<string[]>{
-      return this.http.get<string[]>('/api/camperPlace/getCamperPlaceTypes');
+      return this.http.get<string[]>(this.api + 'getCamperPlaceTypes');
     }
 
 }

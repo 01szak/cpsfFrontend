@@ -15,20 +15,15 @@
       </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{i + 1}}</th>
-      <!--    nie wiem jak wygenerować ilość elementów w zależności od ilości dni-->
       <td *ngFor="let day of daysInAMonth"></td>
     </tr>
   </table>
 </div>
 <div>
   <br>
-  <!--  taki console.log w html :) -->
   {{ camperPlaces.length }}
   <button (click)="openPopup()">add</button>
-<!--  <button>update</button>-->
-<!--  <button mat-raised-button (click)="deleteCamperPlace()" style=>-->
-<!--    delete-->
-<!--  </button>-->
+
 
 </div>
 
