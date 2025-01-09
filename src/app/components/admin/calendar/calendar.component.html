@@ -8,14 +8,16 @@
 </div>
 <div>
   <table id="calendar">
-    <tr id="mainRow">
+
       <th></th>
+
       <th *ngFor="let day of daysInAMonth; index as i">
         {{ day + 1 }}
       </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{i + 1}}</th>
-      <td *ngFor="let day of daysInAMonth"></td>
+      <td *ngFor="let day of daysInAMonth" [ngClass]="{'reserved': isDayReserved(camperPlace, day)}">
+      </td>
     </tr>
   </table>
 </div>

@@ -29,7 +29,14 @@ td:hover {
 
 
 }
+td.reserved {
+  background-color: orangered;
+}
 
+td.reserved:hover {
+  background-color: red;
+  visibility: visible;
+}
 /*button {*/
 /*  padding: 0.2% 0.4%;*/
 /*  font-size: 12px;*/

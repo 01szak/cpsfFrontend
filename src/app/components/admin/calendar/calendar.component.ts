@@ -23,22 +23,20 @@ import {PopupService} from '../../../service/PopupService';
 export class CalendarComponent {
   months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   daysInAMonth: Array<number> = [];
-  storage: Storage = window.localStorage;
-  data = new Preform<CamperPlace>();
   camperPlaces: Array<CamperPlace> = [];
   currentMonth: string = this.months[new Date().getMonth()];
   selectedMonth: string = this.currentMonth;
-  camperPlaceTypes: Array<string> = [];
 
-  constructor(private camperPlaceService: CamperPlaceService,private popupService: PopupService) {
+  constructor(private camperPlaceService: CamperPlaceService, private popupService: PopupService) {
   }
+
   openPopup() {
     this.popupService.openPopup();
   }
+
   closePopup() {
     this.popupService.closePopup();
   }
-
 
   ngOnInit(): void {
     this.loadCamperPlaces();
@@ -49,6 +47,7 @@ export class CalendarComponent {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
+        console.log(data)
       },
       error: (error) => {
         console.error('failed to load camper places', error);
@@ -64,9 +63,6 @@ export class CalendarComponent {
     }
     return this.daysInAMonth;
   }
-
-
-
 
   checkHowManyDaysInMonth(): number {
 
@@ -135,5 +131,21 @@ export class CalendarComponent {
 
   deleteCamperPlace() {
     this.camperPlaces.pop();
+  }
+
+  isDayReserved(camperPlace: CamperPlace, day: number): boolean {
+
+    this.camperPlaces.forEach(camperPlace => {
+      camperPlace.reservations = camperPlace.reservations.map(reservation =>
+        new Reservation(
+          reservation.id,
+          new Date(reservation.checkin),
+          new Date(reservation.checkout),
+          camperPlace
+
+    ))
+    })
+    const reservedDays = camperPlace.reservations.flatMap(reservation => reservation.daysBetweenCheckinAndCheckout())
+    return reservedDays.includes(day + 1);
   }
 }
