@@ -3,8 +3,8 @@ import {MatButton} from '@angular/material/button';
 import {MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {NgForOf} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {CamperPlaceToJSONParser} from '../calendar/CamperPlace'
+import {FormsModule, NgForm} from '@angular/forms';
+import {CamperPlace} from '../calendar/CamperPlace'
 
 @Component({
   selector: 'app-popup',
@@ -23,9 +23,10 @@ import {CamperPlaceToJSONParser} from '../calendar/CamperPlace'
 })
 export class PopupComponent {
   camperPlaceTypes: Array<string> = [];
-  newCamperPlace: CamperPlaceToJSONParser = {
+  camperPlace: CamperPlace = {
     type:"",
-    price: 0.00
+    price: "0.00",
+    reservations: []
   };
   constructor(public dialog: MatDialog, public camperPlaceService: CamperPlaceService) {
   }
@@ -51,15 +52,16 @@ export class PopupComponent {
   }
 
   addCamperPlace(): void {
-    this.camperPlaceService.addCamperPlace(this.newCamperPlace).subscribe({
+    this.camperPlaceService.addCamperPlace(this.camperPlace).subscribe({
 
       next: (response) => {
         console.log(response);
+        window.location.reload();
         this.closePopup();
       },
       error: (error: Error) => {
         console.error('failed to add camper place');
-        console.log(JSON.stringify(this.newCamperPlace, null, 2));
+        console.log(this.camperPlace);
         this.closePopup();
 
       }

@@ -6,7 +6,7 @@ import {Injectable} from '@angular/core';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const storedData = localStorage.getItem('jwtToken');
+    const storedData = sessionStorage.getItem('jwtToken');
     const jwtToken = storedData ? storedData : null;
 
     if (jwtToken) {

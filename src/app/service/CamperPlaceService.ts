@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {CamperPlace, CamperPlaceToJSONParser} from '../components/admin/calendar/CamperPlace';
+import {CamperPlace} from '../components/admin/calendar/CamperPlace';
 
 @Injectable({ providedIn: 'root' })
 export class CamperPlaceService {
@@ -10,13 +10,18 @@ export class CamperPlaceService {
     getAllCamperPlaces(): Observable<CamperPlace[]>{
       return this.http.get<CamperPlace[]>(this.api  + 'findAll');
     }
-    addCamperPlace(camperPlace : CamperPlaceToJSONParser): Observable<CamperPlace>{
+
+  addCamperPlace(camperPlace: CamperPlace): Observable<CamperPlace>{
     const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});
 
-       return this.http.post<CamperPlace>(this.api + 'create',JSON.stringify(camperPlace), {headers: headers});
+       return this.http.post<CamperPlace>(this.api + 'create',camperPlace, {headers: headers});
     }
     getCamperPlaceTypes(): Observable<string[]>{
-      return this.http.get<string[]>(this.api + 'getCamperPlaceTypes');
+      return this.http.get<string[]>( this.api + 'getCamperPlaceTypes');
+    }
+    deleteCamperPlace(camperPlaceNumber: number){
+    return this.http.delete(this.api + 'deleteCamperPlace/'+ camperPlaceNumber.toString())
+
     }
 
 }

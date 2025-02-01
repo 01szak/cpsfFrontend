@@ -38,6 +38,18 @@ export class CalendarComponent {
     this.popupService.closePopup();
   }
 
+  delete(camperPlaceNumber: number): void {
+    this.camperPlaceService.deleteCamperPlace(camperPlaceNumber).subscribe({
+      next:()=> {
+      this.camperPlaces.pop();
+      },
+      error: (err) =>{
+        console.log(err);
+      }
+      }
+    );
+  }
+
   ngOnInit(): void {
     this.loadCamperPlaces();
     this.addNumbersToDaysInMonth();
@@ -129,9 +141,7 @@ export class CalendarComponent {
 
   }
 
-  deleteCamperPlace() {
-    this.camperPlaces.pop();
-  }
+
 
   isDayReserved(camperPlace: CamperPlace, day: number): boolean {
 
@@ -142,8 +152,7 @@ export class CalendarComponent {
           new Date(reservation.checkin),
           new Date(reservation.checkout),
           camperPlace
-
-    ))
+        ))
     })
     const reservedDays = camperPlace.reservations.flatMap(reservation => reservation.daysBetweenCheckinAndCheckout())
     return reservedDays.includes(day + 1);

@@ -18,6 +18,6 @@ import {MatButton} from '@angular/material/button';
 export class FooterComponent {
 
   logout():void{
-    localStorage.removeItem('jwtToken');
+    sessionStorage.removeItem('jwtToken');
   }
 }

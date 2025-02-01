@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>New Camper Place: </h1>
 <div mat-dialog-content>
   <label>type: </label>
-  <select [(ngModel)]="newCamperPlace.type" name="type">
+  <select [(ngModel)]="camperPlace.type" name="type">
     <option *ngFor="let type of camperPlaceTypes" [value]="type">
       {{type}}
     </option>
@@ -10,7 +10,7 @@
   <br>
   <br>
   <label>price: </label>
-  <input type="text"  [(ngModel)]="newCamperPlace.price" name="price">
+  <input type="text"  [(ngModel)]="camperPlace.price" name="price">
   <br>
   <button mat-button type="button" (click)="addCamperPlace()" >submit</button>
 </div>

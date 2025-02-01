@@ -18,7 +18,7 @@ export class LoginService {
     return this.http.post<AuthenticatorRequest>(this.api + 'login', request,{headers: this.headers}).pipe(
       tap((response: any) =>{
         if(response.token){
-          localStorage.setItem('jwtToken',response?.token.toString());
+          sessionStorage.setItem('jwtToken',response?.token.toString());
         }
       })
     );

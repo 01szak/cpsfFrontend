@@ -18,6 +18,7 @@
       <th>{{i + 1}}</th>
       <td *ngFor="let day of daysInAMonth" [ngClass]="{'reserved': isDayReserved(camperPlace, day)}">
       </td>
+      <button (click)="delete(i + 1)">delete</button>
     </tr>
   </table>
 </div>
