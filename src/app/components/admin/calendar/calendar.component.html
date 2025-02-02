@@ -1,29 +1,33 @@
-
 <div>
-  <select id="monthSelector" [(ngModel)]="selectedMonth"  (ngModelChange)="addNumbersToDaysInMonth()"  >
-    <option *ngFor="let month of months"  >
+  <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
+    <option *ngFor="let month of months" [value]="month">
       {{ month }}
-    </option >
+    </option>
   </select>
 </div>
 <div>
   <table id="calendar">
 
-      <th></th>
+    <th></th>
 
-      <th *ngFor="let day of daysInAMonth; index as i">
-        {{ day + 1 }}
-      </th>
+    <th *ngFor="let day of daysInAMonth; index as i">
+      {{ day + 1 }}
+    </th>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
-      <th>{{i + 1}}</th>
-      <td *ngFor="let day of daysInAMonth" [ngClass]="{'reserved': isDayReserved(camperPlace, day)}">
+      <th>{{ i + 1 }}</th>
+      <td *ngFor="let day of daysInAMonth"
+          [ngClass]="{'reserved':
+           isDayReserved(camperPlace, day).at(0) &&
+            ((selectedMonth === isDayReserved(camperPlace, day).at(1)) || selectedMonth === isDayReserved(camperPlace, day).at(2))}">
       </td>
+
       <button (click)="delete(i + 1)">delete</button>
     </tr>
   </table>
 </div>
 <div>
   <br>
+
   {{ camperPlaces.length }}
   <button (click)="openPopup()">add</button>
 

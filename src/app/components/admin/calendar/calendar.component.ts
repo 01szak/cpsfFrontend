@@ -7,6 +7,9 @@ import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {Preform} from '../../../Preform';
 import {Reservation} from './Reservation';
 import {PopupService} from '../../../service/PopupService';
+import {ReservationService} from '../../../service/ReservationService';
+import {Guest} from './Guest';
+import moment from 'moment/moment';
 
 
 @Component({
@@ -40,12 +43,12 @@ export class CalendarComponent {
 
   delete(camperPlaceNumber: number): void {
     this.camperPlaceService.deleteCamperPlace(camperPlaceNumber).subscribe({
-      next:()=> {
-      this.camperPlaces.pop();
-      },
-      error: (err) =>{
-        console.log(err);
-      }
+        next: () => {
+          this.camperPlaces.pop();
+        },
+        error: (err) => {
+          console.log(err);
+        }
       }
     );
   }
@@ -140,21 +143,32 @@ export class CalendarComponent {
     }
 
   }
+  isDayReserved(camperPlace: CamperPlace, day: number): [boolean, string,string] {
 
+    const days: string[] = [];
+    let monthOfTheReservation1: string = "";
+    let monthOfTheReservation2:string = "";
 
+    camperPlace.reservations.forEach(r => {
 
-  isDayReserved(camperPlace: CamperPlace, day: number): boolean {
+      if (r.status === 'EXPIRED') {
+        return;
+      }
 
-    this.camperPlaces.forEach(camperPlace => {
-      camperPlace.reservations = camperPlace.reservations.map(reservation =>
-        new Reservation(
-          reservation.id,
-          new Date(reservation.checkin),
-          new Date(reservation.checkout),
-          camperPlace
-        ))
+      const startDate = moment(r.checkin);
+      const endDate = moment(r.checkout);
+      monthOfTheReservation1 = this.months.at(startDate.month()) || "";
+      monthOfTheReservation2 = this.months.at(endDate.month()) || "";
+
+      while (startDate.isSameOrBefore(endDate)) {
+
+        days.push(startDate.format('YYYY-MM-DD'));
+
+        startDate.add(1, 'day');
+      }
     })
-    const reservedDays = camperPlace.reservations.flatMap(reservation => reservation.daysBetweenCheckinAndCheckout())
-    return reservedDays.includes(day + 1);
+    const today = moment().date(day).format('YYYY-MM-DD')
+    return [days.includes(today),monthOfTheReservation1,monthOfTheReservation2]
+
   }
 }
