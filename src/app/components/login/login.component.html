@@ -9,11 +9,11 @@
 
       <mat-form-field>
         <mat-label>Email</mat-label>
-        <input matNativeControl type="email" id="loginEmail" name="loginEmail" [(ngModel)]="this.request.email">
+        <input matNativeControl type="email" id="loginEmail" name="loginEmail" [(ngModel)]="this.request.email"(keydown.enter)="passwordField.focus()" >
       </mat-form-field>
       <br>
       <mat-form-field>
-        <input matNativeControl type="password" id="password" name="password" [(ngModel)]="this.request.password">
+        <input matNativeControl type="password" id="password" name="password" #passwordField [(ngModel)]="this.request.password" (keydown.enter)="onSubmitLogin()">
 
       </mat-form-field>
       <br>

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, input, Output} from '@angular/core';
 import {MatFormField, MatHint} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
@@ -76,4 +76,5 @@ export class LoginComponent {
     this.active = 'register';
   }
 
+  protected readonly input = input;
 }

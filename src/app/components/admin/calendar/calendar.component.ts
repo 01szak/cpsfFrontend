@@ -1,14 +1,10 @@
-import {Component, input, InputSignal} from '@angular/core';
+import {Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule} from '@angular/common';
 
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
-import {Preform} from '../../../Preform';
-import {Reservation} from './Reservation';
 import {PopupService} from '../../../service/PopupService';
-import {ReservationService} from '../../../service/ReservationService';
-import {Guest} from './Guest';
 import moment from 'moment/moment';
 
 
@@ -143,7 +139,7 @@ export class CalendarComponent {
     }
 
   }
-  isDayReserved(camperPlace: CamperPlace, day: number): [boolean, string,string] {
+  isDayReserved(camperPlace: CamperPlace, day: number,month: number): [boolean, string,string] {
 
     const days: string[] = [];
     let monthOfTheReservation1: string = "";
@@ -156,10 +152,9 @@ export class CalendarComponent {
       }
 
       const startDate = moment(r.checkin);
-      const endDate = moment(r.checkout);
+      const endDate =  moment(r.checkout);
       monthOfTheReservation1 = this.months.at(startDate.month()) || "";
       monthOfTheReservation2 = this.months.at(endDate.month()) || "";
-
       while (startDate.isSameOrBefore(endDate)) {
 
         days.push(startDate.format('YYYY-MM-DD'));
@@ -167,8 +162,24 @@ export class CalendarComponent {
         startDate.add(1, 'day');
       }
     })
-    const today = moment().date(day).format('YYYY-MM-DD')
-    return [days.includes(today),monthOfTheReservation1,monthOfTheReservation2]
+    const date = moment().set({ date: day + 1, month: month }).format('YYYY-MM-DD');
+    return [days.includes(date),monthOfTheReservation1,monthOfTheReservation2]
 
+
+  }
+
+  countNewReservations():string {
+    let todaysReservations = 0;
+    const today = moment().date(new Date().getDate()).format('YYYY-MM-DD')
+
+    this.camperPlaces.forEach(cp => {
+      cp.reservations.forEach(r =>{
+          let checkin = moment().date(new Date(r.checkin).getDate()).format('YYYY-MM-DD')
+        if(today === checkin){
+          todaysReservations ++;
+        }
+      })
+    })
+    return todaysReservations.toString();
   }
 }

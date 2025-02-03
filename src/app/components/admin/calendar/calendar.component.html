@@ -1,6 +1,7 @@
+<h1>Today you have {{countNewReservations()}} reservations upcoming</h1>
 <div>
   <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
-    <option *ngFor="let month of months" [value]="month">
+    <option *ngFor="let month of months" [ngValue]="month">
       {{ month }}
     </option>
   </select>
@@ -17,8 +18,9 @@
       <th>{{ i + 1 }}</th>
       <td *ngFor="let day of daysInAMonth"
           [ngClass]="{'reserved':
-           isDayReserved(camperPlace, day).at(0) &&
-            ((selectedMonth === isDayReserved(camperPlace, day).at(1)) || selectedMonth === isDayReserved(camperPlace, day).at(2))}">
+           isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
+            (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
+            || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2))}">
       </td>
 
       <button (click)="delete(i + 1)">delete</button>
