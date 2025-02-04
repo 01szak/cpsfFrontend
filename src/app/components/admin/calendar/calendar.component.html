@@ -1,37 +1,44 @@
-<h1>Today you have {{countNewReservations()}} reservations upcoming</h1>
-<div>
-  <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
-    <option *ngFor="let month of months" [ngValue]="month">
-      {{ month }}
-    </option>
-  </select>
-</div>
-<div>
-  <table id="calendar">
+<h1>Today you have {{ countNewReservations() }} reservations upcoming</h1>
 
-    <th></th>
+<div>
 
-    <th *ngFor="let day of daysInAMonth; index as i">
-      {{ day + 1 }}
-    </th>
-    <tr *ngFor="let camperPlace of camperPlaces; index as i;">
-      <th>{{ i + 1 }}</th>
-      <td *ngFor="let day of daysInAMonth"
-          [ngClass]="{'reserved':
+
+  <div class="table">
+    <div class="monthSelector">
+      <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
+        <option *ngFor="let month of months" [ngValue]="month">
+          {{ month }}
+        </option>
+      </select>
+    </div>
+    <table #calendar>
+      <th></th>
+      <th *ngFor="let day of daysInAMonth; index as i">
+        {{ day + 1 }}
+      </th>
+      <tbody>
+      <tr *ngFor="let camperPlace of camperPlaces; index as i;">
+        <th>{{ i + 1 }}</th>
+        <td *ngFor="let day of daysInAMonth"
+            [ngClass]="{'reserved':
            isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
             (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
             || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2))}">
-      </td>
+        </td>
+        <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>
 
-      <button (click)="delete(i + 1)">delete</button>
-    </tr>
-  </table>
+      </tr>
+      </tbody>
+    </table>
+    <div class="addDiv">
+      <button class="button add" (click)="openPopup()"><i class="fa-solid fa-plus"></i></button>
+    </div>
+  </div>
 </div>
-<div>
-  <br>
+<br>
 
-  {{ camperPlaces.length }}
-  <button (click)="openPopup()">add</button>
+
+<div>
 
 
 </div>

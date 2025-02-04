@@ -1,3 +1,11 @@
+html{
+  overflow: hidden;
+  /*background-color: #a2d8ea;*/
+background-color: rgba(0, 0, 0, 0.88);
+  color: white;
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+}
+
+html, body { height: 100vh; }
+body { margin: 0;
+  font-family: Biome Light, "Helvetica Neue", sans-serif}

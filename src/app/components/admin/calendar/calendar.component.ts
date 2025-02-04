@@ -38,12 +38,13 @@ export class CalendarComponent {
   }
 
   delete(camperPlaceNumber: number): void {
-    this.camperPlaceService.deleteCamperPlace(camperPlaceNumber).subscribe({
+    this.camperPlaceService.deleteCamperPlace(camperPlaceNumber + 1).subscribe({
         next: () => {
-          this.camperPlaces.pop();
+          this.camperPlaces.slice(camperPlaceNumber,camperPlaceNumber + 1);
+          window.location.reload()
         },
         error: (err) => {
-          console.log(err);
+          console.log(camperPlaceNumber);
         }
       }
     );
