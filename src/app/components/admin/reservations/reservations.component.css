@@ -1,0 +1,55 @@
+.reservations {
+  position: relative;
+  height: 65vh;
+  max-width: 96vw;
+  /*padding: 40px;*/
+  margin: 30px;
+  background-color: rgba(162, 120, 246, 0.19);
+  border: solid rgba(162, 120, 246, 0.19) 1px;
+  border-radius: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+table {
+  margin-top: 10px;
+  background-color: unset;
+  padding: 0 0 0 10px;
+
+}
+
+td, th, tr {
+  color: white;
+  padding: 0;
+
+}
+th{
+  position: sticky;
+  top: 0
+}
+
+.filter {
+  border: solid 1px;
+  border-radius: 5px;
+  padding: 5px;
+  position: fixed;
+  margin-bottom: 2px;
+  left: 80vw
+}
+
+.reservations::-webkit-scrollbar{
+  background-color: unset;
+  width: 10px;
+}
+.reservations::-webkit-scrollbar-thumb{
+ background-color: black;
+  width: 10px;
+  border-radius: 10px;
+  border: solid black;
+}
+.reservations::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+background-color: unset;
+  border-radius: 5px;
+
+}

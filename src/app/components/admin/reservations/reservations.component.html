@@ -1,0 +1,53 @@
+<div class="reservations">
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <!-- Kolumna numeru -->
+    <ng-container matColumnDef="no">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by no"> No.</th>
+      <td mat-cell *matCellDef="let reservation; let i = index"> {{
+          i + 1
+        }}
+      </td>
+    </ng-container>
+
+    <!-- Kolumna Checkin -->
+    <ng-container matColumnDef="checkin">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by checkin"> Checkin</th>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkin }}</td>
+    </ng-container>
+
+    <!-- Kolumna Checkout -->
+    <ng-container matColumnDef="checkout">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by checkout"> Checkout</th>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkout }}</td>
+    </ng-container>
+
+    <!-- Kolumna Camper Place -->
+    <ng-container matColumnDef="camperPlace">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by camperPlace"> Camper Place
+      </th>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.camperPlace }}</td>
+    </ng-container>
+
+    <!-- Kolumna Guest -->
+    <ng-container matColumnDef="guest">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by guest"> Guest</th>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.guest }}</td>
+    </ng-container>
+
+    <!-- Kolumna Status -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> Status</th>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.status }}</td>
+    </ng-container>
+
+    <!-- Nagłówki wiersza -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <!-- Wiersze -->
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+</div>
+<div class="filter">
+  <label>Search: </label>
+  <input type="text" class="inputFilter"/>
+</div>
