@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-content>
+    <h1>New Reservation</h1>
+    <br>
+    <mat-form-field>
+      Checkin:
+      <input matNativeControl type="date" id="checkin" name="checkin" [(ngModel)]="this.reservation.checkin">
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      Checkout:
+      <input matNativeControl type="date" id="checkout" name="checkout" [(ngModel)]="this.reservation.checkout">
+    </mat-form-field>
+    <br>
+    Select Camper Place
+    <select [(ngModel)]="number" (change)="findCamperPlaceByNumber(number)" name="number">
+      <option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.number">
+        {{ camperPlace.number}}
+      </option>
+    </select>
+    <h2>New guest</h2>
+    <mat-form-field>
+      First Name:
+      <input matNativeControl type="text" id="firstname" name="firstName" [(ngModel)]="this.user.firstName">
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      Last Name:
+      <input matNativeControl type="text" id="lastName" name="lastName" [(ngModel)]="this.user.lastName">
+    </mat-form-field>
+    <mat-form-field>
+      Email:
+      <input matNativeControl type="email" id="email" name="email" [(ngModel)]="this.user.email">
+    </mat-form-field>
+  </mat-card-content>
+<button (click)="createReservation(reservation)">create</button>
+</mat-card>

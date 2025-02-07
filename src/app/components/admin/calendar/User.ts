@@ -1,14 +1,14 @@
 import {Reservation} from './Reservation';
 
-export interface Guest {
+export interface User {
   firstName:string;
   lastName: string;
   email: string;
   phoneNumber: string;
   reservations: Array<Reservation>;
-  carRegistration: string;
+  carRegistration?: string;
   country: string;
   city: string;
-  streetAddress: string;
+  streetAddress?: string;
 
 }

@@ -13,6 +13,8 @@ import {
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
+import {FormsModule} from '@angular/forms';
+import {PopupService} from '../../../service/PopupService';
 
 
 @Component({
@@ -31,7 +33,8 @@ import {MatSort, MatSortHeader} from '@angular/material/sort';
     MatRowDef,
     MatPaginatorModule,
     MatSortHeader,
-    MatSort
+    MatSort,
+    FormsModule
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
@@ -46,9 +49,8 @@ export class ReservationsComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
 
-  constructor(private reservationService: ReservationService) {
+  constructor(private reservationService: ReservationService,private popupService: PopupService) {
   }
-
   ngOnInit() {
     this.loadAllReservation();
 
@@ -57,48 +59,34 @@ export class ReservationsComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
   }
-
-
-  // sortData(sort: Sort) {
-  //   const data = [...this.allReservations];
-  //   if (!sort.active || sort.direction === '') {
-  //     this.sortedData = data;
-  //     return;
-  //   }
-  //   this.sortedData = data.sort((a, b) => {
-  //     const isAsc = sort.direction === 'asc'
-  //     switch (sort.active) {
-  //       case 'no':
-  //         return compare(this.allReservations.indexOf(a) || 0, this.allReservations.indexOf(b) || 0, isAsc);
-  //       case 'checkin':
-  //       case 'checkout':
-  //         return compare(new Date(a[sort.active]).getTime(), new Date(b[sort.active]).getTime(), isAsc);
-  //       case 'camperPlace':
-  //         return compare(a.camperPlace.number || 0, b.camperPlace.number || 0, isAsc);
-  //       case 'guest':
-  //         return compare(a.guest.lastName, b.guest.lastName, isAsc);
-  //       case 'status':
-  //         return compare(a.status, b.status, isAsc)
-  //       default:
-  //         return 0;
-  //     }
-  //   })
-  //
-  //   function compare(a: number | string, b: number | string, isAsc: boolean) {
-  //     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-  //   }
-  // }
+  openPopup(){
+    this.popupService.openReservationPopup();
+  }
 
 
   loadAllReservation() {
-
     this.reservationService.getAllReservations().subscribe({
       next: (data) => {
         this.allReservations = data;
         this.dataSource.data = data;
         console.log(data);
+        data.forEach((d) =>{
+          console.log(d.status)
+        })
       }
     })
+  }
+
+  applyFilter(value: string) {
+    if (!value) {
+      return this.allReservations;
+    }
+    let filterValue = value.toLowerCase() || "";
+
+    return this.allReservations.filter(reservation => {
+//TODO
+    })
+
   }
 }
 

@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PopupComponent } from '../components/admin/popup/popup.component';
+import { CamperPlacePopupComponent } from '../components/admin/popups/camperPlacePopup/camperPlacePopup.component';
+import {
+  ReservationPopupComponent
+} from '../components/admin/popups/reservationPopup/reservation-popup/reservation-popup/reservation-popup.component';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +11,12 @@ import { PopupComponent } from '../components/admin/popup/popup.component';
 export class PopupService {
   constructor(private dialog: MatDialog) {}
 
-  openPopup() {
-    this.dialog.open(PopupComponent);
+  openCamperPlacePopup() {
+    this.dialog.open(CamperPlacePopupComponent);
+  }
+
+  openReservationPopup() {
+    this.dialog.open(ReservationPopupComponent);
   }
   closePopup() {
     this.dialog.closeAll()
