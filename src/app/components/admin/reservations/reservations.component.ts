@@ -12,9 +12,10 @@ import {
   MatTable, MatTableDataSource,
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSort, MatSortHeader} from '@angular/material/sort';
+import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
+import {subscribeToWorkflow} from '@angular/cli/src/command-builder/utilities/schematic-workflow';
 
 
 @Component({
@@ -45,13 +46,50 @@ export class ReservationsComponent implements AfterViewInit {
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
   dataSource = new MatTableDataSource<Reservation>();
-
+  sortedData: Reservation[];
   @ViewChild(MatSort) sort!: MatSort;
 
-
-  constructor(private reservationService: ReservationService,private popupService: PopupService) {
+  constructor(private reservationService: ReservationService, private popupService: PopupService) {
+    this.sortedData = this.dataSource.data.slice();
   }
+
+  sortData(sort: Sort) {
+    const data = this.dataSource.data.slice();
+    if (!sort.active || sort.direction === "") {
+      this.sortedData = data;
+      return;
+    }
+    this.sortedData = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'checkin':
+          return compare(new Date(a.checkin).getTime(), new Date(b.checkin).getTime(), isAsc)
+        case 'checkout':
+          return compare(new Date(a.checkout).getTime(), new Date(b.checkout).getTime(), isAsc);
+        case 'guest':
+          return compare(a.userLastName.toLowerCase() ?? '', b.userLastName?.toLowerCase() ?? '', isAsc);
+        case 'camperPlace':
+          return compare(a.camperPlaceNumber ?? '', b.camperPlaceNumber ?? '', isAsc);
+        case 'status':
+          return compare(a.status ?? '', b.status ?? '', isAsc);
+        default:
+          return 0
+
+      }
+    })
+
+    function compare(a: number | string, b: number | string, isAsc: boolean) {
+      if (a === b) {
+        return 0;
+      }
+      return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    }
+  }
+
+
   ngOnInit() {
+    const data = this.dataSource.data.slice();
+
     this.loadAllReservation();
 
   }
@@ -59,7 +97,8 @@ export class ReservationsComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
   }
-  openPopup(){
+
+  openPopup() {
     this.popupService.openReservationPopup();
   }
 
@@ -69,8 +108,11 @@ export class ReservationsComponent implements AfterViewInit {
       next: (data) => {
         this.allReservations = data;
         this.dataSource.data = data;
-        console.log(data);
-        data.forEach((d) =>{
+
+        if (this.sort) {
+          this.sortData({active: 'checkin', direction: 'desc'})
+        }
+        data.forEach((d) => {
           console.log(d.status)
         })
       }
