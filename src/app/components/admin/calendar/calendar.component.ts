@@ -146,7 +146,7 @@ export class CalendarComponent {
 
     camperPlace.reservations?.forEach(r => {
       console.log(r);
-      if (r.status === 'EXPIRED') {
+      if (r.reservationStatus === 'EXPIRED') {
         return;
       }
 

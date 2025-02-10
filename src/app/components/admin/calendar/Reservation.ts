@@ -5,7 +5,7 @@ export interface Reservation{
   id: number;
   checkin: Date;
   checkout: Date;
-  status: string;
+  reservationStatus: string;
   camperPlaceNumber: number;
   userFirstName: string;
   userLastName: string;

@@ -9,8 +9,8 @@ import {User} from '../components/admin/calendar/User';
 export class ReservationService{
   api  = '/api/reservations/';
   constructor(private http: HttpClient) {}
-  getAllReservations(): Observable<Reservation[]>{
-    return this.http.get<Reservation[]>(this.api  + 'findAll');
+  getFilteredReservations(value: string): Observable<Reservation[]>{
+    return this.http.get<Reservation[]>(this.api  + 'getFilteredReservations/' +  value);
   }
 
   createReservation(reservation: {

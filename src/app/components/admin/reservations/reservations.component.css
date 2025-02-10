@@ -11,18 +11,18 @@
   overflow-x: hidden;
 }
 
+td, th, tr {
+  color: white;
+  padding: 0;
+}
+
+
 table {
-  margin-top: 10px;
+  margin-top: 0;
   padding: 0 0 0 10px;
   background-color:inherit;
 
 
-}
-
-
-td, th, tr {
-  color: white;
-  padding: 0;
 }
 
 tr {
@@ -30,8 +30,8 @@ tr {
 
 th {
   position: sticky;
-  top: 0;
-  padding-top: 30px;
+  top: 20px;
+
 }
 
 .filter {
@@ -66,7 +66,7 @@ th {
   top: 0;
   position: sticky;
   font-size: small;
-  z-index: 2;
+  background-color: rgb(44, 33, 66);
 
 }
 
@@ -81,3 +81,13 @@ th {
   color: darkgray;
   cursor: pointer;
 }
+.expired{
+  color: grey;
+}
+.active{
+  color: lightgreen;
+}
+.coming{
+  color: yellow;
+}
+

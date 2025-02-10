@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {ReservationService} from '../../../service/ReservationService';
 import {Reservation} from '../calendar/Reservation';
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {
   MatCell,
   MatCellDef,
@@ -13,15 +13,13 @@ import {
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
-import {FormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
-import {subscribeToWorkflow} from '@angular/cli/src/command-builder/utilities/schematic-workflow';
-
 
 @Component({
   selector: 'reservations',
   imports: [
-    NgForOf,
+    CommonModule,
     MatTable,
     MatHeaderCell,
     MatHeaderCellDef,
@@ -35,103 +33,52 @@ import {subscribeToWorkflow} from '@angular/cli/src/command-builder/utilities/sc
     MatPaginatorModule,
     MatSortHeader,
     MatSort,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
   standalone: true
 })
-export class ReservationsComponent implements AfterViewInit {
+export class ReservationsComponent implements OnInit{
 
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
-  dataSource = new MatTableDataSource<Reservation>();
-  sortedData: Reservation[];
-  @ViewChild(MatSort) sort!: MatSort;
+  searchValue=  'empty';
+  searchForm!: FormGroup;
 
-  constructor(private reservationService: ReservationService, private popupService: PopupService) {
-    this.sortedData = this.dataSource.data.slice();
+  constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder) {
+  this.searchForm = this.fb.nonNullable.group({
+    searchValue: '',
+  })
   }
 
-  sortData(sort: Sort) {
-    const data = this.dataSource.data.slice();
-    if (!sort.active || sort.direction === "") {
-      this.sortedData = data;
-      return;
-    }
-    this.sortedData = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'checkin':
-          return compare(new Date(a.checkin).getTime(), new Date(b.checkin).getTime(), isAsc)
-        case 'checkout':
-          return compare(new Date(a.checkout).getTime(), new Date(b.checkout).getTime(), isAsc);
-        case 'guest':
-          return compare(a.userLastName.toLowerCase() ?? '', b.userLastName?.toLowerCase() ?? '', isAsc);
-        case 'camperPlace':
-          return compare(a.camperPlaceNumber ?? '', b.camperPlaceNumber ?? '', isAsc);
-        case 'status':
-          return compare(a.status ?? '', b.status ?? '', isAsc);
-        default:
-          return 0
-
+  fetchData() {
+    this.reservationService.getFilteredReservations(this.searchValue).subscribe({
+      next:(reservations)=>{
+        this.allReservations = reservations;
       }
     })
-
-    function compare(a: number | string, b: number | string, isAsc: boolean) {
-      if (a === b) {
-        return 0;
-      }
-      return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-    }
   }
-
-
   ngOnInit() {
-    const data = this.dataSource.data.slice();
-
-    this.loadAllReservation();
-
+    this.fetchData();
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-  }
+onSearchSubmit(){
+    this.searchValue = this.searchForm.value.searchValue;
+    this.fetchData();
+
+}
 
   openPopup() {
     this.popupService.openReservationPopup();
   }
 
 
-  loadAllReservation() {
-    this.reservationService.getAllReservations().subscribe({
-      next: (data) => {
-        this.allReservations = data;
-        this.dataSource.data = data;
-
-        if (this.sort) {
-          this.sortData({active: 'checkin', direction: 'desc'})
-        }
-        data.forEach((d) => {
-          console.log(d.status)
-        })
-      }
-    })
-  }
-
-  applyFilter(value: string) {
-    if (!value) {
-      return this.allReservations;
-    }
-    let filterValue = value.toLowerCase() || "";
-
-    return this.allReservations.filter(reservation => {
-//TODO
-    })
+  checkStatus(reservation: Reservation) {
+    return reservation.reservationStatus.toLowerCase();
 
   }
+
 }
-
-
-
 

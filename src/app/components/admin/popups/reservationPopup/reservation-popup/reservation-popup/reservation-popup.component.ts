@@ -55,7 +55,7 @@ export class ReservationPopupComponent {
     id: 0,
     checkin: new Date(),
     checkout: new Date(),
-    status: '',
+    reservationStatus: '',
     camperPlaceNumber: 0,
     userEmail: '',
     userFirstName: '',
