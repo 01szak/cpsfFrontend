@@ -70,14 +70,17 @@ th {
 
 }
 
-.addButton {
+.headButton {
   background-color: unset;
   color: white;
   border: unset;
   font-size: larger;
+  margin-top: 2px;
+
 }
 
-.addButton:hover {
+
+.headButton:hover {
   color: darkgray;
   cursor: pointer;
 }

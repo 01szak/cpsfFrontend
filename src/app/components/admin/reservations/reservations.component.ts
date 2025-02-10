@@ -40,35 +40,39 @@ import {PopupService} from '../../../service/PopupService';
   styleUrl: './reservations.component.css',
   standalone: true
 })
-export class ReservationsComponent implements OnInit{
+export class ReservationsComponent implements OnInit {
 
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
-  searchValue=  'empty';
+  sortedReservations: Array<Reservation> = []
+  searchValue = 'empty';
   searchForm!: FormGroup;
+  isAsc: number = 0;
+
 
   constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder) {
-  this.searchForm = this.fb.nonNullable.group({
-    searchValue: '',
-  })
+    this.searchForm = this.fb.nonNullable.group({
+      searchValue: '',
+    })
   }
 
   fetchData() {
     this.reservationService.getFilteredReservations(this.searchValue).subscribe({
-      next:(reservations)=>{
+      next: (reservations) => {
         this.allReservations = reservations;
       }
     })
   }
+
   ngOnInit() {
     this.fetchData();
   }
 
-onSearchSubmit(){
+  onSearchSubmit() {
     this.searchValue = this.searchForm.value.searchValue;
     this.fetchData();
 
-}
+  }
 
   openPopup() {
     this.popupService.openReservationPopup();
@@ -80,5 +84,17 @@ onSearchSubmit(){
 
   }
 
+  sorTable(header: string) {
+    return this.reservationService.sortTable(header,this.isAsc).subscribe({
+      next: (reservation) => {
+        this.allReservations = reservation;
+        if (this.isAsc === 0) {
+          this.isAsc = 1;
+        }else{
+          this.isAsc = 0;
+        }
+      }
+    })
+  }
 }
 

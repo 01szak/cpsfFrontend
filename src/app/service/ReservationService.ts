@@ -27,4 +27,7 @@ export class ReservationService{
   }
 
 
+  sortTable(header: string,isAsc: number ) {
+return this.http.get<Reservation[]>(this.api + 'sortTable/' + header + "/" + isAsc);
+  }
 }
