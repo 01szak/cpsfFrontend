@@ -30,12 +30,10 @@ export class CalendarComponent {
   }
 
   openPopup() {
-    this.popupService.openPopup();
+    this.popupService.openCamperPlacePopup();
   }
 
-  closePopup() {
-    this.popupService.closePopup();
-  }
+
 
   delete(camperPlaceNumber: number): void {
     this.camperPlaceService.deleteCamperPlace(camperPlaceNumber + 1).subscribe({
@@ -58,7 +56,7 @@ export class CalendarComponent {
   loadCamperPlaces(): void {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
-        this.camperPlaces = data;
+        this.camperPlaces = data || [];
         console.log(data)
       },
       error: (error) => {
@@ -79,8 +77,7 @@ export class CalendarComponent {
   checkHowManyDaysInMonth(): number {
 
     function isLeapYear(): boolean {
-      let currentDate = new Date()
-      return currentDate.getFullYear() % 4 === 0;
+      return new Date().getFullYear() % 4 === 0;
     }
 
     let days: number = 0;
@@ -146,9 +143,10 @@ export class CalendarComponent {
     let monthOfTheReservation1: string = "";
     let monthOfTheReservation2:string = "";
 
-    camperPlace.reservations.forEach(r => {
 
-      if (r.status === 'EXPIRED') {
+    camperPlace.reservations?.forEach(r => {
+      console.log(r);
+      if (r.reservationStatus === 'EXPIRED') {
         return;
       }
 
@@ -170,11 +168,13 @@ export class CalendarComponent {
   }
 
   countNewReservations():string {
+    if (!this.camperPlaces) return '0';
     let todaysReservations = 0;
     const today = moment().date(new Date().getDate()).format('YYYY-MM-DD')
 
     this.camperPlaces.forEach(cp => {
-      cp.reservations.forEach(r =>{
+      cp.reservations?.forEach(r =>{
+        if (!r.checkin) return;
           let checkin = moment().date(new Date(r.checkin).getDate()).format('YYYY-MM-DD')
         if(today === checkin){
           todaysReservations ++;

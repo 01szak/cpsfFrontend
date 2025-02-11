@@ -6,14 +6,13 @@
       {{type}}
     </option>
   </select>
-<!--  <input type="text" [(ngModel)]="newCamperPlace.type" name="type">-->
   <br>
   <br>
   <label>price: </label>
   <input type="text"  [(ngModel)]="camperPlace.price" name="price">
-  <br>
-  <button mat-button type="button" (click)="addCamperPlace()" >submit</button>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="closePopup()">Close</button>
+  <button mat-button type="button" (click)="addCamperPlace()" >Submit</button>
+
 </div>

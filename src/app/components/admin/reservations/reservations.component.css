@@ -4,28 +4,34 @@
   max-width: 96vw;
   /*padding: 40px;*/
   margin: 30px;
-  background-color: rgba(162, 120, 246, 0.19);
+  background-color: rgb(44, 33, 66);
   border: solid rgba(162, 120, 246, 0.19) 1px;
   border-radius: 10px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
-table {
-  margin-top: 10px;
-  background-color: unset;
-  padding: 0 0 0 10px;
-
-}
-
 td, th, tr {
   color: white;
   padding: 0;
+}
+
+
+table {
+  margin-top: 0;
+  padding: 0 0 0 10px;
+  background-color:inherit;
+
 
 }
-th{
+
+tr {
+}
+
+th {
   position: sticky;
-  top: 0
+  top: 20px;
+
 }
 
 .filter {
@@ -37,19 +43,66 @@ th{
   left: 80vw
 }
 
-.reservations::-webkit-scrollbar{
+.reservations::-webkit-scrollbar {
   background-color: unset;
   width: 10px;
 }
-.reservations::-webkit-scrollbar-thumb{
- background-color: black;
+
+.reservations::-webkit-scrollbar-thumb {
+  background-color: black;
   width: 10px;
   border-radius: 10px;
   border: solid black;
 }
+
 .reservations::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px grey;
-background-color: unset;
+  background-color: unset;
   border-radius: 5px;
 
+}
+
+.buttonDiv {
+  top: 0;
+  position: sticky;
+  font-size: small;
+  background-color: rgb(44, 33, 66);
+
+}
+
+.headButton {
+  background-color: unset;
+  color: white;
+  border: unset;
+  font-size: larger;
+  margin-top: 2px;
+
+}
+.sortingButton{
+  background-color: unset;
+  color: white;
+  border: unset;
+}
+.sortingButton:hover{
+  color: lightgray;
+  cursor:pointer;
+}
+
+.headButton:hover {
+  color: darkgray;
+  cursor: pointer;
+}
+.expired{
+  color: grey;
+}
+.active{
+  color: lightgreen;
+}
+.coming{
+  color: yellow;
+}
+
+.row:hover{
+  cursor: pointer;
+  background-color: mediumpurple;
 }

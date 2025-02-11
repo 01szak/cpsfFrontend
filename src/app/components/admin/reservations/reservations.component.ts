@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {ReservationService} from '../../../service/ReservationService';
 import {Reservation} from '../calendar/Reservation';
-import {NgForOf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {
   MatCell,
   MatCellDef,
@@ -9,16 +9,19 @@ import {
   MatHeaderCell,
   MatHeaderCellDef, MatHeaderRow,
   MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable, MatTableDataSource,
+  MatTable
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSort, MatSortHeader} from '@angular/material/sort';
+import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PopupService} from '../../../service/PopupService';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 @Component({
   selector: 'reservations',
   imports: [
-    NgForOf,
+    CommonModule,
     MatTable,
     MatHeaderCell,
     MatHeaderCellDef,
@@ -31,77 +34,75 @@ import {MatSort, MatSortHeader} from '@angular/material/sort';
     MatRowDef,
     MatPaginatorModule,
     MatSortHeader,
-    MatSort
+    MatSort,
+    FormsModule,
+    ReactiveFormsModule,
+    MatNativeDateModule
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
   standalone: true
 })
-export class ReservationsComponent implements AfterViewInit {
+export class ReservationsComponent implements OnInit {
 
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
-  dataSource = new MatTableDataSource<Reservation>();
+  sortedReservations: Array<Reservation> = []
+  searchValue = 'empty';
+  searchForm!: FormGroup;
+  isAsc: number = 0;
 
-  @ViewChild(MatSort) sort!: MatSort;
 
-
-  constructor(private reservationService: ReservationService) {
+  constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder) {
+    this.searchForm = this.fb.nonNullable.group({
+      searchValue: '',
+    })
   }
 
-  ngOnInit() {
-    this.loadAllReservation();
-
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-  }
-
-
-  // sortData(sort: Sort) {
-  //   const data = [...this.allReservations];
-  //   if (!sort.active || sort.direction === '') {
-  //     this.sortedData = data;
-  //     return;
-  //   }
-  //   this.sortedData = data.sort((a, b) => {
-  //     const isAsc = sort.direction === 'asc'
-  //     switch (sort.active) {
-  //       case 'no':
-  //         return compare(this.allReservations.indexOf(a) || 0, this.allReservations.indexOf(b) || 0, isAsc);
-  //       case 'checkin':
-  //       case 'checkout':
-  //         return compare(new Date(a[sort.active]).getTime(), new Date(b[sort.active]).getTime(), isAsc);
-  //       case 'camperPlace':
-  //         return compare(a.camperPlace.number || 0, b.camperPlace.number || 0, isAsc);
-  //       case 'guest':
-  //         return compare(a.guest.lastName, b.guest.lastName, isAsc);
-  //       case 'status':
-  //         return compare(a.status, b.status, isAsc)
-  //       default:
-  //         return 0;
-  //     }
-  //   })
-  //
-  //   function compare(a: number | string, b: number | string, isAsc: boolean) {
-  //     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-  //   }
-  // }
-
-
-  loadAllReservation() {
-
-    this.reservationService.getAllReservations().subscribe({
-      next: (data) => {
-        this.allReservations = data;
-        this.dataSource.data = data;
-        console.log(data);
+  fetchData() {
+    this.reservationService.getFilteredReservations(this.searchValue).subscribe({
+      next: (reservations) => {
+        this.allReservations = reservations;
       }
     })
   }
+
+  ngOnInit() {
+    this.fetchData();
+  }
+
+  onSearchSubmit() {
+    this.searchValue = this.searchForm.value.searchValue;
+    this.fetchData();
+
+  }
+
+  openCreatePopup() {
+    this.popupService.openCreateReservationPopup();
+  }
+
+  openUpdatePopup(reservation: Reservation) {
+    this.popupService.openUpdateReservationPopup(reservation);
+  }
+
+  checkStatus(reservation: Reservation) {
+    return reservation.reservationStatus.toLowerCase();
+
+  }
+
+  sorTable(header: string) {
+    return this.reservationService.sortTable(header,this.isAsc).subscribe({
+      next: (reservation) => {
+        this.allReservations = reservation;
+        if (this.isAsc === 0) {
+          this.isAsc = 1;
+        }else{
+          this.isAsc = 0;
+        }
+      }
+    })
+  }
+
+  protected readonly console = console;
 }
-
-
-
 

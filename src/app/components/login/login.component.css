@@ -15,7 +15,7 @@ background: rgba(222, 224, 234, 0.2);
   margin-top: 100px;
 }
 
-.bottomButtons{
+.bottomButtonsNoBs{
   position: absolute; /* Ustawia pozycję relatywnie do karty */
   bottom: 2px; /* Odstęp od dolnej krawędzi karty */
   right: 16px; /* Odstęp od prawej krawędzi karty */
