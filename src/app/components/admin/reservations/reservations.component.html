@@ -1,7 +1,8 @@
 <div class="reservations">
   <div class="buttonDiv">
-    <button (click)="openPopup()" class="headButton"><i class="fa-solid fa-plus"></i></button>
-    <button (click)="fetchData()" class="headButton filterButton"><i class="fa-solid fa-filter-circle-xmark"></i></button>
+    <button (click)="openCreatePopup()" class="headButton"><i class="fa-solid fa-plus"></i></button>
+    <button (click)="fetchData()" class="headButton filterButton"><i class="fa-solid fa-filter-circle-xmark"></i>
+    </button>
 
   </div>
   <table mat-table [dataSource]="allReservations">
@@ -18,15 +19,15 @@
     <!-- Kolumna Checkin -->
     <ng-container matColumnDef="checkin">
       <th mat-header-cell *matHeaderCellDef>
-      <button (click)="sorTable('checkin')">Checkin</button>
+        <button class="sortingButton " (click)="sorTable('checkin')">Checkin</button>
       </th>
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkin }}</td>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkin}}</td>
     </ng-container>
 
     <!-- Kolumna Checkout -->
     <ng-container matColumnDef="checkout">
       <th mat-header-cell *matHeaderCellDef>
-        <button (click)="sorTable('checkout')">Checkout</button>
+        <button class="sortingButton" (click)="sorTable('checkout')">Checkout</button>
       </th>
       <td mat-cell *matCellDef="let reservation"> {{ reservation.checkout }}</td>
     </ng-container>
@@ -34,7 +35,7 @@
     <!-- Kolumna Camper Place -->
     <ng-container matColumnDef="camperPlace">
       <th mat-header-cell *matHeaderCellDef>
-        <button (click)="sorTable('number')">Camper Place</button>
+        <button class="sortingButton" (click)="sorTable('number')">Camper Place</button>
       </th>
       <td mat-cell *matCellDef="let reservation"> {{ reservation.camperPlaceNumber }}</td>
     </ng-container>
@@ -42,7 +43,7 @@
     <!-- Kolumna User -->
     <ng-container matColumnDef="guest">
       <th mat-header-cell *matHeaderCellDef>
-        <button (click)="sorTable('guest')">Guest</button>
+        <button class="sortingButton" (click)="sorTable('guest')">Guest</button>
       </th>
       <td mat-cell *matCellDef="let reservation"> {{ reservation.userFirstName + " " + reservation.userLastName }}</td>
     </ng-container>
@@ -50,7 +51,7 @@
     <!-- Kolumna Status -->
     <ng-container matColumnDef="status">
       <th mat-header-cell *matHeaderCellDef>
-        <button (click)="sorTable('status')">Status </button>
+        Status
       </th>
       <td mat-cell *matCellDef="let reservation"
           [ngClass]="{'expired': checkStatus(reservation) === 'expired','active': checkStatus(reservation) === 'active', 'coming': checkStatus(reservation) === 'coming' }"> {{ reservation.reservationStatus }}
@@ -61,8 +62,11 @@
     <!-- Nagłówki wiersza -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <!-- Wiersze -->
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
+    <tr mat-row
+        (click)="openUpdatePopup(row)"
+        class="row"
+        *matRowDef="let row; columns: displayedColumns;">
+    </tr>
   </table>
 
 </div>

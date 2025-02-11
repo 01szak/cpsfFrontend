@@ -9,12 +9,14 @@ import {
   MatHeaderCell,
   MatHeaderCellDef, MatHeaderRow,
   MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable, MatTableDataSource,
+  MatTable
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
+import { MatNativeDateModule } from '@angular/material/core';
+
 
 @Component({
   selector: 'reservations',
@@ -35,6 +37,7 @@ import {PopupService} from '../../../service/PopupService';
     MatSort,
     FormsModule,
     ReactiveFormsModule,
+    MatNativeDateModule
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
@@ -74,10 +77,13 @@ export class ReservationsComponent implements OnInit {
 
   }
 
-  openPopup() {
-    this.popupService.openReservationPopup();
+  openCreatePopup() {
+    this.popupService.openCreateReservationPopup();
   }
 
+  openUpdatePopup(reservation: Reservation) {
+    this.popupService.openUpdateReservationPopup(reservation);
+  }
 
   checkStatus(reservation: Reservation) {
     return reservation.reservationStatus.toLowerCase();
@@ -96,5 +102,7 @@ export class ReservationsComponent implements OnInit {
       }
     })
   }
+
+  protected readonly console = console;
 }
 

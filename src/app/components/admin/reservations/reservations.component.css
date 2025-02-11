@@ -78,7 +78,15 @@ th {
   margin-top: 2px;
 
 }
-
+.sortingButton{
+  background-color: unset;
+  color: white;
+  border: unset;
+}
+.sortingButton:hover{
+  color: lightgray;
+  cursor:pointer;
+}
 
 .headButton:hover {
   color: darkgray;
@@ -94,3 +102,7 @@ th {
   color: yellow;
 }
 
+.row:hover{
+  cursor: pointer;
+  background-color: mediumpurple;
+}

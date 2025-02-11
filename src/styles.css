@@ -9,3 +9,12 @@ background-color: rgba(0, 0, 0, 0.88);
 html, body { height: 100vh; }
 body { margin: 0;
   font-family: Biome Light, "Helvetica Neue", sans-serif}
+
+mat-card-content{
+  color: black;
+}
+mat-form-field{
+  padding: 0 5px 0 5px;
+  margin-bottom: 15px;
+  height: 50px;
+}

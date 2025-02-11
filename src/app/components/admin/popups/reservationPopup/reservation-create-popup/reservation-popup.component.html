@@ -1,0 +1,61 @@
+<mat-card>
+  <mat-card-content>
+    <h1>New Reservation</h1>
+    <br>
+    <mat-form-field appearance="outline">
+      <mat-label>Checkin</mat-label>
+      <input type="date" matInput [(ngModel)]="reservation.checkin">
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="outline">
+      <mat-label>Checkout</mat-label>
+      <input type="date" matInput [(ngModel)]="reservation.checkout">
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="outline">
+      <mat-label>
+        Select Camper Place
+      </mat-label>
+      <mat-select [(ngModel)]="number" (ngModelChange)="findCamperPlaceByNumber(number)" name="number">
+        <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.number">
+          {{camperPlace.number}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
+      <mat-label>Select a Guest</mat-label>
+      <input type="text" matInput [matAutocomplete]="auto">
+      <mat-autocomplete #auto=matAutocomplete>
+        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
+        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
+        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
+        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-checkbox #newGuest>New Guest</mat-checkbox>
+    <div *ngIf="newGuest.checked " aria-hidden="true">
+      <h3>New guest</h3>
+      <mat-form-field appearance="outline">
+        <mat-label>First Name:</mat-label>
+        <input matInput type="text" id="firstname" name="firstName" [(ngModel)]="this.user.firstName">
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name:</mat-label>
+        <input matInput type="text" id="lastName" name="lastName" [(ngModel)]="this.user.lastName">
+      </mat-form-field>
+      <br>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email:</mat-label>
+        <input matInput type="email" id="email" name="email" [(ngModel)]="this.user.email">
+      </mat-form-field>
+    </div>
+    <br>
+    <button class="cancelButton" mat-button (click)="closePopup()">cancel</button>
+    <button mat-button (click)="createReservation(reservation)">submit</button>
+
+  </mat-card-content>
+
+</mat-card>
