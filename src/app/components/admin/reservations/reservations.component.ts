@@ -16,6 +16,7 @@ import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
 import { MatNativeDateModule } from '@angular/material/core';
+import {MatCard} from '@angular/material/card';
 
 
 @Component({
@@ -37,7 +38,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatSort,
     FormsModule,
     ReactiveFormsModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatCard
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',

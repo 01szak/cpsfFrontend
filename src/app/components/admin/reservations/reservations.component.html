@@ -1,4 +1,4 @@
-<div class="reservations">
+<mat-card class="reservations">
   <div class="buttonDiv">
     <button (click)="openCreatePopup()" class="headButton"><i class="fa-solid fa-plus"></i></button>
     <button (click)="fetchData()" class="headButton filterButton"><i class="fa-solid fa-filter-circle-xmark"></i>
@@ -69,7 +69,7 @@
     </tr>
   </table>
 
-</div>
+</mat-card>
 <div class="filter">
 
   <form [formGroup]="searchForm" class="searchBar" (keydown)="onSearchSubmit()">
