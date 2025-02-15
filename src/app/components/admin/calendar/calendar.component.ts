@@ -6,6 +6,8 @@ import {CommonModule} from '@angular/common';
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {PopupService} from '../../../service/PopupService';
 import moment from 'moment/moment';
+import {MatCard} from '@angular/material/card';
+import {MatTooltip} from '@angular/material/tooltip';
 
 
 @Component({
@@ -14,6 +16,8 @@ import moment from 'moment/moment';
     ReactiveFormsModule,
     CommonModule,
     FormsModule,
+    MatCard,
+    MatTooltip,
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
@@ -25,6 +29,7 @@ export class CalendarComponent {
   camperPlaces: Array<CamperPlace> = [];
   currentMonth: string = this.months[new Date().getMonth()];
   selectedMonth: string = this.currentMonth;
+  today: number = new Date().getDate();
 
   constructor(private camperPlaceService: CamperPlaceService, private popupService: PopupService) {
   }
@@ -183,4 +188,6 @@ export class CalendarComponent {
     })
     return todaysReservations.toString();
   }
+
+  protected readonly Date = Date;
 }

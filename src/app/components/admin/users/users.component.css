@@ -1,0 +1,101 @@
+.users {
+  position: relative;
+  height: 65vh;
+  max-width: 96vw;
+  /*padding: 40px;*/
+  margin: 30px;
+  background-color: rgb(44, 33, 66);
+  border: solid rgba(162, 120, 246, 0.19) 1px;
+  border-radius: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+td, th, tr {
+  color: white;
+  padding: 0;
+}
+
+
+table {
+  margin-top: 0;
+  padding: 0 0 0 10px;
+  background-color:inherit;
+
+
+}
+
+
+th {
+  position: sticky;
+  top: 0;
+
+}
+
+.filter {
+  border: solid 1px;
+  border-radius: 5px;
+  padding: 5px;
+  position: fixed;
+  margin-bottom: 2px;
+  left: 80vw
+}
+
+.users::-webkit-scrollbar {
+  background-color: unset;
+  width: 10px;
+}
+
+.users::-webkit-scrollbar-thumb {
+  background-color: black;
+  width: 5px;
+  border-radius: 10px;
+  border: solid black;
+}
+
+
+
+/*.buttonDiv {*/
+/*  top: 0;*/
+/*  position: sticky;*/
+/*  font-size: small;*/
+/*  background-color: rgb(44, 33, 66);*/
+
+/*}*/
+
+/*.headButton {*/
+/*  background-color: unset;*/
+/*  color: white;*/
+/*  border: unset;*/
+/*  font-size: larger;*/
+/*  margin-top: 2px;*/
+
+/*}*/
+/*.sortingButton{*/
+/*  background-color: unset;*/
+/*  color: white;*/
+/*  border: unset;*/
+/*}*/
+/*.sortingButton:hover{*/
+/*  color: lightgray;*/
+/*  cursor:pointer;*/
+/*}*/
+
+/*.headButton:hover {*/
+/*  color: darkgray;*/
+/*  cursor: pointer;*/
+/*}*/
+/*.expired{*/
+/*  color: grey;*/
+/*}*/
+/*.active{*/
+/*  color: lightgreen;*/
+/*}*/
+/*.coming{*/
+/*  color: yellow;*/
+/*}*/
+
+.row:hover{
+  cursor: pointer;
+  background-color: mediumpurple;
+}

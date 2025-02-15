@@ -87,6 +87,7 @@ export class ReservationPopupComponent {
   };
 
   user: User = {
+    id: 0,
     firstName:  '',
     lastName: '',
     email: '',
@@ -95,7 +96,7 @@ export class ReservationPopupComponent {
     carRegistration: '',
     country: '',
     city: '',
-    streetAddress: '',
+    streetAddress: ''
   };
   ngOnInit() {
     this.loadCamperPlace()

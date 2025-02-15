@@ -1,26 +1,27 @@
-
 <mat-card>
   <mat-card-content>
-
-      <mat-card-header>Login</mat-card-header>
-      <br>
-    <mat-hint style="color: red; font-size: small" >{{errorMessage}}</mat-hint>
+    <h2>Login</h2>
+    <br>
+    <mat-hint style="color: red; font-size: small">{{ errorMessage }}</mat-hint>
     <br>
 
-      <mat-form-field>
-        <mat-label>Email</mat-label>
-        <input matNativeControl type="email" id="loginEmail" name="loginEmail" [(ngModel)]="this.request.email" (keydown.enter)="passwordField.focus()" >
-      </mat-form-field>
-      <br>
-      <mat-form-field>
-        <input matNativeControl type="password" id="password" name="password" #passwordField [(ngModel)]="this.request.password" (keydown.enter)="onSubmitLogin()">
+    <mat-form-field class="writtenText loginInput" appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" id="loginEmail" name="loginEmail" [(ngModel)]="this.request.email"
+             (keydown.enter)="passwordField.focus()">
+    </mat-form-field>
+    <br>
+    <mat-form-field class="writtenText loginInput"  appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" id="password" name="password" #passwordField
+             [(ngModel)]="this.request.password" (keydown.enter)="onSubmitLogin()">
 
-      </mat-form-field>
-      <br>
-      <div class="bottomButtonsNoBs">
-        <a mat-button [routerLink]="'/register'">register</a>
-        <button mat-flat-button type="button" (click)="onSubmitLogin()" >submit</button>
-      </div>
+    </mat-form-field>
+    <br>
+    <div class="bottomButtons">
+      <a mat-button [routerLink]="'/register'">register</a>
+      <button mat-flat-button type="button" (click)="onSubmitLogin()">submit</button>
+    </div>
 
   </mat-card-content>
 </mat-card>

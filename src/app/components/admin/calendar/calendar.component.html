@@ -1,9 +1,6 @@
-<h1>Today you have {{ countNewReservations() }} reservations upcoming</h1>
+<h2>Today you have {{ countNewReservations() }} reservations upcoming</h2>
 
-<div>
-
-
-  <div class="table">
+<mat-card>
     <div class="monthSelector">
       <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
         <option *ngFor="let month of months" [ngValue]="month">
@@ -13,13 +10,13 @@
     </div>
     <table #calendar>
       <th></th>
-      <th *ngFor="let day of daysInAMonth; index as i">
+      <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
         {{ day + 1 }}
       </th>
       <tbody>
       <tr *ngFor="let camperPlace of camperPlaces; index as i;">
         <th>{{ i + 1 }}</th>
-        <td *ngFor="let day of daysInAMonth"
+        <td *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
             [ngClass]="{'reserved':
            isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
             (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
@@ -33,8 +30,7 @@
     <div class="addDiv">
       <button class="button add" (click)="openPopup()"><i class="fa-solid fa-plus"></i></button>
     </div>
-  </div>
-</div>
+</mat-card>
 <br>
 
 

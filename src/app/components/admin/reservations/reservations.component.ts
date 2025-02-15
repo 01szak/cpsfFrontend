@@ -16,6 +16,7 @@ import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
 import { MatNativeDateModule } from '@angular/material/core';
+import {MatCard} from '@angular/material/card';
 
 
 @Component({
@@ -37,7 +38,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatSort,
     FormsModule,
     ReactiveFormsModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatCard
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
@@ -48,7 +50,7 @@ export class ReservationsComponent implements OnInit {
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
   sortedReservations: Array<Reservation> = []
-  searchValue = 'empty';
+  searchValue = '';
   searchForm!: FormGroup;
   isAsc: number = 0;
 
@@ -103,6 +105,5 @@ export class ReservationsComponent implements OnInit {
     })
   }
 
-  protected readonly console = console;
 }
 

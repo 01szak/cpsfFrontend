@@ -13,7 +13,11 @@ export class ReservationService {
   }
 
   getFilteredReservations(value: string): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(this.api + 'getFilteredReservations/' + value);
+    if (value === '') {
+      return this.http.get<Reservation[]>(this.api + 'getFilteredReservations');
+    } else {
+      return this.http.get<Reservation[]>(this.api + 'getFilteredReservations/' + value);
+    }
   }
 
   createReservation(reservation: {
