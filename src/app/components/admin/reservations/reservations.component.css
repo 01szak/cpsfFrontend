@@ -55,12 +55,6 @@ th {
   border: solid black;
 }
 
-.reservations::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
-  background-color: unset;
-  border-radius: 5px;
-
-}
 
 .buttonDiv {
   top: 0;

@@ -50,7 +50,7 @@ export class ReservationsComponent implements OnInit {
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
   allReservations: Array<Reservation> = [];
   sortedReservations: Array<Reservation> = []
-  searchValue = 'empty';
+  searchValue = '';
   searchForm!: FormGroup;
   isAsc: number = 0;
 
@@ -105,6 +105,5 @@ export class ReservationsComponent implements OnInit {
     })
   }
 
-  protected readonly console = console;
 }
 

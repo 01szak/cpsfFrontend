@@ -8,6 +8,10 @@ import {
   ReservationUpdatePopupComponent
 } from '../components/admin/popups/reservationPopup/reservation-update-popup/reservation-update-popup.component';
 import {Reservation} from '../components/admin/calendar/Reservation';
+import {User} from '../components/admin/calendar/User';
+import {
+  UserUpdatePopupComponent
+} from '../components/admin/popups/userPopup/user-update-popup/user-update-popup.component';
 
 @Injectable({
   providedIn: 'root',
@@ -30,5 +34,12 @@ export class PopupService {
     this.dialog.open(ReservationUpdatePopupComponent,{
       data: reservation
     })
+  }
+
+  openUpdateUserPopup(user: User) {
+    this.dialog.open(UserUpdatePopupComponent,{
+      data: user
+    })
+
   }
 }

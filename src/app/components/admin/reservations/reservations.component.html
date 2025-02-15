@@ -72,7 +72,7 @@
 </mat-card>
 <div class="filter">
 
-  <form [formGroup]="searchForm" class="searchBar" (keydown)="onSearchSubmit()">
+  <form [formGroup]="searchForm" class="searchBar" (keyup)="onSearchSubmit()">
     <input type="text" placeholder="Search..." formControlName="searchValue" class="searchBarInput"/>
   </form>
 
