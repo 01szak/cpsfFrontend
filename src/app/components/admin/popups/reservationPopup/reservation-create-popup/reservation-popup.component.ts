@@ -1,11 +1,11 @@
-import {Component} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Component, Inject} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAnchor, MatButton} from '@angular/material/button';
-import {MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {NgForOf, NgIf} from '@angular/common';
 import {PopupService} from '../../../../../service/PopupService';
 import {ReservationService} from '../../../../../service/ReservationService';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule, MatOption} from '@angular/material/core';
 import {User} from '../../../calendar/User';
 import {CamperPlace} from '../../../calendar/CamperPlace';
@@ -20,6 +20,8 @@ import {MatRadioButton} from '@angular/material/radio';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reservation-update-popup.component';
+import {find, map, Observable, startWith} from 'rxjs';
+import {UserService} from '../../../../../service/UserService';
 
 @Component({
   selector: 'app-reservation-popup',
@@ -61,34 +63,38 @@ import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reser
 export class ReservationPopupComponent {
   camperPlaces: Array<CamperPlace> = [];
   checkinControl = new FormControl;
-
-  constructor(private camperPlaceService: CamperPlaceService, private dialog: MatDialog, private popupService: PopupService, private reservationService: ReservationService) {
+  checkin!: string;
+  number!: number;
+  allUsers!: User[];
+  searchValue = '';
+  searchForm = new FormControl('') ;
+  filteredOptions!: Observable<User[]>;
+  constructor(private camperPlaceService: CamperPlaceService, private dialog: MatDialog, private popupService: PopupService, private reservationService: ReservationService,
+              @Inject(MAT_DIALOG_DATA) public data: { camperPlaceNumber: number; checkinDate: Date }, private userService: UserService) {
   }
 
 
-
   camperPlace: CamperPlace = {
+    reservations: [],
     number: 0,
     price: '',
-    reservations: [],
     type: ''
-
-  };
+  }
   reservation: Reservation = {
-    id: 0,
-    checkin: new Date(),
-    checkout: new Date(),
-    reservationStatus: '',
     camperPlaceNumber: 0,
+    checkin: new Date(this.checkin) ?? new Date(),
+    userLastName: '',
     userEmail: '',
+    id: 0,
     userFirstName: '',
-    userLastName: ''
+    checkout: new Date(),
+    reservationStatus: ''
+  }
 
-  };
 
   user: User = {
     id: 0,
-    firstName:  '',
+    firstName: '',
     lastName: '',
     email: '',
     phoneNumber: '',
@@ -98,10 +104,32 @@ export class ReservationPopupComponent {
     city: '',
     streetAddress: ''
   };
+
   ngOnInit() {
     this.loadCamperPlace()
+    this.checkin = new Date(this.data.checkinDate).toISOString().split('T')[0];
+    this.number = this.data.camperPlaceNumber;
+    if(this.number !== 0){
+      this.findCamperPlaceByNumber(this.number);
+    }
+    this.getUsers();
+    this.filteredOptions = this.searchForm.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
   }
+  private _filter(value: string): User[] {
+    const filterValue = value.toLowerCase();
 
+    return this.allUsers.filter(user =>user.lastName.toLowerCase().includes(filterValue));
+  }
+  getUsers(){
+    this.userService.getAllUsers().subscribe({
+      next:(u) =>{
+        this.allUsers = u;
+      }
+    })
+  }
   loadCamperPlace() {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (cp) => {
@@ -115,39 +143,45 @@ export class ReservationPopupComponent {
     this.dialog.closeAll();
   }
 
-  createReservation(reservation: Reservation) {
+  createReservation() {
     const reservationRequest = {
-      checkin: new Date(this.reservation.checkin).toISOString().split('T')[0], // YYYY-MM-DD
-      checkout: new Date(this.reservation.checkout).toISOString().split('T')[0],
-      camperPlace: this.camperPlace,
+      checkin: new Date(this.checkin)
+        .toISOString()
+        .split('T')[0], // YYYY-MM-DD
+      checkout: new Date(this.reservation.checkout)
+        .toISOString()
+        .split('T')[0],
+      camperPlace: this.findCamperPlaceByNumber(this.number),
       user: this.user,
-    }
+    };
+
     this.reservationService.createReservation(reservationRequest).subscribe({
-      next:()=>{
+      next: () => {
         this.closePopup();
         window.location.reload();
       },
-      error:(err)=>{
+      error: (err) => {
         console.log(err);
         console.log(reservationRequest)
         this.closePopup();
 
       }
     });
-}
+  }
 
-  number: number = 0;
 
   findCamperPlaceByNumber(number: number): CamperPlace {
-    this.camperPlaceService.findCamperPlaceByNumber(number).subscribe({
-      next: (cp) => {
+    if (number !== 0) {
+      this.camperPlaceService.findCamperPlaceByNumber(number).subscribe({
+        next: (cp) => {
           this.camperPlace = cp;
           console.log(cp)
-      },error: (err)=>{
-        console.log(err)
-      }
+        }, error: (err) => {
+          console.log(err)
+        }
 
-    });
+      });
+    }
     return this.camperPlace;
   }
 }

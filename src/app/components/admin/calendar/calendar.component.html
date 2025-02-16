@@ -10,17 +10,25 @@
     </div>
     <table #calendar>
       <th></th>
-      <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
+      <th  *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
         {{ day + 1 }}
+        <br>
+        <p class="weekdays" >   ({{ checkWhatWeekDayItIs(selectedMonth, day + 1) }})</p>
       </th>
       <tbody>
       <tr *ngFor="let camperPlace of camperPlaces; index as i;">
         <th>{{ i + 1 }}</th>
-        <td *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
-            [ngClass]="{'reserved':
-           isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
-            (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
-            || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2))}">
+        <td (click)="openCreateReservationPopupFromCalendar(
+         moment().set({ date: day + 1, month: months.indexOf(selectedMonth) }).toDate(), i + 1)"
+            *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
+            [ngClass]="{
+            'reserved':
+                   isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
+                    (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
+                    || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2)),
+            'weekend':
+                    (checkWhatWeekDayItIs(selectedMonth,day + 1) === this.weekdays.get(0))
+                    || ( checkWhatWeekDayItIs(selectedMonth,day + 1) === this.weekdays.get(6))} ">
         </td>
         <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>
 

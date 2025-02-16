@@ -40,7 +40,7 @@ updatedReservation!: Reservation;
 
   ngOnInit() {
     this.updatedReservation = {
-      camperPlaceNumber: 0,
+      camperPlaceNumber: this.reservation.camperPlaceNumber,
       checkin: this.reservation.checkin,
       checkout: this.reservation.checkout,
       id: 0,
@@ -70,7 +70,7 @@ updatedReservation!: Reservation;
 
   }
 
-  number: number = 0;
+  number: number = this.reservation.camperPlaceNumber?? 0;
 
   findCamperPlaceByNumber(number: number): CamperPlace {
 

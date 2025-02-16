@@ -14,6 +14,7 @@ mat-card{
   border-radius: 10px;
   margin-left: 400px;
   border: solid black;
+  border-collapse: collapse;
 }
 
 table {
@@ -39,7 +40,7 @@ td {
   border-radius: 1px;
   width: auto;
   height: auto;
-  padding: 10px 15px;
+  padding: 0;
   background-color: palegreen;
   cursor: pointer;
   border: solid lightgreen 1px;
@@ -101,4 +102,16 @@ select{
 }
 option{
   background-color: rgba(0, 0, 0, 0.2);
+}
+.weekdays{
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+.weekend{
+  background-color: springgreen;
+  border: solid springgreen;
+}
+.weekend:hover{
+  background-color: lime;
+
 }
