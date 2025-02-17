@@ -43,7 +43,7 @@ td {
   padding: 0;
   background-color: palegreen;
   cursor: pointer;
-  border: solid lightgreen 1px;
+  border: solid black 1px !important;
 }
 
 td:hover {
@@ -52,17 +52,13 @@ td:hover {
 
 }
 
-td.reserved {
-  background-color: orangered;
-border: solid orangered 1px;
+.reserved {
+  background-color: orangered !important;
 }
 
-td.reserved:hover {
-  background-color: red;
+.reserved:hover {
+  background-color: red !important;
   border: solid red 1px;
-
-
-  visibility: visible;
 }
 
 .button {
@@ -115,3 +111,28 @@ option{
   background-color: lime;
 
 }
+.coming{
+  background-color: orange !important; ;
+border: solid orange ;
+}
+.coming:hover{
+  background-color:  darkorange!important;
+  border: solid darkorange;
+}
+ .checkout{
+   background: linear-gradient(to right, orangered 45%, black 10%, lightgreen 55%) ;
+ }
+ .checkin{
+   background: linear-gradient(to right, lightgreen 45%, black 10%, orangered 55%) !important;
+
+ }
+ .checkin.checkout.coming.reserved{
+   background: linear-gradient(to right,orangered 45%, black 10%, orange 55%) !important;
+ }
+ .checkin.coming{
+   background: linear-gradient(to right,lightgreen  45%, black 10%, orange 55%) !important;
+ }
+ .checkout.coming{
+   background: linear-gradient(to right,orange  45%, black 10%, lightgreen 55%) !important;
+ }
+
