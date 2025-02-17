@@ -1,8 +1,8 @@
 import {Component, Inject} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAnchor, MatButton} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {PopupService} from '../../../../../service/PopupService';
 import {ReservationService} from '../../../../../service/ReservationService';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -20,7 +20,7 @@ import {MatRadioButton} from '@angular/material/radio';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reservation-update-popup.component';
-import {find, map, Observable, startWith} from 'rxjs';
+import {delay, Observable} from 'rxjs';
 import {UserService} from '../../../../../service/UserService';
 
 @Component({
@@ -54,7 +54,8 @@ import {UserService} from '../../../../../service/UserService';
     MatCheckbox,
     NgIf,
     ReactiveFormsModule,
-    ReservationUpdatePopupComponent
+    ReservationUpdatePopupComponent,
+    AsyncPipe
   ],
   templateUrl: './reservation-popup.component.html',
   standalone: true,
@@ -62,18 +63,25 @@ import {UserService} from '../../../../../service/UserService';
 })
 export class ReservationPopupComponent {
   camperPlaces: Array<CamperPlace> = [];
-  checkinControl = new FormControl;
   checkin!: string;
   number!: number;
   allUsers!: User[];
   searchValue = '';
-  searchForm = new FormControl('') ;
-  filteredOptions!: Observable<User[]>;
-  constructor(private camperPlaceService: CamperPlaceService, private dialog: MatDialog, private popupService: PopupService, private reservationService: ReservationService,
-              @Inject(MAT_DIALOG_DATA) public data: { camperPlaceNumber: number; checkinDate: Date }, private userService: UserService) {
-  }
+  searchForm!: FormGroup;
 
 
+  constructor(
+    private camperPlaceService: CamperPlaceService,
+    private dialog: MatDialog,
+    private popupService: PopupService,
+    private reservationService: ReservationService,
+    @Inject(MAT_DIALOG_DATA) public data: { camperPlaceNumber: number; checkinDate: Date },
+    private userService: UserService,
+    private fb: FormBuilder
+  ) { this.searchForm = this.fb.nonNullable.group({
+    searchValue: '',
+  })
+}
   camperPlace: CamperPlace = {
     reservations: [],
     number: 0,
@@ -105,31 +113,33 @@ export class ReservationPopupComponent {
     streetAddress: ''
   };
 
+  displayFn(): string {
+    return this.user ? `${this.user.firstName} ${this.user.lastName}` : 'obiecuje ze działaಥ‿ಥ'
+  }
+
   ngOnInit() {
     this.loadCamperPlace()
     this.checkin = new Date(this.data.checkinDate).toISOString().split('T')[0];
     this.number = this.data.camperPlaceNumber;
-    if(this.number !== 0){
+    if (this.number !== 0) {
       this.findCamperPlaceByNumber(this.number);
     }
-    this.getUsers();
-    this.filteredOptions = this.searchForm.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
+    this.getFilteredUsers();
   }
-  private _filter(value: string): User[] {
-    const filterValue = value.toLowerCase();
 
-    return this.allUsers.filter(user =>user.lastName.toLowerCase().includes(filterValue));
+  onSearchSubmit() {
+    this.searchValue = this.searchForm.value.searchValue;
+    this.getFilteredUsers();
+
   }
-  getUsers(){
-    this.userService.getAllUsers().subscribe({
-      next:(u) =>{
+  getFilteredUsers() {
+    this.userService.getFilteredUsers(this.searchValue).subscribe({
+      next: (u) => {
         this.allUsers = u;
       }
     })
   }
+
   loadCamperPlace() {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (cp) => {
@@ -145,13 +155,9 @@ export class ReservationPopupComponent {
 
   createReservation() {
     const reservationRequest = {
-      checkin: new Date(this.checkin)
-        .toISOString()
-        .split('T')[0], // YYYY-MM-DD
-      checkout: new Date(this.reservation.checkout)
-        .toISOString()
-        .split('T')[0],
-      camperPlace: this.findCamperPlaceByNumber(this.number),
+      checkin: new Date(this.checkin).toISOString().split('T')[0], // YYYY-MM-DD
+      checkout: new Date(this.reservation.checkout).toISOString().split('T')[0],
+      camperPlace: this.camperPlace,
       user: this.user,
     };
 
@@ -183,5 +189,17 @@ export class ReservationPopupComponent {
       });
     }
     return this.camperPlace;
+  }
+
+
+
+
+  findUserById(id: number) {
+    return this.userService.getUserById(id).subscribe({
+      next:(user) =>{
+        this.user = user
+        console.log(this.user)
+      }
+    })
   }
 }
