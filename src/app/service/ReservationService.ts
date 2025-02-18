@@ -21,8 +21,8 @@ export class ReservationService {
   }
 
   createReservation(reservation: {
-    checkin: string;
-    camperPlace: CamperPlace;
+    checkin: Date | number | string;
+    camperPlace: Date | number | CamperPlace;
     checkout: string;
     user: User
   }): Observable<Reservation> {

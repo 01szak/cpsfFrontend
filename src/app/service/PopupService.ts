@@ -26,6 +26,16 @@ export class PopupService {
   openCreateReservationPopup() {
     this.dialog.open(ReservationPopupComponent);
   }
+    openCreateReservationPopupFromCalendar(date: Date, camperPlaceNumber: number) {
+    this.dialog.open(ReservationPopupComponent,{
+      data:{
+        checkinDate: date,
+        camperPlaceNumber: camperPlaceNumber
+      }
+
+      });
+  }
+
   closePopup() {
     this.dialog.closeAll()
   }

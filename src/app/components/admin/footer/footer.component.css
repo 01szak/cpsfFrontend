@@ -1,26 +1,17 @@
 .container {
-  position: absolute;
-  bottom: 0;
   width: 100%;
-  height: 120px;
-
+  height: 60px;
+top: 0;
 
 }
 
-.drawer {
-  width: 100%;
-  border-radius: 0;
-
-
-}
 
 .routers {
   display: flex;
+  padding-bottom: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  background-color: rgb(10, 10, 10);
-  padding: 35px 10px;
+  background-color: inherit;
   border-radius: 5px;
   gap: 20px;
 }
@@ -29,36 +20,17 @@
 .footerButton {
   margin: 10px;
   color: lightgray;
-  font-size: 1em;
+  font-size: 1.5em;
   font-weight: lighter;
   text-decoration: none;
 }
 
 .footerButton:hover {
-  color: darkgray;
-}
-
-.icon {
-  color: lightgray;
-  font-size: 2em;
-}
-
-.left {
-  margin-right: auto;
-}
-
-.right {
-  margin-left: auto;
-}
-
-.right:hover {
-  cursor: pointer;
+  color: white;
 }
 
 
-.icon:hover {
-  cursor: pointer;
-  color: darkgray;
 
-}
+
+
 

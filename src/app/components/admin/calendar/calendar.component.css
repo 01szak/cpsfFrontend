@@ -14,6 +14,7 @@ mat-card{
   border-radius: 10px;
   margin-left: 400px;
   border: solid black;
+  border-collapse: collapse;
 }
 
 table {
@@ -39,10 +40,10 @@ td {
   border-radius: 1px;
   width: auto;
   height: auto;
-  padding: 10px 15px;
+  padding: 0;
   background-color: palegreen;
   cursor: pointer;
-  border: solid lightgreen 1px;
+  border: solid black 1px !important;
 }
 
 td:hover {
@@ -51,17 +52,13 @@ td:hover {
 
 }
 
-td.reserved {
-  background-color: orangered;
-border: solid orangered 1px;
+.reserved {
+  background-color: orangered !important;
 }
 
-td.reserved:hover {
-  background-color: red;
+.reserved:hover {
+  background-color: red !important;
   border: solid red 1px;
-
-
-  visibility: visible;
 }
 
 .button {
@@ -101,4 +98,55 @@ select{
 }
 option{
   background-color: rgba(0, 0, 0, 0.2);
+}
+.weekdays{
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+.weekend{
+  background-color: springgreen;
+  border: solid springgreen;
+}
+.weekend:hover{
+  background-color: lime;
+
+}
+.coming{
+  background-color: orange !important; ;
+border: solid orange ;
+}
+.coming:hover{
+  background-color:  darkorange!important;
+  border: solid darkorange;
+}
+ .checkout{
+   background: linear-gradient(to right, orangered 45%, black 10%, lightgreen 55%) ;
+ }
+ .checkin{
+   background: linear-gradient(to right, lightgreen 45%, black 10%, orangered 55%) !important;
+
+ }
+ .checkin.checkout.coming.reserved{
+   background: linear-gradient(to right,orangered 45%, black 10%, orange 55%) !important;
+ }
+ .checkin.coming{
+   background: linear-gradient(to right,lightgreen  45%, black 10%, orange 55%) !important;
+ }
+ .checkout.coming{
+   background: linear-gradient(to right,orange  45%, black 10%, lightgreen 55%) !important;
+ }
+
+.checkin.weekend.coming{
+  background: linear-gradient(to right,springgreen  45%, black 10%, orange 55%) !important;
+}
+.checkout.weekend.coming{
+  background: linear-gradient(to right,orange  45%, black 10%, springgreen 55%) !important;
+}
+
+.checkin.weekend.reserved{
+  background: linear-gradient(to right,springgreen  45%, black 10%, orangered 55%) !important;
+}
+
+.checkout.weekend.reserved{
+  background: linear-gradient(to right,orangered  45%, black 10%, springgreen 55%) ;
 }

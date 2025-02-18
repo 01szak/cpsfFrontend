@@ -37,4 +37,7 @@ export class UserService {
   getAllUsers() {
     return this.http.get<User[]>(this.api + 'getAll')
   }
+  getUserById(id: number){
+    return this.http.get<User>(this.api + 'getUser/' + id.toString())
+  }
 }

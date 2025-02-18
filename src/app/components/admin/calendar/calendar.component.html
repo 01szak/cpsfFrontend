@@ -1,35 +1,57 @@
 <h2>Today you have {{ countNewReservations() }} reservations upcoming</h2>
 
 <mat-card>
-    <div class="monthSelector">
-      <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
-        <option *ngFor="let month of months" [ngValue]="month">
-          {{ month }}
-        </option>
-      </select>
-    </div>
-    <table #calendar>
-      <th></th>
-      <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
-        {{ day + 1 }}
-      </th>
-      <tbody>
-      <tr *ngFor="let camperPlace of camperPlaces; index as i;">
-        <th>{{ i + 1 }}</th>
-        <td *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
-            [ngClass]="{'reserved':
-           isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
-            (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
-            || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2))}">
-        </td>
-        <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>
+  <div class="monthSelector">
+    <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
+      <option *ngFor="let month of months" [ngValue]="month">
+        {{ month }}
+      </option>
+    </select>
+  </div>
+  <table #calendar>
+    <th></th>
+    <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
+      {{ day + 1 }}
+      <br>
+      <p class="weekdays"> ({{ checkWhatWeekDayItIs(selectedMonth, day + 1) }})</p>
+    </th>
+    <tbody>
+    <tr *ngFor="let camperPlace of camperPlaces; index as i;">
+      <th>{{ i + 1 }}</th>
+      <td (click)="openCreateReservationPopupFromCalendar(
+         moment().set({ date: day + 2, month: months.indexOf(selectedMonth) }).toDate(), i + 1)"
+          *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
+          [ngClass]="{
+            'reserved':
+                   isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(0) &&
+                    (( selectedMonth === isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(1))
+                    || isDayReserved(camperPlace, day,months.indexOf(selectedMonth) ).at(2)) &&
+                      isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[3] !== 'EXPIRED',
+            'weekend':
+                    (checkWhatWeekDayItIs(selectedMonth,day + 1) === this.weekdays.get(0))
+                    || ( checkWhatWeekDayItIs(selectedMonth,day + 1) === this.weekdays.get(6)),
+            'checkout':
+                    isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[0] &&
+                    isCheckout(camperPlace,day + 1, months.indexOf(selectedMonth)),
+            'checkin':
+                    isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[0] &&
+                    isCheckin(camperPlace,day + 1, months.indexOf(selectedMonth)),
 
-      </tr>
-      </tbody>
-    </table>
-    <div class="addDiv">
-      <button class="button add" (click)="openPopup()"><i class="fa-solid fa-plus"></i></button>
-    </div>
+              'coming':
+                    isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[0] &&
+                    isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[3] === 'COMING'
+                    }">
+
+
+      </td>
+      <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>
+
+    </tr>
+    </tbody>
+  </table>
+  <div class="addDiv">
+    <button class="button add" (click)="openPopup()"><i class="fa-solid fa-plus"></i></button>
+  </div>
 </mat-card>
 <br>
 

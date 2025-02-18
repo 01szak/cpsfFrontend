@@ -7,6 +7,7 @@ import {CalendarComponent} from './components/admin/calendar/calendar.component'
 import {StatisticsComponent} from './components/admin/statistics/statistics.component';
 import {ReservationsComponent} from './components/admin/reservations/reservations.component';
 import {UsersComponent} from './components/admin/users/users.component';
+import {OptionsComponent} from './components/admin/options/options.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,9 @@ export const routes: Routes = [
       {
         path: 'users',
         component: UsersComponent
+      }, {
+        path: 'options',
+        component: OptionsComponent
       },
     ]
   },

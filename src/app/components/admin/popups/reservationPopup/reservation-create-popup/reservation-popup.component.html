@@ -4,7 +4,7 @@
     <br>
     <mat-form-field appearance="outline">
       <mat-label>Checkin</mat-label>
-      <input type="date" matInput [(ngModel)]="reservation.checkin">
+      <input type="date" matInput [(ngModel)]="this.checkin">
     </mat-form-field>
     <br>
     <mat-form-field appearance="outline">
@@ -16,23 +16,24 @@
       <mat-label>
         Select Camper Place
       </mat-label>
-      <mat-select [(ngModel)]="number" (ngModelChange)="findCamperPlaceByNumber(number)" name="number">
+      <mat-select [(ngModel)]="this.number" (ngModelChange)="findCamperPlaceByNumber(number.valueOf())" name="number">
         <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.number">
-          {{camperPlace.number}}
+          {{ camperPlace.number }}
         </mat-option>
       </mat-select>
     </mat-form-field>
     <br>
-    <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
-      <mat-label>Select a Guest</mat-label>
-      <input type="text" matInput [matAutocomplete]="auto">
-      <mat-autocomplete #auto=matAutocomplete>
-        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
-        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
-        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
-        <mat-option>tu będzie wyświetlana lista zapisanych gosci</mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+    <form [formGroup]="searchForm" (keyup)="onSearchSubmit() ">
+      <mat-form-field  appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
+        <mat-label>Select a Guest</mat-label>
+        <input type="text" matInput   formControlName="searchValue" [matAutocomplete]="auto"   >
+        <mat-autocomplete  (optionSelected)="findUserById($event.option.value) "#auto="matAutocomplete" [displayWith]="displayFn">
+          <mat-option *ngFor="let user of allUsers" [value]="user" >
+            {{user.firstName}} {{user.lastName}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
     <mat-checkbox #newGuest>New Guest</mat-checkbox>
     <div *ngIf="newGuest.checked " aria-hidden="true">
       <h3>New guest</h3>
@@ -54,7 +55,7 @@
     </div>
     <br>
     <button class="cancelButton" mat-button (click)="closePopup()">cancel</button>
-    <button mat-button (click)="createReservation(reservation)">submit</button>
+    <button mat-button (click)="createReservation()">submit</button>
 
   </mat-card-content>
 
