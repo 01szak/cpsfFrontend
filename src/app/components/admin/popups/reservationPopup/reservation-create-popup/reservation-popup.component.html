@@ -28,7 +28,7 @@
         <mat-label>Select a Guest</mat-label>
         <input type="text" matInput   formControlName="searchValue" [matAutocomplete]="auto"   >
         <mat-autocomplete  (optionSelected)="findUserById($event.option.value) "#auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let user of allUsers" [value]="user.id" >
+          <mat-option *ngFor="let user of allUsers" [value]="user" >
             {{user.firstName}} {{user.lastName}}
           </mat-option>
         </mat-autocomplete>

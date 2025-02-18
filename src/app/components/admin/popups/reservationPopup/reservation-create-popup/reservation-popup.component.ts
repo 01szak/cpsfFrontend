@@ -20,7 +20,6 @@ import {MatRadioButton} from '@angular/material/radio';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reservation-update-popup.component';
-import {delay, Observable} from 'rxjs';
 import {UserService} from '../../../../../service/UserService';
 
 @Component({
@@ -113,8 +112,8 @@ export class ReservationPopupComponent {
     streetAddress: ''
   };
 
-  displayFn(): string {
-    return this.user ? `${this.user.firstName} ${this.user.lastName}` : 'obiecuje ze działaಥ‿ಥ'
+  displayFn(user: User): string {
+    return user ? `${user.firstName} ${user.lastName}` : ''
   }
 
   ngOnInit() {
@@ -194,8 +193,8 @@ export class ReservationPopupComponent {
 
 
 
-  findUserById(id: number) {
-    return this.userService.getUserById(id).subscribe({
+  findUserById(user:User) {
+    return this.userService.getUserById(user.id).subscribe({
       next:(user) =>{
         this.user = user
         console.log(this.user)

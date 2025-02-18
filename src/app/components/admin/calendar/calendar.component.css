@@ -136,3 +136,17 @@ border: solid orange ;
    background: linear-gradient(to right,orange  45%, black 10%, lightgreen 55%) !important;
  }
 
+.checkin.weekend.coming{
+  background: linear-gradient(to right,springgreen  45%, black 10%, orange 55%) !important;
+}
+.checkout.weekend.coming{
+  background: linear-gradient(to right,orange  45%, black 10%, springgreen 55%) !important;
+}
+
+.checkin.weekend.reserved{
+  background: linear-gradient(to right,springgreen  45%, black 10%, orangered 55%) !important;
+}
+
+.checkout.weekend.reserved{
+  background: linear-gradient(to right,orangered  45%, black 10%, springgreen 55%) ;
+}
