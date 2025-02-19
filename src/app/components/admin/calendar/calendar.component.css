@@ -1,12 +1,14 @@
 
-h1{
+h1 {
   font-weight: lighter;
   margin-left: 450px;;
   margin-top: 30px;
 }
-mat-card{
+
+mat-card {
   background-color: rgb(44, 33, 66);
 }
+
 .table {
   display: table;
   overflow: hidden;
@@ -29,9 +31,10 @@ table {
 th {
   width: auto;
   height: auto;
-  color: darkgray ;
+  color: darkgray;
 }
-.today{
+
+.today {
   color: white;
 }
 
@@ -43,7 +46,7 @@ td {
   padding: 0;
   background-color: palegreen;
   cursor: pointer;
-  border: solid black 1px !important;
+  border: solid black 0 !important;
 }
 
 td:hover {
@@ -88,65 +91,119 @@ td:hover {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
-select{
+
+select {
   color: white;
   background-color: rgba(162, 120, 246, 0.19);
   border: solid rgba(162, 120, 246, 0.19);
-  border-radius: 5px ;
-  margin-bottom: 10px;
+  border-radius: 5px;
+  padding: 3px 3px 3px 3px;
+  margin: 0 0 10px 6px;
 
 }
-option{
+
+option {
   background-color: rgba(0, 0, 0, 0.2);
 }
-.weekdays{
+
+.weekdays {
   margin-top: 0;
   margin-bottom: 5px;
 }
-.weekend{
+
+.weekend {
   background-color: springgreen;
   border: solid springgreen;
 }
-.weekend:hover{
+
+.weekend:hover {
   background-color: lime;
 
 }
-.coming{
-  background-color: orange !important; ;
-border: solid orange ;
+
+.coming {
+  background-color: orange !important;;
+  border: solid orange;
 }
-.coming:hover{
-  background-color:  darkorange!important;
+
+.coming:hover {
+  background-color: darkorange !important;
   border: solid darkorange;
 }
- .checkout{
-   background: linear-gradient(to right, orangered 45%, black 10%, lightgreen 55%) ;
- }
- .checkin{
-   background: linear-gradient(to right, lightgreen 45%, black 10%, orangered 55%) !important;
 
- }
- .checkin.checkout.coming.reserved{
-   background: linear-gradient(to right,orangered 45%, black 10%, orange 55%) !important;
- }
- .checkin.coming{
-   background: linear-gradient(to right,lightgreen  45%, black 10%, orange 55%) !important;
- }
- .checkout.coming{
-   background: linear-gradient(to right,orange  45%, black 10%, lightgreen 55%) !important;
- }
-
-.checkin.weekend.coming{
-  background: linear-gradient(to right,springgreen  45%, black 10%, orange 55%) !important;
-}
-.checkout.weekend.coming{
-  background: linear-gradient(to right,orange  45%, black 10%, springgreen 55%) !important;
+.checkout.reserved{
+  background: linear-gradient(to right, orangered 49.5%, black 0.5%, lightgreen 50.5%);
 }
 
-.checkin.weekend.reserved{
-  background: linear-gradient(to right,springgreen  45%, black 10%, orangered 55%) !important;
+.checkout.reserved:hover {
+  background: linear-gradient(to right, red 49.5%, black 0.5%, lightgreen 50.5%);
 }
 
-.checkout.weekend.reserved{
-  background: linear-gradient(to right,orangered  45%, black 10%, springgreen 55%) ;
+.checkin.reserved {
+  background: linear-gradient(to right, lightgreen 49.5%, black 0.5%, orangered 50.5%) !important;
+
 }
+
+.checkin.reserved:hover {
+  background: linear-gradient(to right, lightgreen 49.5%, black 0.5%, red 50.5%) !important;
+
+}
+.checkin.weekend.reserved {
+  background: linear-gradient(to right, springgreen 49.5%, black 0.5%, orangered 50.5%) !important;
+}
+
+.checkin.weekend.reserved:hover {
+  background: linear-gradient(to right, springgreen 49.5%, black 0.5%, red 50.5%) !important;
+}
+
+.checkout.weekend.reserved {
+  background: linear-gradient(to right, orangered 49.5%, black 0.5%, springgreen 50.5%);
+}
+
+.checkout.weekend.reserved:hover {
+  background: linear-gradient(to right, red 49.5%, black 0.5%, springgreen 50.5%);
+}
+
+.checkin.coming {
+  background: linear-gradient(to right, lightgreen 49.5%, black 0.5%, orange 50.5%) !important;
+}
+
+.checkin.coming:hover {
+  background: linear-gradient(to right, lightgreen 49.5%, black 0.5%, darkorange 50.5%) !important;
+}
+.checkout.coming {
+  background: linear-gradient(to right, orange 49.5%, black 0.5%, lightgreen 50.5%) !important;
+}
+.checkout.coming:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 0.5%, lightgreen 50.5%) !important;
+}
+.checkin.weekend.reserved.coming{
+  background: linear-gradient(to right, springgreen 49.5%, black 0.5%, orange 50.5%) !important;
+}
+.checkin.weekend.reserved.coming:hover{
+  background: linear-gradient(to right, springgreen 49.5%, black 0.5%, darkorange 50.5%) !important;
+}
+.checkout.weekend.reserved.coming{
+  background: linear-gradient(to right, orange 49.5%, black 0.5%, springgreen 50.5%) !important;
+}
+
+.checkout.weekend.coming.reserved:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 0.5%, springgreen 50.5%) !important;
+}
+
+
+.checkin.checkout.coming.reserved {
+  background: linear-gradient(to right, orangered 49.5%, black 0.5%, orange 50.5%) !important;
+}
+
+.checkin.checkout.coming.reserved:hover {
+  background: linear-gradient(to right, red 49.5%, black 0.5%, darkorange 50.5%) !important;
+}
+.checkin.checkout.weekend.reserved.coming {
+  background: linear-gradient(to right, orangered 49.5%, black 0.5%, orange 50.5%) !important;
+}
+
+.checkin.checkout.weekend.reserved.coming:hover {
+  background: linear-gradient(to right, red 49.5%, black 0.5%, darkorange 50.5%) !important;
+}
+

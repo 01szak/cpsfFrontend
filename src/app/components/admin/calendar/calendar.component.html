@@ -3,7 +3,7 @@
 <mat-card>
   <div class="monthSelector">
     <select id="monthSelector" [(ngModel)]="selectedMonth" (ngModelChange)="addNumbersToDaysInMonth()">
-      <option *ngFor="let month of months" [ngValue]="month">
+      <option *ngFor="let month of months" [value]="month">
         {{ month }}
       </option>
     </select>
@@ -13,13 +13,13 @@
     <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : (day + 1) === today} ">
       {{ day + 1 }}
       <br>
-      <p class="weekdays"> ({{ checkWhatWeekDayItIs(selectedMonth, day + 1) }})</p>
+      <p class="weekdays"> {{ checkWhatWeekDayItIs(selectedMonth, day + 1) }}</p>
     </th>
     <tbody>
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{ i + 1 }}</th>
       <td (click)="openCreateReservationPopupFromCalendar(
-         moment().set({ date: day + 2, month: months.indexOf(selectedMonth) }).toDate(), i + 1)"
+         moment().set({ date: day + 1, month: months.indexOf(selectedMonth) }).toDate(), i + 1)"
           *ngFor="let day of daysInAMonth" matTooltip="{{day + 1 + ' ' +  selectedMonth}}"
           [ngClass]="{
             'reserved':
@@ -41,8 +41,6 @@
                     isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[0] &&
                     isDayReserved(camperPlace, day, months.indexOf(selectedMonth))?.[3] === 'COMING'
                     }">
-
-
       </td>
       <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>
 

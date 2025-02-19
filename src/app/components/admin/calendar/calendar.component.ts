@@ -8,6 +8,7 @@ import {PopupService} from '../../../service/PopupService';
 import moment from 'moment/moment';
 import {MatCard} from '@angular/material/card';
 import {MatTooltip} from '@angular/material/tooltip';
+import {MatOption, MatSelect} from '@angular/material/select';
 
 
 @Component({
@@ -18,6 +19,8 @@ import {MatTooltip} from '@angular/material/tooltip';
     FormsModule,
     MatCard,
     MatTooltip,
+    MatSelect,
+    MatOption,
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
