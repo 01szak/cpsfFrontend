@@ -1,4 +1,4 @@
-import {catchError, Observable, of, take} from 'rxjs';
+import {catchError, Observable} from 'rxjs';
 
 export class Preform<T>{
   data: T | undefined;

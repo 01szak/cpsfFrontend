@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import {ReservationService} from '../../../service/ReservationService';
 import {Reservation} from '../calendar/Reservation';
 import {CommonModule} from '@angular/common';

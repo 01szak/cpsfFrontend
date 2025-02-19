@@ -4,18 +4,18 @@ import {MatDrawerContainer,MatDrawer} from '@angular/material/sidenav';
 import {MatButton} from '@angular/material/button';
 
 @Component({
-  selector: 'app-footer',
+  selector: 'app-navbar',
   imports: [
     RouterLink,
     MatDrawerContainer,
     MatDrawer,
     MatButton
   ],
-  templateUrl: './footer.component.html',
-  styleUrl: './footer.component.css',
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.css',
   standalone: true
 })
-export class FooterComponent {
+export class NavbarComponent {
 
   logout():void{
     sessionStorage.removeItem('jwtToken');

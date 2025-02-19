@@ -1,5 +1,3 @@
-import {User} from './User';
-import {CamperPlace} from './CamperPlace';
 
 export interface Reservation{
   id: number;

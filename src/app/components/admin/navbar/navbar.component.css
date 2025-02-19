@@ -7,6 +7,7 @@ top: 0;
 
 
 .routers {
+  margin-top: 4px;
   display: flex;
   padding-bottom: 10px;
   flex-wrap: wrap;
@@ -17,19 +18,21 @@ top: 0;
 }
 
 
-.footerButton {
-  margin: 10px;
+.navbarButton {
+  margin: 15px;
   color: lightgray;
   font-size: 1.5em;
   font-weight: lighter;
   text-decoration: none;
 }
 
-.footerButton:hover {
+.navbarButton:hover {
   color: white;
 }
-
-
+.functionalButtons{
+  position: absolute;
+  right: 0;
+}
 
 
 
