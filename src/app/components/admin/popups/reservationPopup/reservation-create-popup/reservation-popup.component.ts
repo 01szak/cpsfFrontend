@@ -21,6 +21,7 @@ import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocom
 import {MatCheckbox} from '@angular/material/checkbox';
 import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reservation-update-popup.component';
 import {UserService} from '../../../../../service/UserService';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-reservation-popup',
@@ -67,6 +68,7 @@ export class ReservationPopupComponent {
   allUsers!: User[];
   searchValue = '';
   searchForm!: FormGroup;
+  errorMessage: Error = new Error();
 
 
   constructor(
@@ -165,10 +167,11 @@ export class ReservationPopupComponent {
         this.closePopup();
         window.location.reload();
       },
-      error: (err) => {
-        console.log(err);
+      error: (err: HttpErrorResponse) => {
+        console.log(err)
+        this.errorMessage = err.error || 'Unexpected error...'
         console.log(reservationRequest)
-        this.closePopup();
+        console.log(err)
 
       }
     });

@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MatCard, MatCardContent} from '@angular/material/card';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
@@ -11,6 +11,7 @@ import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
 import {CamperPlaceService} from '../../../../../service/CamperPlaceService';
 import {CamperPlace} from '../../../calendar/CamperPlace';
 import {ReservationService} from '../../../../../service/ReservationService';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-reservation-update-popup',
@@ -24,7 +25,8 @@ import {ReservationService} from '../../../../../service/ReservationService';
     MatInput,
     NgForOf,
     MatButton,
-    MatLabel
+    MatLabel,
+    MatHint
   ],
   templateUrl: './reservation-update-popup.component.html',
   standalone: true,
@@ -33,6 +35,7 @@ import {ReservationService} from '../../../../../service/ReservationService';
 export class ReservationUpdatePopupComponent {
   camperPlace!: CamperPlace;
   camperPlaces: CamperPlace[] = [];
+  errorMessage: string = ''
 
 updatedReservation!: Reservation;
   constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected reservation: Reservation, private camperPlaceService: CamperPlaceService, private reservationService: ReservationService) {
@@ -97,7 +100,8 @@ updatedReservation!: Reservation;
       next: () => {
         window.location.reload();
         this.closePopup();
-      },error:()=>{
+      },error:(err: HttpErrorResponse)=>{
+        this.errorMessage = err.error || 'Unknown Error...'
         console.log(reservationRequest)
 
       }

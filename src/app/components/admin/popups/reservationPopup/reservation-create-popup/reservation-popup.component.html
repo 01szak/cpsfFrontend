@@ -1,7 +1,14 @@
 <mat-card>
   <mat-card-content>
+
     <h1>New Reservation</h1>
     <br>
+    <div class="errorHint">
+      <mat-hint>{{ errorMessage }}</mat-hint>
+    </div>
+    <br>
+    <br>
+
     <mat-form-field appearance="outline">
       <mat-label>Checkin</mat-label>
       <input type="date" matInput [(ngModel)]="this.checkin">
@@ -24,12 +31,13 @@
     </mat-form-field>
     <br>
     <form [formGroup]="searchForm" (keyup)="onSearchSubmit() ">
-      <mat-form-field  appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
+      <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
         <mat-label>Select a Guest</mat-label>
-        <input type="text" matInput   formControlName="searchValue" [matAutocomplete]="auto"   >
-        <mat-autocomplete  (optionSelected)="findUserById($event.option.value) "#auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let user of allUsers" [value]="user" >
-            {{user.firstName}} {{user.lastName}}
+        <input type="text" matInput formControlName="searchValue" [matAutocomplete]="auto">
+        <mat-autocomplete (optionSelected)="findUserById($event.option.value) " #auto="matAutocomplete"
+                          [displayWith]="displayFn">
+          <mat-option *ngFor="let user of allUsers" [value]="user">
+            {{ user.firstName }} {{ user.lastName }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>

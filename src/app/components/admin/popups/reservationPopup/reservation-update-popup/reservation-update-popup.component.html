@@ -2,6 +2,8 @@
   <mat-card-content>
     <h1>Update Reservation</h1>
     <br>
+    <br>
+    <mat-hint>{{errorMessage}}</mat-hint>
     <mat-form-field appearance="outline">
       <mat-label>Checkin</mat-label>
       <input type="date" matInput  [(ngModel)]="this.updatedReservation.checkin" >
