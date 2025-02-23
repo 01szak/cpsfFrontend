@@ -46,13 +46,15 @@ updatedReservation!: Reservation;
       camperPlaceNumber: this.reservation.camperPlaceNumber,
       checkin: this.reservation.checkin,
       checkout: this.reservation.checkout,
-      id: 0,
+      id: this.reservation.id,
       reservationStatus: '',
-      userEmail: '',
-      userFirstName: '',
-      userLastName: ''
+      userEmail: this.reservation.userEmail,
+      userFirstName: this.reservation.userFirstName,
+      userLastName:this.reservation.userLastName
 
     };
+    this.findCamperPlaceByNumber(this.reservation.camperPlaceNumber);
+    console.log(this.camperPlace)
 
 
     this.loadCamperPlace()
@@ -91,10 +93,10 @@ updatedReservation!: Reservation;
 
   updateReservation() {
     const reservationRequest = {
-      id: this.reservation.id,
+      id: this.updatedReservation.id,
       checkin: new Date(this.updatedReservation.checkin ).toISOString().split('T')[0], // YYYY-MM-DD
       checkout: new Date(this.updatedReservation.checkout ).toISOString().split('T')[0],
-      camperPlace: this.camperPlace,
+      camperPlace: this.camperPlace
     }
     this.reservationService.updateReservation(reservationRequest).subscribe({
       next: () => {
@@ -103,6 +105,7 @@ updatedReservation!: Reservation;
       },error:(err: HttpErrorResponse)=>{
         this.errorMessage = err.error || 'Unknown Error...'
         console.log(reservationRequest)
+        console.log(err)
 
       }
     })
