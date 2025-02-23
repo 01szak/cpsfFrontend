@@ -1,12 +1,17 @@
 <mat-card>
   <mat-card-content>
+
     <h1>New Reservation</h1>
     <br>
+    <div class="errorHint">
+      <mat-hint>{{ errorMessage }}</mat-hint>
+    </div>
+    <br>
+
     <mat-form-field appearance="outline">
       <mat-label>Checkin</mat-label>
       <input type="date" matInput [(ngModel)]="this.checkin">
     </mat-form-field>
-    <br>
     <mat-form-field appearance="outline">
       <mat-label>Checkout</mat-label>
       <input type="date" matInput [(ngModel)]="this.reservation.checkout">
@@ -22,26 +27,24 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <br>
-    <form [formGroup]="searchForm" (keyup)="onSearchSubmit() ">
-      <mat-form-field  appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true">
+      <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true" [formGroup]="searchForm" (keyup)="onSearchSubmit() ">
         <mat-label>Select a Guest</mat-label>
-        <input type="text" matInput   formControlName="searchValue" [matAutocomplete]="auto"   >
-        <mat-autocomplete  (optionSelected)="findUserById($event.option.value) "#auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let user of allUsers" [value]="user" >
-            {{user.firstName}} {{user.lastName}}
+        <input type="text" matInput formControlName="searchValue" [matAutocomplete]="auto">
+        <mat-autocomplete (optionSelected)="findUserById($event.option.value) " #auto="matAutocomplete"
+                          [displayWith]="displayFn">
+          <mat-option *ngFor="let user of allUsers" [value]="user">
+            {{ user.firstName }} {{ user.lastName }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-    </form>
-    <mat-checkbox #newGuest>New Guest</mat-checkbox>
-    <div *ngIf="newGuest.checked " aria-hidden="true">
+    <mat-checkbox [(ngModel)]="isNewGuestClicked" (change)="newGuestCheckBox()" #newGuest>New Guest</mat-checkbox>
+    <div *ngIf="newGuest.checked"  aria-hidden="true">
       <h3>New guest</h3>
       <mat-form-field appearance="outline">
         <mat-label>First Name:</mat-label>
         <input matInput type="text" id="firstname" name="firstName" [(ngModel)]="this.user.firstName">
       </mat-form-field>
-      <br>
+
       <mat-form-field appearance="outline">
         <mat-label>Last Name:</mat-label>
         <input matInput type="text" id="lastName" name="lastName" [(ngModel)]="this.user.lastName">
@@ -51,6 +54,10 @@
       <mat-form-field appearance="outline">
         <mat-label>Email:</mat-label>
         <input matInput type="email" id="email" name="email" [(ngModel)]="this.user.email">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number:</mat-label>
+        <input matInput type="text" id="phoneNumber" name="phoneNumber" [(ngModel)]="this.user.phoneNumber">
       </mat-form-field>
     </div>
     <br>

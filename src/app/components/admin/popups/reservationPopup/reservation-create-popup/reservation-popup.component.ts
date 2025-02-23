@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, inject, Inject, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAnchor, MatButton} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
@@ -21,6 +21,9 @@ import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocom
 import {MatCheckbox} from '@angular/material/checkbox';
 import {ReservationUpdatePopupComponent} from '../reservation-update-popup/reservation-update-popup.component';
 import {UserService} from '../../../../../service/UserService';
+import {HttpErrorResponse} from '@angular/common/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {CalendarComponent} from '../../../calendar/calendar.component';
 
 @Component({
   selector: 'app-reservation-popup',
@@ -67,8 +70,12 @@ export class ReservationPopupComponent {
   allUsers!: User[];
   searchValue = '';
   searchForm!: FormGroup;
+  errorMessage: string = '';
+  isNewGuestClicked: boolean = false;
+  tempUser!: User;
+  snackBar = inject(MatSnackBar)
 
-
+// @ViewChild(CalendarComponent) calendarComponent!: CalendarComponent;
   constructor(
     private camperPlaceService: CamperPlaceService,
     private dialog: MatDialog,
@@ -76,11 +83,13 @@ export class ReservationPopupComponent {
     private reservationService: ReservationService,
     @Inject(MAT_DIALOG_DATA) public data: { camperPlaceNumber: number; checkinDate: Date },
     private userService: UserService,
-    private fb: FormBuilder
-  ) { this.searchForm = this.fb.nonNullable.group({
-    searchValue: '',
-  })
-}
+    private fb: FormBuilder,
+  ) {
+    this.searchForm = this.fb.nonNullable.group({
+      searchValue: '',
+    })
+  }
+
   camperPlace: CamperPlace = {
     reservations: [],
     number: 0,
@@ -131,6 +140,7 @@ export class ReservationPopupComponent {
     this.getFilteredUsers();
 
   }
+
   getFilteredUsers() {
     this.userService.getFilteredUsers(this.searchValue).subscribe({
       next: (u) => {
@@ -165,15 +175,37 @@ export class ReservationPopupComponent {
         this.closePopup();
         window.location.reload();
       },
-      error: (err) => {
-        console.log(err);
+      error: (err: HttpErrorResponse) => {
+        console.log(err)
+        this.errorMessage = err.error || 'Unexpected error...'
         console.log(reservationRequest)
-        this.closePopup();
 
       }
     });
   }
 
+  newGuestCheckBox() {
+    if (this.isNewGuestClicked) {
+      this.user = {
+        carRegistration: "",
+        city: "",
+        country: "",
+        email: "",
+        firstName: "",
+        id: 0,
+        lastName: "",
+        phoneNumber: "",
+        reservations: [],
+        streetAddress: ""
+
+      }
+
+    } else {
+      this.user = this.tempUser;
+
+
+    }
+  }
 
   findCamperPlaceByNumber(number: number): CamperPlace {
     if (number !== 0) {
@@ -191,14 +223,29 @@ export class ReservationPopupComponent {
   }
 
 
-
-
-  findUserById(user:User) {
+  findUserById(user: User) {
     return this.userService.getUserById(user.id).subscribe({
-      next:(user) =>{
+      next: (user) => {
         this.user = user
-        console.log(this.user)
+        this.tempUser = user;
+        console.log(this.tempUser)
       }
     })
+  }
+
+  resetUserData() {
+    this.user = {
+      carRegistration: '',
+      city: '',
+      country: '',
+      email: '',
+      firstName: '',
+      id: 0,
+      lastName: '',
+      phoneNumber: '',
+      reservations: [],
+      streetAddress: ''
+
+    }
   }
 }

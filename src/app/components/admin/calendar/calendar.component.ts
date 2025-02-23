@@ -33,7 +33,7 @@ export class CalendarComponent {
   camperPlaces: Array<CamperPlace> = [];
   currentMonth: string = this.months[new Date().getMonth()];
   selectedMonth: string = this.currentMonth;
-  today: number = new Date().getDate();
+  today= moment(Date.now()).format('YYYY-MM-DD');
 
   constructor(private camperPlaceService: CamperPlaceService, private popupService: PopupService) {
   }
@@ -155,35 +155,58 @@ export class CalendarComponent {
 
   }
 
-  isDayReserved(camperPlace: CamperPlace, day: number, month: number): [boolean, string, string, string] {
+  //
+  // isDayReserved(camperPlace: CamperPlace, day: number, month: number): [boolean, string, string, string] {
+  //
+  //   const days: string[] = [];
+  //   let monthOfTheReservation1: string = "";
+  //   let monthOfTheReservation2: string = "";
+  //   let reservationStatus: string = "";
+  //
+  //   camperPlace.reservations?.forEach(r => {
+  //     if (r.reservationStatus === 'EXPIRED') {
+  //       return;
+  //     }
+  //
+  //     const startDate = moment(r.checkin);
+  //     const endDate = moment(r.checkout);
+  //     monthOfTheReservation1 = this.months.at(startDate.month()) || "";
+  //     monthOfTheReservation2 = this.months.at(endDate.month()) || "";
+  //     while (startDate.isSameOrBefore(endDate)) {
+  //       const formattedDate = startDate.format('YYYY-MM-DD')
+  //       days.push(formattedDate);
+  //
+  //       if(formattedDate === moment().set({ date: day  , month: month }).format('YYYY-MM-DD')){
+  //         reservationStatus = r.reservationStatus
+  //       }
+  //       startDate.add(1, 'day');
+  //     }
+  //   })
+  //   const date = moment().set({date: day , month: month}).format('YYYY-MM-DD');
+  //   return [days.includes(date), monthOfTheReservation1, monthOfTheReservation2, reservationStatus || ""]
+  // }
+  isDayReserved(camperPlace: CamperPlace, day: number, month: string) : boolean{
+    const _month = this.months.indexOf(month);
+    const reservations = camperPlace.reservations;
+    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
 
-    const days: string[] = [];
-    let monthOfTheReservation1: string = "";
-    let monthOfTheReservation2: string = "";
-    let reservationStatus: string = "";
+    return reservations.some(reservation => {
+      return moment(td).isBetween(moment(reservation.checkin), moment(reservation.checkout),"days",'[]')
 
-    camperPlace.reservations?.forEach(r => {
-      if (r.reservationStatus === 'EXPIRED') {
-        return;
-      }
-
-      const startDate = moment(r.checkin);
-      const endDate = moment(r.checkout);
-      monthOfTheReservation1 = this.months.at(startDate.month()) || "";
-      monthOfTheReservation2 = this.months.at(endDate.month()) || "";
-      while (startDate.isSameOrBefore(endDate)) {
-        const formattedDate = startDate.format('YYYY-MM-DD')
-        days.push(formattedDate);
-
-        if(formattedDate === moment().set({ date: day + 1, month: month }).format('YYYY-MM-DD')){
-          reservationStatus = r.reservationStatus
-        }
-        startDate.add(1, 'day');
-      }
     })
-    const date = moment().set({date: day + 1, month: month}).format('YYYY-MM-DD');
-    return [days.includes(date), monthOfTheReservation1, monthOfTheReservation2, reservationStatus || ""]
+
   }
+  //
+  // checkReservationStatus(camperPlace: CamperPlace, day: number, month: string): string{
+  // const _month = this.months.indexOf(month);
+  // const reservations = camperPlace.reservations;
+  // const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
+  // if(this.isDayReserved(camperPlace, day, month)){
+  //   return
+  // }
+
+
+// }
 
   countNewReservations(): string {
     if (!this.camperPlaces) return '0';
@@ -207,14 +230,15 @@ export class CalendarComponent {
   protected readonly moment = moment;
 
   isCheckout(camperPlace: CamperPlace, day: number, month: number) {
-    const date = moment().set({date: day, month:month}).format('YYYY-MM-DD');
-    return camperPlace.reservations.some(r =>{
+    const date = moment().set({date: day, month: month}).format('YYYY-MM-DD');
+    return camperPlace.reservations.some(r => {
       return date === moment(r.checkout).format('YYYY-MM-DD');
     }) ?? false;
   }
+
   isCheckin(camperPlace: CamperPlace, day: number, month: number) {
-    const date = moment().set({date: day, month:month}).format('YYYY-MM-DD');
-    return camperPlace.reservations.some(r =>{
+    const date = moment().set({date: day, month: month}).format('YYYY-MM-DD');
+    return camperPlace.reservations.some(r => {
       return date === moment(r.checkin).format('YYYY-MM-DD');
     }) ?? false;
   }
