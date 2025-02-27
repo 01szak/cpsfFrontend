@@ -1,0 +1,6 @@
+
+  <select [(ngModel)]="currentMonth" (ngModelChange)="selectMonth(selectedMonth.value)" #selectedMonth>
+    <option *ngFor="let month of months">
+      {{ month }}
+    </option>
+  </select>
