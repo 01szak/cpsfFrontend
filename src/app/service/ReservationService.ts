@@ -16,6 +16,7 @@ export class ReservationService {
     if (value === '') {
       return this.http.get<Reservation[]>(this.api + 'getFilteredReservations');
     } else {
+
       return this.http.get<Reservation[]>(this.api + 'getFilteredReservations/' + value);
     }
   }
@@ -35,7 +36,7 @@ export class ReservationService {
 
 
   sortTable(header: string, isAsc: number) {
-    return this.http.get<Reservation[]>(this.api + 'sortTable/' + header + "/" + isAsc);
+    return this.http.get<Reservation[]>(this.api + 'sortTable/' + header + '/' + isAsc);
   }
 
   updateReservation(reservation: {

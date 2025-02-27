@@ -1,1 +1,7 @@
-<p>statistics works!</p>
+<app-year-selector (selectYearEvent)="selectYear(Number($event))"></app-year-selector>
+<mat-card class="tableCard">
+  <app-month-selector (selectMonthEvent)="selectMonth(Number($event))"></app-month-selector>
+  <app-statistic-table [camperPlaces]="camperPlaces" [reservationCountPerCamperPlace]="reservationCountPerCamperPlace" [revenuePerCamperPlace]="revenuePerCamperPlace"></app-statistic-table>
+</mat-card>
+
+<app-graph></app-graph>

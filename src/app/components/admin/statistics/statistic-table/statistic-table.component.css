@@ -1,0 +1,10 @@
+.tableRow{
+  height: 27px;
+}
+table{
+  background-color: inherit ;
+
+}
+th,td,tr{
+  color: white;
+}

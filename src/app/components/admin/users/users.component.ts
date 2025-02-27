@@ -16,8 +16,6 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatCard} from '@angular/material/card';
 import {User} from '../calendar/User';
 import {UserService} from '../../../service/UserService';
-import {isEmpty} from 'rxjs';
-import {Reservation} from '../calendar/Reservation';
 import {PopupService} from '../../../service/PopupService';
 
 
@@ -73,7 +71,7 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-this.fetchData()
+    this.fetchData()
   }
 
   onSearchSubmit() {
@@ -100,33 +98,10 @@ this.fetchData()
   }
 
 
-  //
-  // openCreatePopup() {
-  //   this.popupService.openCreateReservationPopup();
-  // }
-  //
+
   openUpdatePopup(user: User) {
     this.popupService.openUpdateUserPopup(user);
   }
 
-  // checkStatus(reservation: Reservation) {
-  //   return reservation.reservationStatus.toLowerCase();
-  //
-  // }
-
-  // sorTable(header: string) {
-  //   return this.userService.sortTable(header,this.isAsc).subscribe({
-  //     next: (reservation) => {
-  //       this.allUsers = reservation;
-  //       if (this.isAsc === 0) {
-  //         this.isAsc = 1;
-  //       }else{
-  //         this.isAsc = 0;
-  //       }
-  //     }
-  //   })
-  // }
-
 
 }
-
