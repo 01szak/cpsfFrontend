@@ -1,0 +1,12 @@
+mat-card{
+  margin: 20px 0 0 30px;
+  width: 600px;
+  height: 280px;
+  background-color: rgb(44, 33, 66);
+  color:white;
+
+}
+.resCount.revenue{
+  color: white!important;
+}
+

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {StatisticTableComponent} from './statistic-table/statistic-table.component';
 import {GraphComponent} from './graph/graph.component';
 import {CamperPlace} from '../calendar/CamperPlace';
@@ -21,7 +21,7 @@ import {YearSelectorComponent} from './statistic-table/year-selector/year-select
   styleUrl: './statistics.component.css',
   standalone: true
 })
-export class StatisticsComponent {
+export class StatisticsComponent implements  OnInit {
   camperPlaces: CamperPlace[] = [];
   month: number = 0;
   year: number = 0;
@@ -56,7 +56,6 @@ export class StatisticsComponent {
         this.camperPlaces = camperPlaces;
         this.showReservationCount();
         this.showRevenue();
-        console.log(this.month)
       },
       error: (error) => {
         console.log(error);
@@ -70,30 +69,37 @@ export class StatisticsComponent {
 
     this.camperPlaces.forEach(cp => {
 
-      this.statisticsService.getMonthlyReservationCount(cp.id || 0, this.month, this.year).subscribe({
-        next: (value) => {
-          this.reservationCountPerCamperPlace.set(cp.id || 0, value);
-        },
-        error: (err) => {
-          console.log(err)
-        }
-      })
+      if (cp.id != null) {
+        this.statisticsService.getMonthlyReservationCount(cp.id, this.month, this.year).subscribe({
+          next: (value) => {
+            if (cp.id != null) {
+              this.reservationCountPerCamperPlace.set(cp.id, value);
+            }
+          },
+          error: (err) => {
+            console.log(err)
+          }
+        })
+      }
     })
 
   }
 
   showRevenue() {
     this.camperPlaces.forEach(cp => {
-      console.log(this.month)
-      this.statisticsService.getMonthlyRevenue(cp.id || 0, this.month, this.year).subscribe({
-        next: (value) => {
-          this.revenuePerCamperPlace.set(cp.id || 0, value);
+      if (cp.id != null) {
+        this.statisticsService.getMonthlyRevenue(cp.id, this.month, this.year).subscribe({
+          next: (value) => {
+            if (cp.id != null) {
+              this.revenuePerCamperPlace.set(cp.id, value);
+            }
 
-        },
-        error: (err) => {
-          console.log(err)
-        }
-      })
+          },
+          error: (err) => {
+            console.log(err)
+          }
+        })
+      }
     })
 
   }

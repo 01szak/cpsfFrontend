@@ -36,7 +36,6 @@ export class StatisticTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['reservationCountPerCamperPlace']?.currentValue || changes['revenuePerCamperPlace']?.currentValue)
-
       this.calculateTotals();
   }
   showTotalResCount(){

@@ -16,7 +16,6 @@ export class StatisticsService {
     if (year === 0) {
       year = this.currentYear;
     }
-    console.log(this.api + 'getMonthlyReservationCount/' + id + '/' + month + '/' + year);
     return this.http.get<number>(this.api + 'getMonthlyReservationCount/' + id + '/' + month + '/' + year)
 
   }
@@ -26,7 +25,12 @@ export class StatisticsService {
     if (year === 0) {
       year = this.currentYear;
     }
-    console.log(this.api + 'getCamperPlaceMonthlyRevenue/' + id + '/' + month + '/' + year );
     return this.http.get<number>(this.api + 'getCamperPlaceMonthlyRevenue/' + id + '/' + month + '/' + year)
+  }
+  getReservationCountForChart(month: number, year: number,camperPlaceId: number[] ) {
+    if (year === 0) {
+      year = this.currentYear;
+    }
+    return this.http.get<number[]>(this.api + 'getReservationCountForChart/' + month + '/' + year + '/' + camperPlaceId)
   }
 }

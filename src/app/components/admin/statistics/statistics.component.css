@@ -10,3 +10,15 @@ app-month-selector{
   margin: 25px 0 0 50px;
 
 }
+.content{
+  width: 100%;
+  display: flex;
+  align-content: space-between ;
+  align-items: end;
+}
+.graph{
+  width: 700px;
+  height:200px;
+  color: black;
+
+}

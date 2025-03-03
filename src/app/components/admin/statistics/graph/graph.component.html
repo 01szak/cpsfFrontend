@@ -1,1 +1,32 @@
-<p>graph works!</p>
+<mat-card>
+  <ngx-charts-bar-vertical class="resCount"
+                           [results]="resCountChartData"
+                           [scheme]="'cool'"
+                           [xAxis]="true"
+                           [yAxis]="true"
+                           [legend]="false"
+                           [showXAxisLabel]="true"
+                           [showYAxisLabel]="true"
+                           xAxisLabel="Camper Place"
+                           yAxisLabel="Reservations"
+                           [animations]="true"
+                           [yAxisTickFormatting]="hideHalfNumbers"
+                            >
+
+  </ngx-charts-bar-vertical>
+</mat-card>
+<!--<mat-card>-->
+<!--  <ngx-charts-bar-vertical class="revenue"-->
+<!--    [results]="transferRevenueToChart()"-->
+<!--    [scheme]="'cool'"-->
+<!--    [xAxis]="true"-->
+<!--    [yAxis]="true"-->
+<!--    [legend]="false"-->
+<!--    [showXAxisLabel]="true"-->
+<!--    [showYAxisLabel]="true"-->
+<!--    xAxisLabel="Camper Place"-->
+<!--    yAxisLabel="Revenue"-->
+<!--    [animations]="false">-->
+<!--  </ngx-charts-bar-vertical>-->
+<!--</mat-card>-->
+
