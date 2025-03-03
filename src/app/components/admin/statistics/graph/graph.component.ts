@@ -21,8 +21,9 @@ export class GraphComponent implements OnInit, OnChanges {
   @Input() year: number = 0;
   camperPlaces: CamperPlace[] = [];
   reservationCountPerCamperPlace: Map<number, number> = new Map();
-  revenuePerCamperPlace: Map<number, number> = new Map();
   resCountChartData: { name: number, value: number }[] = [];
+
+  revenueChartData: { name: number, value: number }[] = [];
 
   constructor(private statisticsService: StatisticsService, private camperPlaceService: CamperPlaceService) {
   }
@@ -34,33 +35,19 @@ export class GraphComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['month']?.currentValue || changes['year']?.currentValue) {
       this.loadResCountChart()
-      this.getReservationCount();
-      this.getRevenue();
+      this.loadRevenueChart()
     }
 
   }
 
-  getReservationCount() {
-    this.camperPlaces.forEach(cp => {
-      if (cp.id != null) {
-        this.statisticsService.getMonthlyReservationCount(cp.id, this.month, this.year).subscribe({
-          next: (resCount) => {
-            this.reservationCountPerCamperPlace.set(cp.number || 0, resCount)
-          }
 
-        })
-      }
-    })
-  }
 
   loadCamperPlace() {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (value) => {
         this.camperPlaces = value;
         this.loadResCountChart()
-        console.log(this.resCountChartData)
-        this.getReservationCount();
-        this.getRevenue();
+        this.loadRevenueChart();
       }
     })
   }
@@ -86,38 +73,32 @@ export class GraphComponent implements OnInit, OnChanges {
 
   }
 
+  loadRevenueChart() {
+    if (!this.camperPlaces) {
+      return;
+    }
+    const camperPlaceIds: number[] = this.camperPlaces!.map(camperPlace => camperPlace.id || 0);
+    this.statisticsService.getRevenueForChart(this.month, this.year, camperPlaceIds).subscribe({
+      next: (revenues) => {
+        this.revenueChartData = [];
+        Array.from(revenues).forEach((count, index) => this.revenueChartData.push({
+            name: index + 1,
+            value: count
 
-  getRevenue() {
-    this.camperPlaces.forEach(cp => {
-      if (cp.id != null) {
-        this.statisticsService.getMonthlyRevenue(cp.id, this.month, this.year).subscribe({
-          next: (revenue) => {
-            this.reservationCountPerCamperPlace.set(cp.number || 0, revenue)
           }
-        })
+        ));
       }
     })
-  }
-
-  transferReservationCountToChart() {
-    return Array.from(this.reservationCountPerCamperPlace.entries()).map(([key, value]) => ({
-      name: key,
-      value: value
-    }))
 
   }
 
-  transferRevenueToChart() {
-    return Array.from(this.revenuePerCamperPlace.entries()).map(([key, value]) => ({
-      name: key,
-      value: value
-    }))
 
-  }
+
+
 
   protected readonly Array = Array;
 
-  hideHalfNumbers(val:number) {
+  hideHalfNumbers(val: number) {
     if (val % 1 === 0) {
       return val.toString()
     } else {

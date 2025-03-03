@@ -16,9 +16,4 @@ app-month-selector{
   align-content: space-between ;
   align-items: end;
 }
-.graph{
-  width: 700px;
-  height:200px;
-  color: black;
 
-}
