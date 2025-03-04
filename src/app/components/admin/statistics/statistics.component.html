@@ -1,7 +1,9 @@
 <app-year-selector (selectYearEvent)="selectYear(Number($event))"></app-year-selector>
+<div class="content">
 <mat-card class="tableCard">
   <app-month-selector (selectMonthEvent)="selectMonth(Number($event))"></app-month-selector>
-  <app-statistic-table [camperPlaces]="camperPlaces" [reservationCountPerCamperPlace]="reservationCountPerCamperPlace" [revenuePerCamperPlace]="revenuePerCamperPlace"></app-statistic-table>
+  <app-statistic-table [camperPlaces]="camperPlaces" [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
+                       [revenuePerCamperPlace]="revenuePerCamperPlace"></app-statistic-table>
 </mat-card>
-
-<app-graph></app-graph>
+  <app-graph [month]="month" [year]="year" class="graph"></app-graph>
+</div>
