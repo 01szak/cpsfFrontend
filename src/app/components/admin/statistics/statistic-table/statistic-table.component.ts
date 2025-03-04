@@ -26,8 +26,6 @@ export class StatisticTableComponent implements OnChanges {
   totalReservationCount: number = 0;
   totalRevenue: number = 0;
 
-  ngOnInit() {
-  }
 
   calculateTotals() {
     this.totalReservationCount = Array.from(this.reservationCountPerCamperPlace.values()).reduce((a,b) => a + b, 0)

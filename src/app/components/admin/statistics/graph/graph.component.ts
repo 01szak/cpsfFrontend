@@ -36,6 +36,10 @@ export class GraphComponent implements OnInit, OnChanges {
     if (changes['month']?.currentValue || changes['year']?.currentValue) {
       this.loadResCountChart()
       this.loadRevenueChart()
+    }else if(this.month == 0){
+      this.loadRevenueChart()
+      this.loadResCountChart()
+
     }
 
   }
@@ -45,6 +49,7 @@ export class GraphComponent implements OnInit, OnChanges {
   loadCamperPlace() {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (value) => {
+
         this.camperPlaces = value;
         this.loadResCountChart()
         this.loadRevenueChart();
@@ -61,7 +66,7 @@ export class GraphComponent implements OnInit, OnChanges {
     this.statisticsService.getReservationCountForChart(this.month, this.year, camperPlaceIds).subscribe({
       next: (resCount) => {
         this.resCountChartData = [];
-        console.log(this.resCountChartData)
+
         Array.from(resCount).forEach((count, index) => this.resCountChartData.push({
             name: index + 1,
             value: count
