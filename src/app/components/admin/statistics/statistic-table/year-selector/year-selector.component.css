@@ -1,3 +1,16 @@
+select {
+  color: white;
+  background-color: rgba(162, 120, 246, 0.19);
+  border: solid rgba(162, 120, 246, 0.19);
+  border-radius: 5px;
+  padding: 3px 3px 3px 3px;
+  /*margin-right: 90%;*/
+
+}
+option {
+  background-color: rgba(0, 0, 0, 0.2);
+}
 select:hover{
   cursor: pointer;
 }
+

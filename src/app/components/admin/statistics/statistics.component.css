@@ -1,19 +1,26 @@
 app-month-selector{
-  margin-left: 90%;
+  margin-left: 85%;
   width: 0;
+}
+.selectors{
+  align-content: space-between;
+  align-items: center;
+
 }
 .tableCard{
   width: 900px;
   border:solid  rgb(44, 33, 66);
-  padding: 20px;
   background-color: rgb(44, 33, 66);
-  margin: 25px 0 0 50px;
+  margin: 20px 0 0 50px;
 
 }
 .content{
-  width: 100%;
+  width: 98%;
   display: flex;
   align-content: space-between ;
   align-items: end;
 }
 
+.graph{
+margin-bottom: 35px;
+}
