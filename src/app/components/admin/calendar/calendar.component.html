@@ -10,7 +10,8 @@
   </div>
   <table #calendar>
     <th></th>
-    <th *ngFor="let day of daysInAMonth; index as i" [ngClass]="{'today' : moment({day: day +1, month:months.indexOf(selectedMonth)}).format('YYYY-MM-DD') === today } ">
+    <th *ngFor="let day of daysInAMonth; index as i"
+        [ngClass]="{'today' : moment({day: day +1, month:months.indexOf(selectedMonth)}).format('YYYY-MM-DD') === today } ">
       {{ day + 1 }}
       <br>
       <p class="weekdays"> {{ checkWhatWeekDayItIs(selectedMonth, day + 1) }}</p>
@@ -34,7 +35,21 @@
                               isCheckout(camperPlace,day + 1, months.indexOf(selectedMonth)),
                     'weekend':
                               checkWhatWeekDayItIs(selectedMonth,day + 1) === weekdays.get(0)
-                             ||checkWhatWeekDayItIs(selectedMonth,day + 1) === weekdays.get(6)
+                             ||checkWhatWeekDayItIs(selectedMonth,day + 1) === weekdays.get(6),
+
+                    'mixedPaymentPaidFirst':
+                              isPaid(camperPlace, day + 1, selectedMonth)
+                              && isNotPaid(camperPlace, day + 1, selectedMonth)
+                              &&hasMixedReservations(camperPlace, day + 1, selectedMonth) === 'paidFirst',
+                    'mixedPaymentUnpaidFirst':
+                               isPaid(camperPlace, day + 1, selectedMonth)
+                              && isNotPaid(camperPlace, day + 1, selectedMonth)
+                              &&hasMixedReservations(camperPlace, day + 1, selectedMonth) === 'unpaidFirst',
+                    'paid':
+                              isPaid(camperPlace, day + 1,  selectedMonth)
+
+
+
 
 
   }">

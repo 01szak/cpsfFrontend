@@ -33,7 +33,7 @@ export class CalendarComponent {
   camperPlaces: Array<CamperPlace> = [];
   currentMonth: string = this.months[new Date().getMonth()];
   selectedMonth: string = this.currentMonth;
-  today= moment(Date.now()).format('YYYY-MM-DD');
+  today = moment(Date.now()).format('YYYY-MM-DD');
 
   constructor(private camperPlaceService: CamperPlaceService, private popupService: PopupService) {
   }
@@ -74,7 +74,13 @@ export class CalendarComponent {
   loadCamperPlaces(): void {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
-        this.camperPlaces = data || [];
+        this.camperPlaces = data;
+        console.log(this.camperPlaces)
+        this.camperPlaces.forEach(cp => {
+          cp.reservations.forEach(r => {
+            console.log(r.paid)
+          })
+        })
       },
       error: (error) => {
         console.error('failed to load camper places', error);
@@ -155,58 +161,6 @@ export class CalendarComponent {
 
   }
 
-  //
-  // isDayReserved(camperPlace: CamperPlace, day: number, month: number): [boolean, string, string, string] {
-  //
-  //   const days: string[] = [];
-  //   let monthOfTheReservation1: string = "";
-  //   let monthOfTheReservation2: string = "";
-  //   let reservationStatus: string = "";
-  //
-  //   camperPlace.reservations?.forEach(r => {
-  //     if (r.reservationStatus === 'EXPIRED') {
-  //       return;
-  //     }
-  //
-  //     const startDate = moment(r.checkin);
-  //     const endDate = moment(r.checkout);
-  //     monthOfTheReservation1 = this.months.at(startDate.month()) || "";
-  //     monthOfTheReservation2 = this.months.at(endDate.month()) || "";
-  //     while (startDate.isSameOrBefore(endDate)) {
-  //       const formattedDate = startDate.format('YYYY-MM-DD')
-  //       days.push(formattedDate);
-  //
-  //       if(formattedDate === moment().set({ date: day  , month: month }).format('YYYY-MM-DD')){
-  //         reservationStatus = r.reservationStatus
-  //       }
-  //       startDate.add(1, 'day');
-  //     }
-  //   })
-  //   const date = moment().set({date: day , month: month}).format('YYYY-MM-DD');
-  //   return [days.includes(date), monthOfTheReservation1, monthOfTheReservation2, reservationStatus || ""]
-  // }
-  isDayReserved(camperPlace: CamperPlace, day: number, month: string) : boolean{
-    const _month = this.months.indexOf(month);
-    const reservations = camperPlace.reservations;
-    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
-
-    return reservations.some(reservation => {
-      return moment(td).isBetween(moment(reservation.checkin), moment(reservation.checkout),"days",'[]')
-
-    })
-
-  }
-  //
-  // checkReservationStatus(camperPlace: CamperPlace, day: number, month: string): string{
-  // const _month = this.months.indexOf(month);
-  // const reservations = camperPlace.reservations;
-  // const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
-  // if(this.isDayReserved(camperPlace, day, month)){
-  //   return
-  // }
-
-
-// }
 
   countNewReservations(): string {
     if (!this.camperPlaces) return '0';
@@ -225,6 +179,19 @@ export class CalendarComponent {
     return todaysReservations.toString();
   }
 
+
+  isDayReserved(camperPlace: CamperPlace, day: number, month: string): boolean {
+    const _month = this.months.indexOf(month);
+    const reservations = camperPlace.reservations;
+    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
+
+    return reservations.some(reservation => {
+      return moment(td).isBetween(moment(reservation.checkin), moment(reservation.checkout), "days", '[]')
+
+    })
+
+  }
+
   protected readonly Date = Date;
   protected readonly NgIf = NgIf;
   protected readonly moment = moment;
@@ -241,5 +208,43 @@ export class CalendarComponent {
     return camperPlace.reservations.some(r => {
       return date === moment(r.checkin).format('YYYY-MM-DD');
     }) ?? false;
+  }
+
+  isPaid(camperPlace: CamperPlace, day: number, month: string) {
+
+    const _month = this.months.indexOf(month);
+    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
+
+    return camperPlace.reservations.some(r => {
+      return r.paid && moment(td).isBetween(moment(r.checkin), r.checkout, 'days', '[]')
+    })
+  }
+
+  isNotPaid(camperPlace: CamperPlace, day: number, month: string) {
+    const _month = this.months.indexOf(month);
+    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
+
+    return camperPlace.reservations.some(r => {
+      return !r.paid && moment(td).isBetween(moment(r.checkin), r.checkout, 'days', '[]')
+    })
+  }
+  hasMixedReservations(camperPlace: CamperPlace, day: number, month: string): 'paidFirst' | 'unpaidFirst' | ''{
+    const _month = this.months.indexOf(month);
+    const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
+
+    const sortedReservations = camperPlace.reservations;
+
+    let firstPaid = null;
+    let firstUnpaid = null;
+
+    for(let r of sortedReservations){
+      if(r.paid && firstPaid === null) firstPaid = r;
+      if(!r.paid && firstUnpaid === null) firstUnpaid = r;
+    }
+
+    if(firstPaid && firstUnpaid){
+      return moment(firstPaid.checkin).isBefore(moment(firstUnpaid.checkin)) ? 'paidFirst' : 'unpaidFirst'
+    }
+    return ''
   }
 }

@@ -8,3 +8,6 @@ table{
 th,td,tr{
   color: white;
 }
+.tableRow:hover{
+background-color: mediumpurple;
+}

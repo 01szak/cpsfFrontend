@@ -58,8 +58,18 @@
       </td>
 
     </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef>
+        Paid
+      </th>
+      <td mat-cell *matCellDef="let reservation" >
+      <mat-checkbox (click)="$event.stopPropagation()" (change)="setIsPaid(reservation.id,paid.checked,reservation.camperPlaceNumber,reservation.checkin,reservation.checkout)"  #paid [checked]="reservation.paid"></mat-checkbox>
+      </td>
+
+    </ng-container>
 
     <!-- Nagłówki wiersza -->
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <!-- Wiersze -->
     <tr mat-row

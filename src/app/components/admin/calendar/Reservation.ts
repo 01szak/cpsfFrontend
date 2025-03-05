@@ -1,5 +1,4 @@
-
-export interface Reservation{
+export interface Reservation {
   id: number;
   checkin: Date;
   checkout: Date;
@@ -8,4 +7,5 @@ export interface Reservation{
   userFirstName: string;
   userLastName: string;
   userEmail: string;
+  paid: boolean
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import {Component, numberAttribute, OnInit} from '@angular/core';
 import {ReservationService} from '../../../service/ReservationService';
 import {Reservation} from '../calendar/Reservation';
 import {CommonModule} from '@angular/common';
@@ -15,8 +15,12 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
-import { MatNativeDateModule } from '@angular/material/core';
+import {MatNativeDateModule} from '@angular/material/core';
 import {MatCard} from '@angular/material/card';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {CamperPlaceService} from '../../../service/CamperPlaceService';
+import {CamperPlace} from '../calendar/CamperPlace';
+import {switchAll, switchMap} from 'rxjs';
 
 
 @Component({
@@ -39,7 +43,8 @@ import {MatCard} from '@angular/material/card';
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,
-    MatCard
+    MatCard,
+    MatCheckbox
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
@@ -47,15 +52,16 @@ import {MatCard} from '@angular/material/card';
 })
 export class ReservationsComponent implements OnInit {
 
-  displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status'];
+  displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status', 'delete'];
   allReservations: Array<Reservation> = [];
-  sortedReservations: Array<Reservation> = []
   searchValue = '';
   searchForm!: FormGroup;
   isAsc: number = 0;
+  camperPlace:CamperPlace = {
+    id: 0, number: 0, price: "", reservations: [], type: ""
 
-
-  constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder) {
+  }
+  constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder,private camperPlaceService:CamperPlaceService) {
     this.searchForm = this.fb.nonNullable.group({
       searchValue: '',
     })
@@ -65,12 +71,17 @@ export class ReservationsComponent implements OnInit {
     this.reservationService.getFilteredReservations(this.searchValue).subscribe({
       next: (reservations) => {
         this.allReservations = reservations;
+        console.log(this.allReservations)
+this.allReservations.forEach(r =>{
+  console.log(r.paid)
+})
       }
     })
   }
 
   ngOnInit() {
     this.fetchData();
+
   }
 
   onSearchSubmit() {
@@ -93,16 +104,40 @@ export class ReservationsComponent implements OnInit {
   }
 
   sorTable(header: string) {
-    return this.reservationService.sortTable(header,this.isAsc).subscribe({
+    return this.reservationService.sortTable(header, this.isAsc).subscribe({
       next: (reservation) => {
         this.allReservations = reservation;
         if (this.isAsc === 0) {
           this.isAsc = 1;
-        }else{
+        } else {
           this.isAsc = 0;
         }
       }
     })
+  }
+
+  setIsPaid(id: number, paid: boolean, camperPlaceNumber: number,checkin: Date, checkout: Date) {
+    this.camperPlaceService.findCamperPlaceByNumber(camperPlaceNumber).pipe(
+      switchMap(cp => {
+        this.camperPlace = cp;
+        console.log(this.camperPlace);
+
+        const reservation = {
+          id: id,
+          checkin: new Date(checkin ).toISOString().split('T')[0],
+          checkout: new Date(checkout ).toISOString().split('T')[0],
+          camperPlace: this.camperPlace,
+          paid: paid
+        };
+
+        console.log(reservation.paid);
+        return this.reservationService.updateReservation(reservation);
+      })
+    ).subscribe({
+      error: (err) => {
+        console.log(err);
+      }
+    });
   }
 
 }

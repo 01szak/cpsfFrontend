@@ -41,10 +41,14 @@ export class ReservationService {
 
   updateReservation(reservation: {
     id: number
-    checkin: string;
-    checkout: string;
+    checkin: string ;
+    checkout: string ;
     camperPlace: CamperPlace;
+    paid: boolean
   }) {
     return this.http.patch<Reservation>(this.api + 'updateReservation/' + reservation.id, reservation);
+  }
+  deleteReservation(id:number){
+    return this.http.delete(this.api + 'deleteReservation/' + id);
   }
 }

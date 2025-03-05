@@ -37,7 +37,17 @@ export class ReservationUpdatePopupComponent {
   camperPlaces: CamperPlace[] = [];
   errorMessage: string = ''
 
-updatedReservation!: Reservation;
+updatedReservation!: {
+  camperPlaceNumber: number;
+  checkin: Date;
+  userLastName: string;
+  paid: any;
+  userEmail: string;
+  id: number;
+  userFirstName: string;
+  checkout: Date;
+  reservationStatus: string
+};
   constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected reservation: Reservation, private camperPlaceService: CamperPlaceService, private reservationService: ReservationService) {
   }
 
@@ -50,7 +60,8 @@ updatedReservation!: Reservation;
       reservationStatus: '',
       userEmail: this.reservation.userEmail,
       userFirstName: this.reservation.userFirstName,
-      userLastName:this.reservation.userLastName
+      userLastName:this.reservation.userLastName,
+      paid: this.reservation.paid
 
     };
     this.findCamperPlaceByNumber(this.reservation.camperPlaceNumber);
@@ -61,7 +72,7 @@ updatedReservation!: Reservation;
     console.log(this.reservation)
   }
 
-  closePopup() {
+   closePopup() {
     this.dialog.closeAll();
   }
 
@@ -96,7 +107,8 @@ updatedReservation!: Reservation;
       id: this.updatedReservation.id,
       checkin: new Date(this.updatedReservation.checkin ).toISOString().split('T')[0], // YYYY-MM-DD
       checkout: new Date(this.updatedReservation.checkout ).toISOString().split('T')[0],
-      camperPlace: this.camperPlace
+      camperPlace: this.camperPlace,
+      paid: this.reservation.paid
     }
     this.reservationService.updateReservation(reservationRequest).subscribe({
       next: () => {
@@ -109,5 +121,17 @@ updatedReservation!: Reservation;
 
       }
     })
+  }
+  deleteReservation(id: number){
+    this.reservationService.deleteReservation(id).subscribe({
+        next:() =>{
+          this.closePopup();
+          console.log(id)
+        },
+      error:(err) =>{
+          console.log(err)
+    }
+      }
+    );
   }
 }

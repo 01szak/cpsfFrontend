@@ -73,9 +73,7 @@ export class ReservationPopupComponent {
   errorMessage: string = '';
   isNewGuestClicked: boolean = false;
   tempUser!: User;
-  snackBar = inject(MatSnackBar)
 
-// @ViewChild(CalendarComponent) calendarComponent!: CalendarComponent;
   constructor(
     private camperPlaceService: CamperPlaceService,
     private dialog: MatDialog,
@@ -104,7 +102,8 @@ export class ReservationPopupComponent {
     id: 0,
     userFirstName: '',
     checkout: new Date(),
-    reservationStatus: ''
+    reservationStatus: '',
+    paid: false
   }
 
 

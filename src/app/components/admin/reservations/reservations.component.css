@@ -100,3 +100,6 @@ th {
   cursor: pointer;
   background-color: mediumpurple;
 }
+.deleteButton:hover{
+  color:red;
+}
