@@ -58,7 +58,7 @@
       </td>
 
     </ng-container>
-    <ng-container matColumnDef="delete">
+    <ng-container matColumnDef="paid" class="checkBox">
       <th mat-header-cell *matHeaderCellDef>
         Paid
       </th>
@@ -73,7 +73,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <!-- Wiersze -->
     <tr mat-row
-        (click)="openUpdatePopup(row)"
+        (click)="openUpdatePopup(row,camperPlace)"
         class="row"
         *matRowDef="let row; columns: displayedColumns;">
     </tr>

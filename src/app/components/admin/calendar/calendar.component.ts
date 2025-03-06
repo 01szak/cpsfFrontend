@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ElementRef, ViewChild, ViewChildren} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule, NgIf} from '@angular/common';
@@ -9,6 +9,7 @@ import moment from 'moment/moment';
 import {MatCard} from '@angular/material/card';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatOption, MatSelect} from '@angular/material/select';
+import {Reservation} from './Reservation';
 
 
 @Component({
@@ -42,8 +43,19 @@ export class CalendarComponent {
     this.popupService.openCamperPlacePopup();
   }
 
-  openCreateReservationPopupFromCalendar(checkinDate: Date, camperPlaceNumber: number) {
-    this.popupService.openCreateReservationPopupFromCalendar(checkinDate, camperPlaceNumber);
+  openReservationPopupFromCalendar(event:Event,tdDate: Date, camperPlace: CamperPlace) {
+const td = event.target as HTMLElement
+    if (td.classList.contains('reserved')) {
+      console.log(camperPlace.reservations)
+      const reservation = camperPlace.reservations.filter(r => moment(tdDate).isBetween(moment(r.checkin),moment(r.checkout),"days","[]"));
+      console.log(reservation[0])
+      if (reservation) {
+        this.popupService.openUpdateReservationPopup(reservation[0],camperPlace)
+        return;
+      }
+    }
+      this.popupService.openCreateReservationPopupFromCalendar(tdDate, camperPlace);
+
   }
 
   checkWhatWeekDayItIs(month: string, day: number) {
@@ -228,7 +240,8 @@ export class CalendarComponent {
       return !r.paid && moment(td).isBetween(moment(r.checkin), r.checkout, 'days', '[]')
     })
   }
-  hasMixedReservations(camperPlace: CamperPlace, day: number, month: string): 'paidFirst' | 'unpaidFirst' | ''{
+
+  hasMixedReservations(camperPlace: CamperPlace, day: number, month: string): 'paidFirst' | 'unpaidFirst' | '' {
     const _month = this.months.indexOf(month);
     const td = moment({day: day, month: _month}).format('YYYY-MM-DD');
 
@@ -237,12 +250,12 @@ export class CalendarComponent {
     let firstPaid = null;
     let firstUnpaid = null;
 
-    for(let r of sortedReservations){
-      if(r.paid && firstPaid === null) firstPaid = r;
-      if(!r.paid && firstUnpaid === null) firstUnpaid = r;
+    for (let r of sortedReservations) {
+      if (r.paid && firstPaid === null) firstPaid = r;
+      if (!r.paid && firstUnpaid === null) firstUnpaid = r;
     }
 
-    if(firstPaid && firstUnpaid){
+    if (firstPaid && firstUnpaid) {
       return moment(firstPaid.checkin).isBefore(moment(firstUnpaid.checkin)) ? 'paidFirst' : 'unpaidFirst'
     }
     return ''

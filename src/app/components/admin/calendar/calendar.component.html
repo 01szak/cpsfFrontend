@@ -20,8 +20,8 @@
     <tr *ngFor="let camperPlace of camperPlaces; index as i;">
       <th>{{ i + 1 }}</th>
       <td
-        (click)="openCreateReservationPopupFromCalendar(
-      moment().set({ date: day + 1, month: months.indexOf(selectedMonth) }).toDate(), i + 1
+        (click)="openReservationPopupFromCalendar(
+      $event,moment().set({ date: day + 1, month: months.indexOf(selectedMonth) }).toDate(), camperPlace
   )"
         *ngFor="let day of daysInAMonth"
         matTooltip="{{ day + 1 + ' ' + selectedMonth }}"
@@ -52,8 +52,7 @@
 
 
 
-  }">
-        <br>
+  }" #td>
       </td>
 
       <button class="button delete" (click)="delete(i)"><i class="fa-solid fa-minus"></i></button>

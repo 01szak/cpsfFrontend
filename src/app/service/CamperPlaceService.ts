@@ -32,8 +32,7 @@ export class CamperPlaceService {
   }
 
   findCamperPlaceByNumber(number: number): Observable<CamperPlace> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json; charset=UTF-8'});
-    return this.http.get<CamperPlace>(this.api + 'find/' + number.toString(), {headers: headers});
+    return this.http.get<CamperPlace>(this.api + 'find/' + number);
   }
 }
 

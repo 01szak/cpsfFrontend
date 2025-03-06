@@ -8,7 +8,7 @@
     <br>
     <mat-form-field appearance="outline">
       <mat-label>Checkin</mat-label>
-      <input type="date" matInput  [(ngModel)]="this.updatedReservation.checkin" >
+      <input type="date" matInput  [(ngModel)]="updatedReservation.checkin" >
     </mat-form-field>
     <br>
     <mat-form-field appearance="outline">
@@ -20,7 +20,7 @@
       <mat-label>
         Select Camper Place
       </mat-label>
-      <mat-select [(ngModel)]="number" (ngModelChange)="findCamperPlaceByNumber(number)"  name="number">
+      <mat-select [(ngModel)]="updatedReservation.camperPlaceNumber" (ngModelChange)="findCamperPlaceByNumber(number)"  name="number">
         <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.number">
           {{ camperPlace.number }}
         </mat-option>
@@ -32,7 +32,7 @@
 
     <button class="cancelButton" mat-button (click)="closePopup()">cancel</button>
     <button mat-button (click)="updateReservation()">submit</button>
-    <button mat-button (click)="deleteReservation(reservation.id)" class="deleteButton">delete</button>
+    <button mat-button (click)="deleteReservation(data.reservation.id)" class="deleteButton">delete</button>
   </mat-card-content>
 
 </mat-card>

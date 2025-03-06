@@ -52,7 +52,7 @@ import {switchAll, switchMap} from 'rxjs';
 })
 export class ReservationsComponent implements OnInit {
 
-  displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status', 'delete'];
+  displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status', 'paid'];
   allReservations: Array<Reservation> = [];
   searchValue = '';
   searchForm!: FormGroup;
@@ -94,8 +94,8 @@ this.allReservations.forEach(r =>{
     this.popupService.openCreateReservationPopup();
   }
 
-  openUpdatePopup(reservation: Reservation) {
-    this.popupService.openUpdateReservationPopup(reservation);
+  openUpdatePopup(reservation: Reservation,camperPlace:CamperPlace) {
+    this.popupService.openUpdateReservationPopup(reservation,camperPlace);
   }
 
   checkStatus(reservation: Reservation) {

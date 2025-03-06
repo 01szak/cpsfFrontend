@@ -79,7 +79,7 @@ export class ReservationPopupComponent {
     private dialog: MatDialog,
     private popupService: PopupService,
     private reservationService: ReservationService,
-    @Inject(MAT_DIALOG_DATA) public data: { camperPlaceNumber: number; checkinDate: Date },
+    @Inject(MAT_DIALOG_DATA) private data: { camperPlaceNumber: number; checkinDate: Date },
     private userService: UserService,
     private fb: FormBuilder,
   ) {

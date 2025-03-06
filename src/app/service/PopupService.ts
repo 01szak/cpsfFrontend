@@ -12,6 +12,7 @@ import {User} from '../components/admin/calendar/User';
 import {
   UserUpdatePopupComponent
 } from '../components/admin/popups/userPopup/user-update-popup/user-update-popup.component';
+import {CamperPlace} from '../components/admin/calendar/CamperPlace';
 
 @Injectable({
   providedIn: 'root',
@@ -26,11 +27,11 @@ export class PopupService {
   openCreateReservationPopup() {
     this.dialog.open(ReservationPopupComponent);
   }
-    openCreateReservationPopupFromCalendar(date: Date, camperPlaceNumber: number) {
+    openCreateReservationPopupFromCalendar(date: Date, camperPlace: CamperPlace) {
     this.dialog.open(ReservationPopupComponent,{
       data:{
         checkinDate: date,
-        camperPlaceNumber: camperPlaceNumber
+        camperPlaceNumber: camperPlace.number
       }
 
       });
@@ -40,9 +41,12 @@ export class PopupService {
     this.dialog.closeAll()
   }
 
-  openUpdateReservationPopup(reservation: Reservation) {
+  openUpdateReservationPopup(reservation: Reservation,camperPlace: CamperPlace) {
     this.dialog.open(ReservationUpdatePopupComponent,{
-      data: reservation
+      data:{
+        reservation: reservation,
+        camperPlace: camperPlace
+      }
     })
   }
 

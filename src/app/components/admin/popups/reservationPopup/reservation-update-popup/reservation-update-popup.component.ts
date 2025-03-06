@@ -48,28 +48,28 @@ updatedReservation!: {
   checkout: Date;
   reservationStatus: string
 };
-  constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected reservation: Reservation, private camperPlaceService: CamperPlaceService, private reservationService: ReservationService) {
+  constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected data: { reservation:Reservation,camperPlace:CamperPlace }, private camperPlaceService: CamperPlaceService, private reservationService: ReservationService) {
   }
 
   ngOnInit() {
     this.updatedReservation = {
-      camperPlaceNumber: this.reservation.camperPlaceNumber,
-      checkin: this.reservation.checkin,
-      checkout: this.reservation.checkout,
-      id: this.reservation.id,
+      camperPlaceNumber: this.data.camperPlace.number || this.data.reservation.camperPlaceNumber,
+      checkin: this.data.reservation.checkin,
+      checkout: this.data.reservation.checkout,
+      id: this.data.reservation.id,
       reservationStatus: '',
-      userEmail: this.reservation.userEmail,
-      userFirstName: this.reservation.userFirstName,
-      userLastName:this.reservation.userLastName,
-      paid: this.reservation.paid
+      userEmail: this.data.reservation.userEmail,
+      userFirstName: this.data.reservation.userFirstName,
+      userLastName:this.data.reservation.userLastName,
+      paid: this.data.reservation.paid
 
     };
-    this.findCamperPlaceByNumber(this.reservation.camperPlaceNumber);
+    this.findCamperPlaceByNumber(this.updatedReservation.camperPlaceNumber);
     console.log(this.camperPlace)
 
 
     this.loadCamperPlace()
-    console.log(this.reservation)
+    console.log(this.data.reservation)
   }
 
    closePopup() {
@@ -86,7 +86,7 @@ updatedReservation!: {
 
   }
 
-  number: number = this.reservation.camperPlaceNumber?? 0;
+  number: number =   0;
 
   findCamperPlaceByNumber(number: number): CamperPlace {
 
@@ -107,8 +107,8 @@ updatedReservation!: {
       id: this.updatedReservation.id,
       checkin: new Date(this.updatedReservation.checkin ).toISOString().split('T')[0], // YYYY-MM-DD
       checkout: new Date(this.updatedReservation.checkout ).toISOString().split('T')[0],
-      camperPlace: this.camperPlace,
-      paid: this.reservation.paid
+      camperPlace: this.camperPlace ,
+      paid: this.data.reservation.paid
     }
     this.reservationService.updateReservation(reservationRequest).subscribe({
       next: () => {
