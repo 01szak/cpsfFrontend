@@ -1,7 +1,13 @@
+node {
+  env.NODEJS_HOME = "${tool 'nodejs'}"
+  // on linux / mac
+  env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
+  // on windows
+  env.PATH="${env.NODEJS_HOME};${env.PATH}"
+}
+
 pipeline {
   agent any
-
-  tools { nodejs "nodejs" }
 
   stages {
     stage('Checkout') {
@@ -13,19 +19,17 @@ pipeline {
 
     stage('Build') {
       steps {
-        script {
-          // Build the application
-          sh 'npm run build'  // Modify this according to your build process
+        nodejs(nodeJSInstallationName: 'nodejs') {
+          sh 'npm config ls'
+          sh 'npm install'
+          sh 'npm run build'
         }
       }
     }
 
-    stage('Unit Test') {
+    stage('Deploy') {
       steps {
-        script {
-          // Run unit tests
-          sh 'npm run test'  // Modify this according to your test process
-        }
+          sh 'cp -r dist/* /var/www/html/'
       }
     }
 
