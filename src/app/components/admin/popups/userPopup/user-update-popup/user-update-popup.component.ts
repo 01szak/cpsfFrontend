@@ -8,10 +8,6 @@ import {MatSelect} from '@angular/material/select';
 import {NgForOf} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
-import {Reservation} from '../../../calendar/Reservation';
-import {CamperPlaceService} from '../../../../../service/CamperPlaceService';
-import {ReservationService} from '../../../../../service/ReservationService';
-import {CamperPlace} from '../../../calendar/CamperPlace';
 import {User} from '../../../calendar/User';
 import {UserService} from '../../../../../service/UserService';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -44,27 +40,23 @@ export class UserUpdatePopupComponent {
   ngOnInit() {
     this.updatedUser = {
       id: this.user.id,
-      carRegistration: "",
-      city: "",
-      country: "",
+      carRegistration: this.user.carRegistration ?? "",
+      city: this.user.city ?? "",
+      country:this.user.country ?? "",
       email: this.user.email ?? "",
-      firstName: this.user.firstName,
-      lastName: this.user.lastName,
-      phoneNumber: "",
-      reservations: this.user.reservations,
-      streetAddress: ""
-
+      firstName: this.user.firstName ?? "",
+      lastName: this.user.lastName ?? "",
+      phoneNumber:this.user.phoneNumber ?? "",
+      reservations: this.user.reservations ?? "",
+      streetAddress: this.user.streetAddress ?? ""
     };
-
-
   }
-
   closePopup() {
     this.dialog.closeAll();
   }
-
-
-
+  deleteUser() {
+    this.userService.deleteUserById(this.user.id);
+  }
   updateUser() {
     const reservationRequest = {
       id: this.updatedUser.id,
@@ -77,7 +69,6 @@ export class UserUpdatePopupComponent {
       phoneNumber: this.updatedUser.phoneNumber,
       reservations: this.updatedUser.reservations,
       streetAddress: this.updatedUser.streetAddress
-
     }
     this.userService.updateReservation(reservationRequest).subscribe({
       next: () => {
@@ -88,7 +79,6 @@ export class UserUpdatePopupComponent {
 
       },error:()=>{
         console.log(reservationRequest)
-
       }
     })
   }

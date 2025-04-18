@@ -40,4 +40,8 @@ export class UserService {
   getUserById(id: number){
     return this.http.get<User>(this.api + 'getUser/' + id.toString())
   }
+
+  deleteUserById(id: number) {
+    return this.http.delete(this.api + 'delete/' + id.toString())
+  }
 }

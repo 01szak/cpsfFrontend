@@ -5,4 +5,20 @@ mat-form-field{
   height: 40px;
   margin-top: 10px;
 }
-
+.buttons{
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+}
+.cancelButton {
+  color: red;
+}
+.cancelButton:hover {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+.functionalButtons{
+  justify-self: start;
+}
