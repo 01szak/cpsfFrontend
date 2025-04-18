@@ -1,7 +1,19 @@
-.deleteButton:hover{
-  color:red;
+.buttons{
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
 }
-.deleteButton{
-  margin-left: 70px;
-  color:red;
+.cancelButton {
+  color: red;
+}
+.cancelButton:hover {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+.functionalButtons{
+  justify-self: start;
+  display: flex;
+  justify-content: space-evenly;
 }

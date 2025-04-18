@@ -11,10 +11,10 @@ mat-form-field{
   justify-content: space-evenly;
   flex-direction: row;
 }
-.cancelButton {
+.deleteButton {
   color: red;
 }
-.cancelButton:hover {
+.deleteButton:hover {
   background-color: red;
   color: white;
   cursor: pointer;

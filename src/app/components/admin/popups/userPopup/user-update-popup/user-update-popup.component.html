@@ -47,10 +47,9 @@
     <div class="buttons">
       <div class="functionalButtons">
         <button mat-button (click)="updateUser()">submit</button>
-        <button class="cancelButton" mat-button (click)="deleteUser()">delete</button>
+        <button class="deleteButton" mat-button (click)="deleteUser(this.updatedUser.id)">delete</button>
       </div>
       <button mat-button (click)="closePopup()">cancel</button>
-
     </div>
   </mat-card-content>
 

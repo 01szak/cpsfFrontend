@@ -125,8 +125,7 @@ updatedReservation!: {
   deleteReservation(id: number){
     this.reservationService.deleteReservation(id).subscribe({
         next:() =>{
-          this.closePopup();
-          console.log(id)
+          window.location.reload()
         },
       error:(err) =>{
           console.log(err)

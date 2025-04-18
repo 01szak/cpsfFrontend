@@ -54,9 +54,17 @@ export class UserUpdatePopupComponent {
   closePopup() {
     this.dialog.closeAll();
   }
-  deleteUser() {
-    this.userService.deleteUserById(this.user.id);
-    window.location.reload();
+  deleteUser(id:number) {
+    this.userService.deleteUserById(id).subscribe({
+        next:() =>{
+          window.location.reload()
+        },
+        error:(err) =>{
+          console.log(err)
+        }
+      }
+
+    );
   }
   updateUser() {
     const reservationRequest = {
