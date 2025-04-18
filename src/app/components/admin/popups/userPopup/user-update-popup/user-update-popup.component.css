@@ -21,4 +21,6 @@ mat-form-field{
 }
 .functionalButtons{
   justify-self: start;
+  display: flex;
+  justify-content: space-evenly;
 }
