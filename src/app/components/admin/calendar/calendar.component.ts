@@ -86,10 +86,22 @@ const td = event.target as HTMLElement
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
-        this.camperPlaces.sort((a, b) => (
-            parseInt(a.index?.slice(1, 2) instanceof Number  ?  <string>a.index?.slice(0, 2) : <string>a.index?.slice(0, 1) )
-        - parseInt(b.index?.slice(1, 2) instanceof Number  ?  <string>b.index?.slice(0, 2) : <string>b.index?.slice(0, 1) ))
-        )
+        this.camperPlaces.sort((a, b) => {
+          const aIndex = a.index ?? "";
+          const bIndex = b.index ?? "";
+
+          const aNumber = parseInt(aIndex, 10);
+          const bNumber = parseInt(bIndex, 10);
+
+          const aLetter = aIndex.slice(String(aNumber).length);
+          const bLetter = bIndex.slice(String(bNumber).length);
+
+          if (aNumber !== bNumber) {
+            return aNumber - bNumber;
+          }
+
+          return aLetter.localeCompare(bLetter);
+        });
         console.log(this.camperPlaces)
         this.camperPlaces.forEach(cp => {
           cp.reservations.forEach(r => {
