@@ -82,12 +82,14 @@ const td = event.target as HTMLElement
     this.loadCamperPlaces();
     this.addNumbersToDaysInMonth();
   }
-
   loadCamperPlaces(): void {
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
-        this.camperPlaces.sort((a, b) => parseInt(<string>a.index?.slice(0, 1))  - parseInt(<string>b.index?.slice(0, 1)))
+        this.camperPlaces.sort((a, b) => (
+            parseInt(a.index?.slice(1, 2) instanceof Number  ?  <string>a.index?.slice(0, 2) : <string>a.index?.slice(0, 1) )
+        - parseInt(b.index?.slice(1, 2) instanceof Number  ?  <string>b.index?.slice(0, 2) : <string>b.index?.slice(0, 1) ))
+        )
         console.log(this.camperPlaces)
         this.camperPlaces.forEach(cp => {
           cp.reservations.forEach(r => {
