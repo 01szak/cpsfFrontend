@@ -66,7 +66,7 @@ import {CalendarComponent} from '../../../calendar/calendar.component';
 export class ReservationPopupComponent {
   camperPlaces: Array<CamperPlace> = [];
   checkin!: string;
-  number!: number;
+  index!: string;
   allUsers!: User[];
   searchValue = '';
   searchForm!: FormGroup;
@@ -79,7 +79,7 @@ export class ReservationPopupComponent {
     private dialog: MatDialog,
     private popupService: PopupService,
     private reservationService: ReservationService,
-    @Inject(MAT_DIALOG_DATA) private data: { camperPlaceNumber: number; checkinDate: Date },
+    @Inject(MAT_DIALOG_DATA) private data: { camperPlaceIndex: string; checkinDate: Date },
     private userService: UserService,
     private fb: FormBuilder,
   ) {
@@ -90,12 +90,12 @@ export class ReservationPopupComponent {
 
   camperPlace: CamperPlace = {
     reservations: [],
-    number: 0,
+    index: "",
     price: '',
     type: ''
   }
   reservation: Reservation = {
-    camperPlaceNumber: 0,
+    camperPlaceIndex: "",
     checkin: new Date(this.checkin) ?? new Date(),
     userLastName: '',
     userEmail: '',
@@ -127,9 +127,8 @@ export class ReservationPopupComponent {
   ngOnInit() {
     this.loadCamperPlace()
     this.checkin = new Date(this.data.checkinDate).toISOString().split('T')[0];
-    this.number = this.data.camperPlaceNumber;
-    if (this.number !== 0) {
-      this.findCamperPlaceByNumber(this.number);
+    if (this.data.camperPlaceIndex !== '') {
+      this.findCamperPlaceByIndex(this.data.camperPlaceIndex);
     }
     this.getFilteredUsers();
   }
@@ -206,9 +205,9 @@ export class ReservationPopupComponent {
     }
   }
 
-  findCamperPlaceByNumber(number: number): CamperPlace {
-    if (number !== 0) {
-      this.camperPlaceService.findCamperPlaceByNumber(number).subscribe({
+  findCamperPlaceByIndex(index: string): CamperPlace {
+    if (index !== '') {
+      this.camperPlaceService.findCamperPlaceByIndex(index).subscribe({
         next: (cp) => {
           this.camperPlace = cp;
           console.log(cp)
@@ -220,6 +219,7 @@ export class ReservationPopupComponent {
     }
     return this.camperPlace;
   }
+
 
 
   findUserById(user: User) {

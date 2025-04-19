@@ -38,7 +38,7 @@ export class ReservationUpdatePopupComponent {
   errorMessage: string = ''
 
 updatedReservation!: {
-  camperPlaceNumber: number;
+  camperPlaceIndex: string;
   checkin: Date;
   userLastName: string;
   paid: any;
@@ -53,7 +53,7 @@ updatedReservation!: {
 
   ngOnInit() {
     this.updatedReservation = {
-      camperPlaceNumber: this.data.camperPlace.number || this.data.reservation.camperPlaceNumber,
+      camperPlaceIndex: this.data.camperPlace.index || this.data.reservation.camperPlaceIndex,
       checkin: this.data.reservation.checkin,
       checkout: this.data.reservation.checkout,
       id: this.data.reservation.id,
@@ -64,7 +64,7 @@ updatedReservation!: {
       paid: this.data.reservation.paid
 
     };
-    this.findCamperPlaceByNumber(this.updatedReservation.camperPlaceNumber);
+    this.findCamperPlaceByIndex(this.updatedReservation.camperPlaceIndex);
     console.log(this.camperPlace)
 
 
@@ -86,11 +86,11 @@ updatedReservation!: {
 
   }
 
-  number: number =   0;
+  inedx: string =   '';
 
-  findCamperPlaceByNumber(number: number): CamperPlace {
+  findCamperPlaceByIndex(index: string): CamperPlace {
 
-    this.camperPlaceService.findCamperPlaceByNumber(number).subscribe({
+    this.camperPlaceService.findCamperPlaceByIndex(index).subscribe({
       next: (cp) => {
         this.camperPlace = cp;
         console.log(cp)

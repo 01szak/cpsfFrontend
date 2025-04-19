@@ -87,6 +87,7 @@ const td = event.target as HTMLElement
     this.camperPlaceService.getAllCamperPlaces().subscribe({
       next: (data: CamperPlace[]) => {
         this.camperPlaces = data;
+        this.camperPlaces.sort((a, b) => parseInt(<string>a.index?.slice(0, 1))  - parseInt(<string>b.index?.slice(0, 1)))
         console.log(this.camperPlaces)
         this.camperPlaces.forEach(cp => {
           cp.reservations.forEach(r => {

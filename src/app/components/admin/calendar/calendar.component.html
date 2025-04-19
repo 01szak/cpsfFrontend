@@ -17,8 +17,8 @@
       <p class="weekdays"> {{ checkWhatWeekDayItIs(selectedMonth, day + 1) }}</p>
     </th>
     <tbody>
-    <tr *ngFor="let camperPlace of camperPlaces; index as i;">
-      <th>{{ i + 1 }}</th>
+    <tr *ngFor="let camperPlace of camperPlaces;">
+      <th>{{ camperPlace.index }}</th>
       <td
         (click)="openReservationPopupFromCalendar(
       $event,moment().set({ date: day + 1, month: months.indexOf(selectedMonth) }).toDate(), camperPlace

@@ -58,7 +58,7 @@ export class ReservationsComponent implements OnInit {
   searchForm!: FormGroup;
   isAsc: number = 0;
   camperPlace:CamperPlace = {
-    id: 0, number: 0, price: "", reservations: [], type: ""
+    id: 0, index: "", price: "", reservations: [], type: ""
 
   }
   constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder,private camperPlaceService:CamperPlaceService) {
@@ -116,8 +116,8 @@ this.allReservations.forEach(r =>{
     })
   }
 
-  setIsPaid(id: number, paid: boolean, camperPlaceNumber: number,checkin: Date, checkout: Date) {
-    this.camperPlaceService.findCamperPlaceByNumber(camperPlaceNumber).pipe(
+  setIsPaid(id: number, paid: boolean, camperPlaceIndex: string,checkin: Date, checkout: Date) {
+    this.camperPlaceService.findCamperPlaceByIndex(camperPlaceIndex).pipe(
       switchMap(cp => {
         this.camperPlace = cp;
         console.log(this.camperPlace);

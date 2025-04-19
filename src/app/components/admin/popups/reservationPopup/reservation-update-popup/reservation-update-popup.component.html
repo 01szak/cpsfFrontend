@@ -20,9 +20,9 @@
       <mat-label>
         Select Camper Place
       </mat-label>
-      <mat-select [(ngModel)]="updatedReservation.camperPlaceNumber" (ngModelChange)="findCamperPlaceByNumber(number)"  name="number">
-        <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.number">
-          {{ camperPlace.number }}
+      <mat-select [(ngModel)]="updatedReservation.camperPlaceIndex" (ngModelChange)="findCamperPlaceByIndex(inedx)"  name="index">
+        <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.index">
+          {{ camperPlace.index }}
         </mat-option>
       </mat-select>
     </mat-form-field>

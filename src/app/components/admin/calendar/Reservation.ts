@@ -3,7 +3,7 @@ export interface Reservation {
   checkin: Date;
   checkout: Date;
   reservationStatus: string;
-  camperPlaceNumber: number;
+  camperPlaceIndex: string;
   userFirstName: string;
   userLastName: string;
   userEmail: string;
