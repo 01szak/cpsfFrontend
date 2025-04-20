@@ -5,12 +5,14 @@ import {MatCard} from '@angular/material/card';
 import {StatisticsService} from '../../../../service/StatisticsService';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {TreeError} from '@angular/compiler';
+import {BaseChartDirective} from 'ng2-charts';
 
 @Component({
   selector: 'app-graph',
   imports: [
     NgxChartsModule,
-    MatCard
+    MatCard,
+    BaseChartDirective
   ],
   templateUrl: './graph.component.html',
   standalone: true,
@@ -21,9 +23,9 @@ export class GraphComponent implements OnInit, OnChanges {
   @Input() year: number = 0;
   camperPlaces: CamperPlace[] = [];
   reservationCountPerCamperPlace: Map<number, number> = new Map();
-  resCountChartData: { name: number, value: number }[] = [];
+  resCountChartData: { name: string, value: number }[] = [];
 
-  revenueChartData: { name: number, value: number }[] = [];
+  revenueChartData: { name: string, value: number }[] = [];
 
   constructor(private statisticsService: StatisticsService, private camperPlaceService: CamperPlaceService) {
   }
@@ -31,6 +33,7 @@ export class GraphComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.loadCamperPlace()
   }
+
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['month']?.currentValue || changes['year']?.currentValue) {
@@ -66,13 +69,14 @@ export class GraphComponent implements OnInit, OnChanges {
     this.statisticsService.getReservationCountForChart(this.month, this.year, camperPlaceIds).subscribe({
       next: (resCount) => {
         this.resCountChartData = [];
+        this.camperPlaces.forEach(c => {
+          Array.from(resCount).forEach((count, index) => this.resCountChartData.push({
+              name: c.index?.toString() ||index.toString(),
+              value: count
+            }
+          ));
+        })
 
-        Array.from(resCount).forEach((count, index) => this.resCountChartData.push({
-            name: index + 1,
-            value: count
-
-          }
-        ));
       }
     })
 
@@ -84,14 +88,16 @@ export class GraphComponent implements OnInit, OnChanges {
     }
     const camperPlaceIds: number[] = this.camperPlaces!.map(camperPlace => camperPlace.id || 0);
     this.statisticsService.getRevenueForChart(this.month, this.year, camperPlaceIds).subscribe({
-      next: (revenues) => {
+      next: (rev) => {
         this.revenueChartData = [];
-        Array.from(revenues).forEach((count, index) => this.revenueChartData.push({
-            name: index + 1,
-            value: count
+        this.camperPlaces.forEach(c => {
+          Array.from(rev).forEach((count, index) => this.revenueChartData.push({
+              name: c.index?.toString() ||index.toString(),
+              value: count
+            }
+          ));
+        })
 
-          }
-        ));
       }
     })
 

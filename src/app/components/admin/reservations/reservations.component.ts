@@ -135,6 +135,7 @@ this.allReservations.forEach(r =>{
       })
     ).subscribe({
       error: (err) => {
+        console.log(id)
         console.log(err);
       }
     });
