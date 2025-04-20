@@ -1,7 +1,8 @@
 mat-card{
   margin: 20px 0 0 30px;
-  width: auto;
+  flex-shrink: 1;
+  max-width: inherit;
   background-color: rgb(44, 33, 66);
-  flex-shrink: initial;
+  height: 300px;
 }
 

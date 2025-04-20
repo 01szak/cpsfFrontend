@@ -24,5 +24,5 @@ app-month-selector{
 
 .graph{
 margin-bottom: 35px;
-  width: auto;
+  max-width: 1000px;
 }

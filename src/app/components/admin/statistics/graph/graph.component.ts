@@ -65,20 +65,23 @@ export class GraphComponent implements OnInit, OnChanges {
     }
     const camperPlaceIds: number[] = this.camperPlaces!.map(camperPlace => camperPlace.id || 0);
     this.statisticsService.getReservationCountForChart(this.month, this.year, camperPlaceIds).subscribe({
-      next: (resCount) => {
-        this.resCountChartData = [];
-        this.camperPlaces.forEach(c => {
-          Array.from(resCount).forEach((count, index) => this.resCountChartData.push({
+      next: (res) => {
+        this.resCountChartData= [];
+        this.camperPlaces.forEach((c,index) => {
+          const a = Array.from(res)
+          this.resCountChartData.push(
+            {
               name: c.index?.toString() ||index.toString(),
-              value: count
+              value: a[index]
             }
-          ));
+          )
         })
 
       }
     })
 
   }
+
 
   loadRevenueChart() {
     if (!this.camperPlaces) {
@@ -88,13 +91,15 @@ export class GraphComponent implements OnInit, OnChanges {
     this.statisticsService.getRevenueForChart(this.month, this.year, camperPlaceIds).subscribe({
       next: (rev) => {
         this.revenueChartData = [];
-        this.camperPlaces.forEach(c => {
-          Array.from(rev).forEach((count, index) => this.revenueChartData.push({
-              name: c.index?.toString() ||index.toString(),
-              value: count
-            }
-          ));
-        })
+        this.camperPlaces.forEach((c,index) => {
+          const a = Array.from(rev)
+           this.revenueChartData.push(
+             {
+               name: c.index?.toString() ||index.toString(),
+               value: a[index]
+             }
+           )
+            })
 
       }
     })
