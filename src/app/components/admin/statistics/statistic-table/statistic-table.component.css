@@ -1,8 +1,8 @@
 .tableRow{
   height: 27px;
 }
-table{
-  background-color: inherit ;
+table {
+  background-color: inherit;
 
 }
 th,td,tr{
@@ -12,3 +12,7 @@ th,td,tr{
 background-color: mediumpurple;
 }
 
+mat-card {
+     background-color: rgb(44, 33, 66);
+  max-width:inherit;
+}

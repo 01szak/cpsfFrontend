@@ -8,7 +8,7 @@ app-month-selector{
 
 }
 .tableCard{
-  width: 900px;
+  width: 500px;
   border:solid  rgb(44, 33, 66);
   background-color: rgb(44, 33, 66);
   margin: 5px 0 10px 50px;
@@ -18,9 +18,11 @@ app-month-selector{
   width: 98%;
   display: flex;
   align-content: space-between ;
-  align-items: end;
+  align-items: center;
+  justify-items: center;
 }
 
 .graph{
 margin-bottom: 35px;
+  width: auto;
 }
