@@ -5,14 +5,12 @@ import {MatCard} from '@angular/material/card';
 import {StatisticsService} from '../../../../service/StatisticsService';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {TreeError} from '@angular/compiler';
-import {BaseChartDirective} from 'ng2-charts';
 
 @Component({
   selector: 'app-graph',
   imports: [
     NgxChartsModule,
-    MatCard,
-    BaseChartDirective
+    MatCard
   ],
   templateUrl: './graph.component.html',
   standalone: true,
