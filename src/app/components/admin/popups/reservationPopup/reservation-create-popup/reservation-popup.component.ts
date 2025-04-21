@@ -79,7 +79,7 @@ export class ReservationPopupComponent {
     private dialog: MatDialog,
     private popupService: PopupService,
     private reservationService: ReservationService,
-    @Inject(MAT_DIALOG_DATA) private data: { camperPlaceIndex: string; checkinDate: Date },
+    @Inject(MAT_DIALOG_DATA) private data: { camperPlace: CamperPlace; checkinDate: Date },
     private userService: UserService,
     private fb: FormBuilder,
   ) {
@@ -88,7 +88,7 @@ export class ReservationPopupComponent {
     })
   }
 
-  camperPlace: CamperPlace = {
+  camperPlace: CamperPlace = this.data.camperPlace || {
     reservations: [],
     index: "",
     price: '',
@@ -127,10 +127,8 @@ export class ReservationPopupComponent {
   ngOnInit() {
     this.loadCamperPlace()
     this.checkin = new Date(this.data.checkinDate).toISOString().split('T')[0];
-    if (this.data.camperPlaceIndex !== '') {
-      this.findCamperPlaceByIndex(this.data.camperPlaceIndex);
-    }
-    this.getFilteredUsers();
+
+    this.getFilteredUsers()
   }
 
   onSearchSubmit() {
@@ -205,20 +203,7 @@ export class ReservationPopupComponent {
     }
   }
 
-  findCamperPlaceByIndex(index: string): CamperPlace {
-    if (index !== '') {
-      this.camperPlaceService.findCamperPlaceByIndex(index).subscribe({
-        next: (cp) => {
-          this.camperPlace = cp;
-          console.log(cp)
-        }, error: (err) => {
-          console.log(err)
-        }
 
-      });
-    }
-    return this.camperPlace;
-  }
 
 
 

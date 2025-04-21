@@ -19,10 +19,10 @@
     <br>
     <mat-form-field appearance="outline">
       <mat-label>
-        Select Camper Place
+       {{camperPlace?.index ?? "Select Camper Place" }}
       </mat-label>
-      <mat-select [(ngModel)]="this.index" (ngModelChange)="findCamperPlaceByIndex(index)" name="index">
-        <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.index">
+      <mat-select [(ngModel)]="this.camperPlace"  name="index">
+        <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace">
           {{ camperPlace.index }}
         </mat-option>
       </mat-select>

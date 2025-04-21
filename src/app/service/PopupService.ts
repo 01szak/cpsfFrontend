@@ -31,7 +31,7 @@ export class PopupService {
     this.dialog.open(ReservationPopupComponent,{
       data:{
         checkinDate: date,
-        camperPlaceNumber: camperPlace.index
+        camperPlace: camperPlace
       }
 
       });
