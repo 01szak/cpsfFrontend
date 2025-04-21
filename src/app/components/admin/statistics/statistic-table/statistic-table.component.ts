@@ -20,28 +20,39 @@ import {MatMonthView} from '@angular/material/datepicker';
 export class StatisticTableComponent implements OnChanges {
   displayedColumns: string[] = ['camperPlaceNumber', 'reservationCount', 'revenue'];
   @Input() camperPlaces: CamperPlace[] = [];
-  @Input() reservationCountPerCamperPlace: Map<number, number> = new Map();
-  @Input() revenuePerCamperPlace: Map<number, number> = new Map();
+  @Input() reservationCountPerCamperPlace: [number,number][] = [];
+  @Input() revenuePerCamperPlace: [number,number][] = [];
 
-  totalReservationCount: number = 0;
-  totalRevenue: number = 0;
-
-
-  calculateTotals() {
-    this.totalReservationCount = Array.from(this.reservationCountPerCamperPlace.values()).reduce((a,b) => a + b, 0)
-    this.totalRevenue = Array.from(this.revenuePerCamperPlace.values()).reduce((a,b) => a + b, 0)
+  // totalReservationCount: number = 0;
+  // totalRevenue: number = 0;
+  //
+  //
+  // calculateTotals() {
+  //   this.totalReservationCount = Array.from(this.reservationCountPerCamperPlace.values()).reduce((a,b) => a + b, 0)
+  //   this.totalRevenue = Array.from(this.revenuePerCamperPlace.values()).reduce((a,b) => a + b, 0)
+  // }
+  getReservationCountPerCamperPlace(camperPlace: CamperPlace){
+    return this.reservationCountPerCamperPlace.find(([id, _]) => id === camperPlace.id)?.[1] ?? 0
   }
-
+  getRevenuePerCamperPlace(camperPlace: CamperPlace){
+    return this.revenuePerCamperPlace.find(([id, _]) => id === camperPlace.id)?.[1] ?? 0
+  }
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['reservationCountPerCamperPlace']?.currentValue || changes['revenuePerCamperPlace']?.currentValue)
-      this.calculateTotals();
+    if (changes['reservationCountPerCamperPlace']?.currentValue || changes['revenuePerCamperPlace']?.currentValue) {
+      // this.calculateTotals();
+      console.log("dupa", Array.from(this.reservationCountPerCamperPlace.entries()))
+      console.log("dupaduapghys", Array.from(this.revenuePerCamperPlace.entries()))
+    }
   }
-  showTotalResCount(){
-    return this.revenuePerCamperPlace? Array.from(this.reservationCountPerCamperPlace.values()).reduce((a, b) => a + b, 0) : 0;
+  showTotalResCount(): number {
+    if (!this.reservationCountPerCamperPlace) return 0;
+    return this.reservationCountPerCamperPlace.reduce((sum, [, value]) => sum + value, 0);
   }
-  showTotalRevenue(){
-    return this.revenuePerCamperPlace? Array.from(this.revenuePerCamperPlace.values()).reduce((a, b) => a + b, 0) : 0;
+  showTotalRevenue(): number {
+    if (!this.revenuePerCamperPlace) return 0;
+    return this.revenuePerCamperPlace.reduce((sum, [, value]) => sum + value, 0);
   }
+
 
   protected readonly Array = Array;
 }

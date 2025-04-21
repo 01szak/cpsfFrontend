@@ -16,11 +16,14 @@ import {TreeError} from '@angular/compiler';
   standalone: true,
   styleUrl: './graph.component.css'
 })
-export class GraphComponent implements OnInit, OnChanges {
+export class GraphComponent implements  OnChanges {
   @Input() month: number = 0;
   @Input() year: number = 0;
-  camperPlaces: CamperPlace[] = [];
-  reservationCountPerCamperPlace: Map<number, number> = new Map();
+
+  @Input() camperPlaces: CamperPlace[] = [];
+  @Input() reservationCountPerCamperPlace: [number,number][] = [];
+  @Input() revenuePerCamperPlace: [number,number][] = [];
+
   resCountChartData: { name: string, value: number }[] = [];
 
   revenueChartData: { name: string, value: number }[] = [];
@@ -28,87 +31,47 @@ export class GraphComponent implements OnInit, OnChanges {
   constructor(private statisticsService: StatisticsService, private camperPlaceService: CamperPlaceService) {
   }
 
-  ngOnInit() {
-    this.loadCamperPlace()
-  }
 
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['month']?.currentValue || changes['year']?.currentValue) {
-      this.loadResCountChart()
-      this.loadRevenueChart()
-    }else if(this.month == 0){
-      this.loadRevenueChart()
-      this.loadResCountChart()
-
+    if (changes['reservationCountPerCamperPlace']?.currentValue || changes['revenuePerCamperPlace']?.currentValue) {
+      this.loadRevenueChart();
+      this.loadResCountChart();
+      console.log("zmiana resCount", this.reservationCountPerCamperPlace)
+      console.log("zmiana revCount", this.revenuePerCamperPlace)
     }
 
   }
-
-
-
-  loadCamperPlace() {
-    this.camperPlaceService.getAllCamperPlaces().subscribe({
-      next: (value) => {
-
-        this.camperPlaces = value;
-        this.loadResCountChart()
-        this.loadRevenueChart();
-      }
-    })
-  }
-
 
   loadResCountChart() {
-    if (!this.camperPlaces) {
-      return;
-    }
-    const camperPlaceIds: number[] = this.camperPlaces!.map(camperPlace => camperPlace.id || 0);
-    this.statisticsService.getReservationCountForChart(this.month, this.year, camperPlaceIds).subscribe({
-      next: (res) => {
-        this.resCountChartData= [];
-        this.camperPlaces.forEach((c,index) => {
-          const a = Array.from(res)
-          this.resCountChartData.push(
-            {
-              name: c.index?.toString() ||index.toString(),
-              value: a[index]
-            }
-          )
-        })
-
-      }
+    this.resCountChartData = [];
+    this.reservationCountPerCamperPlace.forEach(([key, value]) => {
+      const camperPlace = this.camperPlaces.find(c => c.id === key);
+      this.resCountChartData.push(
+        {
+          name: camperPlace?.index?.toString() ?? '',
+          value: value
+        }
+      )
     })
-
+    console.log('final resCount chart data', this.resCountChartData);
   }
-
 
   loadRevenueChart() {
-    if (!this.camperPlaces) {
-      return;
-    }
-    const camperPlaceIds: number[] = this.camperPlaces!.map(camperPlace => camperPlace.id || 0);
-    this.statisticsService.getRevenueForChart(this.month, this.year, camperPlaceIds).subscribe({
-      next: (rev) => {
-        this.revenueChartData = [];
-        this.camperPlaces.forEach((c,index) => {
-          const a = Array.from(rev)
-           this.revenueChartData.push(
-             {
-               name: c.index?.toString() ||index.toString(),
-               value: a[index]
-             }
-           )
-            })
-
-      }
+    this.revenueChartData = [];
+    this.revenuePerCamperPlace.forEach(([key, value]) => {
+      const camperPlace = this.camperPlaces.find(c => c.id === key);
+      this.revenueChartData.push(
+        {
+          name: camperPlace?.index?.toString() ?? '',
+          value: value
+        }
+      )
     })
+    console.log('final rev chart data', this.revenueChartData);
+    console.log(this.camperPlaces)
 
   }
-
-
-
-
 
   protected readonly Array = Array;
 

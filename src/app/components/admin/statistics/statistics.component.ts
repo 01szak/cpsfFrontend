@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, SimpleChanges} from '@angular/core';
 import {StatisticTableComponent} from './statistic-table/statistic-table.component';
 import {GraphComponent} from './graph/graph.component';
 import {CamperPlace} from '../calendar/CamperPlace';
@@ -21,19 +21,27 @@ import {YearSelectorComponent} from './statistic-table/year-selector/year-select
   styleUrl: './statistics.component.css',
   standalone: true
 })
-export class StatisticsComponent implements  OnInit {
+export class StatisticsComponent implements OnInit {
   camperPlaces: CamperPlace[] = [];
   month: number = 0;
   year: number = 0;
 
-  reservationCountPerCamperPlace: Map<number, number> = new Map;
-  revenuePerCamperPlace: Map<number, number> = new Map;
+  reservationCountPerCamperPlace: [number,number][] = [];
+  revenuePerCamperPlace: [number,number][] = [];
 
   constructor(private camperPlaceService: CamperPlaceService, private statisticsService: StatisticsService) {
   }
 
   ngOnInit() {
     this.loadCamperPlaces();
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['month']?.currentValue || changes['year']?.currentValue) {
+      this.showReservationCount();
+      this.showRevenue();
+      console.log("zmiana resCount", this.reservationCountPerCamperPlace)
+      console.log("zmiana rev", this.revenuePerCamperPlace)
+    }
 
   }
 
@@ -60,49 +68,36 @@ export class StatisticsComponent implements  OnInit {
       error: (error) => {
         console.log(error);
       }
-
     })
   }
 
   showReservationCount() {
-
-
-    this.camperPlaces.forEach(cp => {
-
-      if (cp.id != null) {
-        this.statisticsService.getMonthlyReservationCount(cp.id, this.month, this.year).subscribe({
-          next: (value) => {
-            if (cp.id != null) {
-              this.reservationCountPerCamperPlace.set(cp.id, value);
-            }
-          },
-          error: (err) => {
-            console.log(err)
-          }
-        })
-      }
-    })
-
+    const camperPlaceIds: number[] = this.camperPlaces.map(cp => cp?.id ?? 0);
+    this.statisticsService.getMonthlyReservationCount(camperPlaceIds,this.month,this.year).subscribe(
+      {
+        next:(value) => {
+          this.reservationCountPerCamperPlace = value;
+        },
+        error:(err) => {
+          console.log(err)
+        }
+      });
   }
 
   showRevenue() {
-    this.camperPlaces.forEach(cp => {
-      if (cp.id != null) {
-        this.statisticsService.getMonthlyRevenue(cp.id, this.month, this.year).subscribe({
-          next: (value) => {
-            if (cp.id != null) {
-              this.revenuePerCamperPlace.set(cp.id, value);
-            }
-
-          },
-          error: (err) => {
-            console.log(err)
-          }
-        })
-      }
-    })
+    const camperPlaceIds: number[] = this.camperPlaces.map(cp => cp?.id ?? 0);
+    this.statisticsService.getMonthlyRevenue(camperPlaceIds,this.month,this.year).subscribe(
+      {
+        next:(value) => {
+          this.revenuePerCamperPlace = value;
+        },
+        error:(err) => {
+          console.log(err)
+        }
+      });
 
   }
 
   protected readonly Number = Number;
+  protected readonly Array = Array;
 }

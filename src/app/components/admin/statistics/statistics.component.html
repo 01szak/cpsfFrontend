@@ -8,9 +8,14 @@
 
   <mat-card class="tableCard">
 
-    <app-statistic-table [camperPlaces]="camperPlaces" [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
-                         [revenuePerCamperPlace]="revenuePerCamperPlace"></app-statistic-table>
+    <app-statistic-table
+      [camperPlaces]="camperPlaces"
+      [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
+      [revenuePerCamperPlace]="revenuePerCamperPlace"/>
   </mat-card>
 
-  <app-graph [month]="month" [year]="year" class="graph"></app-graph>
+  <app-graph [camperPlaces]="camperPlaces"
+             [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
+             [revenuePerCamperPlace]="revenuePerCamperPlace"
+             class="graph"/>
 </div>

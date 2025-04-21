@@ -12,20 +12,20 @@ export class StatisticsService {
   constructor(private http: HttpClient) {
   }
 
-  getMonthlyReservationCount(id: number, month: number, year: number) {
+  getMonthlyReservationCount(ids: number[], month: number, year: number) {
     if (year === 0) {
       year = this.currentYear;
     }
-    return this.http.get<number>(this.api + 'getMonthlyReservationCount/' + id + '/' + month + '/' + year)
+    return this.http.get<[number,number][]>(this.api + 'getReservationCountMonthly/' + ids + '/' + month + '/' + year)
 
   }
 
-  getMonthlyRevenue(id: number, month: number, year: number) {
+  getMonthlyRevenue(ids: number[], month: number, year: number) {
 
     if (year === 0) {
       year = this.currentYear;
     }
-    return this.http.get<number>(this.api + 'getCamperPlaceMonthlyRevenue/' + id + '/' + month + '/' + year)
+    return this.http.get<[number,number][]>(this.api + 'geRevenueMonthly/' + ids + '/' + month + '/' + year)
   }
 
   getReservationCountForChart(month: number, year: number, camperPlaceId: number[]) {
