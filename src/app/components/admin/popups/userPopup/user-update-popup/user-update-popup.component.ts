@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent} from '@angular/material/card';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
@@ -26,7 +26,8 @@ import {MatCheckbox} from '@angular/material/checkbox';
     NgForOf,
     ReactiveFormsModule,
     FormsModule,
-    MatCheckbox
+    MatCheckbox,
+    MatHint
   ],
   templateUrl: './user-update-popup.component.html',
   standalone: true,
@@ -34,6 +35,7 @@ import {MatCheckbox} from '@angular/material/checkbox';
 })
 export class UserUpdatePopupComponent {
   updatedUser!: User;
+  errorMessage:string = "";
   constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected user: User, private userService:UserService) {
   }
 
@@ -86,8 +88,8 @@ export class UserUpdatePopupComponent {
         window.location.reload();
         this.closePopup();
 
-      },error:()=>{
-        console.log(reservationRequest)
+      },error:(err)=>{
+        this.errorMessage = err.error || 'Unexpected error...'
       }
     })
   }

@@ -2,6 +2,9 @@
   <mat-card-content>
     <h2>Update User</h2>
     <br>
+    <div class="errorHint">
+      <mat-hint>{{ errorMessage }}</mat-hint>
+    </div>
     <mat-form-field appearance="outline">
       <mat-label>First Name</mat-label>
       <input type="text" matInput [(ngModel)]="this.updatedUser.firstName">
