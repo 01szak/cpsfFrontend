@@ -12,6 +12,7 @@ import {CamperPlaceService} from '../../../../../service/CamperPlaceService';
 import {CamperPlace} from '../../../calendar/CamperPlace';
 import {ReservationService} from '../../../../../service/ReservationService';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ConfirmationService} from '../../confirmation/confirmation.component';
 
 @Component({
   selector: 'app-reservation-update-popup',
@@ -48,8 +49,13 @@ updatedReservation!: {
   checkout: Date;
   reservationStatus: string
 };
-  constructor(private dialog: MatDialog, @Inject(MAT_DIALOG_DATA) protected data: { reservation:Reservation,camperPlace:CamperPlace }, private camperPlaceService: CamperPlaceService, private reservationService: ReservationService) {
-  }
+  constructor(
+    private dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) protected data: { reservation:Reservation,camperPlace:CamperPlace },
+    private camperPlaceService: CamperPlaceService,
+    private reservationService: ReservationService,
+    private confirmationService: ConfirmationService
+  ) {}
 
   ngOnInit() {
     this.updatedReservation = {
@@ -93,7 +99,6 @@ updatedReservation!: {
     this.camperPlaceService.findCamperPlaceByIndex(index).subscribe({
       next: (cp) => {
         this.camperPlace = cp;
-        console.log(cp)
       }, error: (err) => {
         console.log(err)
       }
@@ -103,34 +108,41 @@ updatedReservation!: {
   }
 
   updateReservation() {
-    const reservationRequest = {
-      id: this.updatedReservation.id,
-      checkin: new Date(this.updatedReservation.checkin ).toISOString().split('T')[0], // YYYY-MM-DD
-      checkout: new Date(this.updatedReservation.checkout ).toISOString().split('T')[0],
-      camperPlace: this.camperPlace ,
-      paid: this.data.reservation.paid
-    }
-    this.reservationService.updateReservation(reservationRequest).subscribe({
-      next: () => {
-        window.location.reload();
-        this.closePopup();
-      },error:(err: HttpErrorResponse)=>{
-        this.errorMessage = err.error || 'Unknown Error...'
-        console.log(reservationRequest)
-        console.log(err)
-
+    this.confirmationService.performAction('Update').subscribe(confirmation => {
+      if (confirmation) {
+        const reservationRequest = {
+          id: this.updatedReservation.id,
+          checkin: new Date(this.updatedReservation.checkin ).toISOString().split('T')[0], // YYYY-MM-DD
+          checkout: new Date(this.updatedReservation.checkout ).toISOString().split('T')[0],
+          camperPlace: this.camperPlace,
+          paid: this.data.reservation.paid
+        }
+        this.reservationService.updateReservation(reservationRequest).subscribe({
+          next: () => {
+            window.location.reload();
+            this.closePopup();
+          },error:(err: HttpErrorResponse)=>{
+            this.errorMessage = err.message || 'Unknown Error...'
+            console.log(reservationRequest)
+            console.log(err)
+          }
+        })
       }
     })
   }
   deleteReservation(id: number){
-    this.reservationService.deleteReservation(id).subscribe({
-        next:() =>{
-          window.location.reload()
-        },
-      error:(err) =>{
-          console.log(err)
-    }
+    this.confirmationService.performAction('Delete').subscribe(confirmation => {
+      if (confirmation) {
+        this.reservationService.deleteReservation(id).subscribe({
+            next: () => {
+              window.location.reload()
+            },
+            error: (err) => {
+              console.log(err)
+            }
+          }
+        );
       }
-    );
+    })
   }
 }

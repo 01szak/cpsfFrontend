@@ -4,12 +4,12 @@
   justify-content: space-evenly;
   flex-direction: row;
 }
-.cancelButton {
-  color: red;
+.deleteButton {
+  color: red !important;
 }
-.cancelButton:hover {
+.deleteButton:hover {
   background-color: red;
-  color: white;
+  color: white !important;
   cursor: pointer;
 }
 .functionalButtons{

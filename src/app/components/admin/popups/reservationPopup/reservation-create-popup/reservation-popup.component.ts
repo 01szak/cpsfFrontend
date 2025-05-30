@@ -1,8 +1,15 @@
 import {Component, inject, Inject, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatAnchor, MatButton} from '@angular/material/button';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {MatAnchor, MatButton, MatButtonModule} from '@angular/material/button';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogModule,
+  MatDialogTitle
+} from '@angular/material/dialog';
+import {AsyncPipe, CommonModule, NgForOf, NgIf} from '@angular/common';
 import {PopupService} from '../../../../../service/PopupService';
 import {ReservationService} from '../../../../../service/ReservationService';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -24,6 +31,7 @@ import {UserService} from '../../../../../service/UserService';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CalendarComponent} from '../../../calendar/calendar.component';
+import {ConfirmationComponent, ConfirmationService} from '../../confirmation/confirmation.component';
 
 @Component({
   selector: 'app-reservation-popup',
@@ -57,7 +65,10 @@ import {CalendarComponent} from '../../../calendar/calendar.component';
     NgIf,
     ReactiveFormsModule,
     ReservationUpdatePopupComponent,
-    AsyncPipe
+    AsyncPipe,
+    MatDialogModule,
+    MatButtonModule,
+    CommonModule
   ],
   templateUrl: './reservation-popup.component.html',
   standalone: true,
@@ -77,18 +88,19 @@ export class ReservationPopupComponent {
   constructor(
     private camperPlaceService: CamperPlaceService,
     private dialog: MatDialog,
-    private popupService: PopupService,
+    protected popupService: PopupService,
     private reservationService: ReservationService,
     @Inject(MAT_DIALOG_DATA) private data: { camperPlace: CamperPlace; checkinDate: Date },
     private userService: UserService,
     private fb: FormBuilder,
+    private confirmationService: ConfirmationService
   ) {
     this.searchForm = this.fb.nonNullable.group({
       searchValue: '',
     })
   }
 
-  camperPlace: CamperPlace = this.data.camperPlace || {
+  camperPlace: CamperPlace = this.data?.camperPlace ??  {
     reservations: [],
     index: "",
     price: '',
@@ -159,25 +171,29 @@ export class ReservationPopupComponent {
   }
 
   createReservation() {
-    const reservationRequest = {
-      checkin: new Date(this.checkin).toISOString().split('T')[0], // YYYY-MM-DD
-      checkout: new Date(this.reservation.checkout).toISOString().split('T')[0],
-      camperPlace: this.camperPlace,
-      user: this.user,
-    };
+    this.confirmationService.performAction('Create').subscribe(confirmed => {
+      if (confirmed) {
+        const reservationRequest = {
+          checkin: new Date(this.checkin).toISOString().split('T')[0], // YYYY-MM-DD
+          checkout: new Date(this.reservation.checkout).toISOString().split('T')[0],
+          camperPlace: this.camperPlace,
+          user: this.user,
+        };
 
-    this.reservationService.createReservation(reservationRequest).subscribe({
-      next: () => {
-        this.closePopup();
-        window.location.reload();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.log(err)
-        this.errorMessage = err.error || 'Unexpected error...'
-        console.log(reservationRequest)
+        this.reservationService.createReservation(reservationRequest).subscribe({
+          next: () => {
+            this.closePopup();
+            window.location.reload();
+          },
+          error: (err: HttpErrorResponse) => {
+            console.log(err)
+            this.errorMessage = err.error || 'Unexpected error...'
 
+          }
+        });
       }
-    });
+    })
+
   }
 
   newGuestCheckBox() {

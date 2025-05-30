@@ -19,26 +19,27 @@
     <br>
     <mat-form-field appearance="outline">
       <mat-label>
-       {{camperPlace?.index ?? "Select Camper Place" }}
+        {{ camperPlace?.index ?? "Select Camper Place" }}
       </mat-label>
-      <mat-select [(ngModel)]="this.camperPlace"  name="index">
+      <mat-select [(ngModel)]="this.camperPlace" name="index">
         <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace">
           {{ camperPlace.index }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-      <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true" [formGroup]="searchForm" (keyup)="onSearchSubmit() ">
-        <mat-label>Select a Guest</mat-label>
-        <input type="text" matInput formControlName="searchValue" [matAutocomplete]="auto">
-        <mat-autocomplete (optionSelected)="findUserById($event.option.value) " #auto="matAutocomplete"
-                          [displayWith]="displayFn">
-          <mat-option *ngFor="let user of allUsers" [value]="user">
-            {{ user.firstName }} {{ user.lastName }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+    <mat-form-field appearance="outline" *ngIf="!newGuest.checked" aria-hidden="true" [formGroup]="searchForm"
+                    (keyup)="onSearchSubmit() ">
+      <mat-label>Select a Guest</mat-label>
+      <input type="text" matInput formControlName="searchValue" [matAutocomplete]="auto">
+      <mat-autocomplete (optionSelected)="findUserById($event.option.value) " #auto="matAutocomplete"
+                        [displayWith]="displayFn">
+        <mat-option *ngFor="let user of allUsers" [value]="user">
+          {{ user.firstName }} {{ user.lastName }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
     <mat-checkbox [(ngModel)]="isNewGuestClicked" (change)="newGuestCheckBox()" #newGuest>New Guest</mat-checkbox>
-    <div *ngIf="newGuest.checked"  aria-hidden="true">
+    <div *ngIf="newGuest.checked" aria-hidden="true">
       <h3>New guest</h3>
       <mat-form-field appearance="outline">
         <mat-label>First Name:</mat-label>
@@ -61,9 +62,10 @@
       </mat-form-field>
     </div>
     <br>
-    <button class="deleteButton" mat-button (click)="closePopup()">cancel</button>
-    <button mat-button (click)="createReservation()">submit</button>
-
+    <div class="fuuButtons">
+      <button mat-button (click)="createReservation()">submit</button>
+      <button class="deleteButton" mat-button (click)="closePopup()">cancel</button>
+    </div>
   </mat-card-content>
 
 </mat-card>

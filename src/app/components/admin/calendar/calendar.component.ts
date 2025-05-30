@@ -44,7 +44,7 @@ export class CalendarComponent {
   }
 
   openReservationPopupFromCalendar(event:Event,tdDate: Date, camperPlace: CamperPlace) {
-const td = event.target as HTMLElement
+    const td = event.target as HTMLElement
     if (td.classList.contains('reserved')) {
       console.log(camperPlace.reservations)
       const reservation = camperPlace.reservations.filter(r => moment(tdDate).isBetween(moment(r.checkin),moment(r.checkout),"days","[]"));

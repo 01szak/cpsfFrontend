@@ -20,7 +20,7 @@
       <mat-label>
         Select Camper Place
       </mat-label>
-      <mat-select [(ngModel)]="updatedReservation.camperPlaceIndex" (ngModelChange)="findCamperPlaceByIndex(inedx)"  name="index">
+      <mat-select [(ngModel)]="updatedReservation.camperPlaceIndex" (ngModelChange)="findCamperPlaceByIndex($event)">
         <mat-option *ngFor="let camperPlace of camperPlaces" [value]="camperPlace.index">
           {{ camperPlace.index }}
         </mat-option>

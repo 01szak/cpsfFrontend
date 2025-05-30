@@ -1,6 +1,3 @@
-.deleteButton{
-margin-left: 120px;
-}
 .errorHint{
   word-wrap: break-word;
   white-space: normal;
@@ -12,4 +9,9 @@ mat-hint{
   font-weight: bold ;
   margin-bottom: 10px;
 
+}
+.fuuButtons {
+  display: flex;
+  width: 100%;
+  justify-content: end;
 }
