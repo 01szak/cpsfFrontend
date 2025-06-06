@@ -4,6 +4,9 @@ h1 {
   margin-left: 450px;;
   margin-top: 30px;
 }
+h2 {
+  margin: 0 0 10px 0;
+}
 
 mat-card {
   background-color: rgb(44, 33, 66);
