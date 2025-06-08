@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, ViewChildren} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule, NgIf} from '@angular/common';
@@ -9,7 +9,6 @@ import moment from 'moment/moment';
 import {MatCard} from '@angular/material/card';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {Reservation} from './Reservation';
 
 
 @Component({
@@ -25,6 +24,7 @@ import {Reservation} from './Reservation';
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true
 })
 export class CalendarComponent {
@@ -43,18 +43,16 @@ export class CalendarComponent {
     this.popupService.openCamperPlacePopup();
   }
 
-  openReservationPopupFromCalendar(event:Event,tdDate: Date, camperPlace: CamperPlace) {
+  openReservationPopupFromCalendar(event: Event, tdDate: Date, camperPlace: CamperPlace) {
     const td = event.target as HTMLElement
     if (td.classList.contains('reserved')) {
-      console.log(camperPlace.reservations)
-      const reservation = camperPlace.reservations.filter(r => moment(tdDate).isBetween(moment(r.checkin),moment(r.checkout),"days","[]"));
-      console.log(reservation[0])
+      const reservation = camperPlace.reservations.filter(r => moment(tdDate).isBetween(moment(r.checkin), moment(r.checkout), "days", "[]"));
       if (reservation) {
-        this.popupService.openUpdateReservationPopup(reservation[0],camperPlace)
+        this.popupService.openUpdateReservationPopup(reservation[0], camperPlace)
         return;
       }
     }
-      this.popupService.openCreateReservationPopupFromCalendar(tdDate, camperPlace);
+    this.popupService.openCreateReservationPopupFromCalendar(tdDate, camperPlace);
 
   }
 
