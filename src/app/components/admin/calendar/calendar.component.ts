@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import { Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CamperPlace} from './CamperPlace';
 import {CommonModule, NgIf} from '@angular/common';
@@ -24,7 +24,6 @@ import {MatOption, MatSelect} from '@angular/material/select';
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true
 })
 export class CalendarComponent {
