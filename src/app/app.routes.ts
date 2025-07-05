@@ -8,6 +8,7 @@ import {StatisticsComponent} from './components/admin/statistics/statistics.comp
 import {ReservationsComponent} from './components/admin/reservations/reservations.component';
 import {UsersComponent} from './components/admin/users/users.component';
 import {OptionsComponent} from './components/admin/options/options.component';
+import {NewCalendarComponent} from './components/admin/new/new-calendar/new-calendar.component';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,7 @@ export const routes: Routes = [
     component: AdminPageComponent,
     children:[{
       path: 'calendar',
-      component: CalendarComponent
+      component: NewCalendarComponent
     },
       {
         path: 'statistics',

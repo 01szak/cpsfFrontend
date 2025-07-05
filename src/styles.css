@@ -1,3 +1,26 @@
+:root {
+  --bg-color-primary: #2C2142FF;
+  --bg-color-secondary: #FFFFFF;
+  --bg-color-tertiary: #3B82F6;
+  --container-blury: rgba(255, 255, 255, 0.8)
+}
+
+.primary {
+  background-color: var(--bg-color-primary) !important;
+}
+.secondary {
+  background-color: var(--bg-color-secondary) !important;
+}
+.tertiary {
+  background-color: var(--bg-color-tertiary) !important;
+}
+.blury {
+  background-color: var(--container-blury) !important;
+}
+.shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
 html{
   overflow: hidden;
   /*background-color: #a2d8ea;*/
@@ -13,11 +36,11 @@ body { margin: 0;
 mat-card-content{
   color: black;
 }
-mat-form-field{
-  padding: 0 5px 0 5px;
-  margin-bottom: 15px;
-  height: 50px;
-}
+/*mat-form-field{*/
+/*  padding: 0 5px 0 5px;*/
+/*  margin-bottom: 15px;*/
+/*  height: 50px;*/
+/*}*/
 mat-hint{
   color: red;
   font-weight: bold;

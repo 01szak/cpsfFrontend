@@ -1,7 +1,7 @@
 .container {
   width: 100%;
-top: 0;
-
+  top: 0;
+  padding-bottom: 50px;
 }
 
 
@@ -28,7 +28,8 @@ top: 0;
 .navbarButton:hover {
   color: white;
 }
-.functionalButtons{
+
+.functionalButtons {
   position: absolute;
   right: 0;
 }
