@@ -121,18 +121,36 @@ export class NewCalendarComponent implements OnInit {
   }
 
   openFormPopup(year: number, month: number, day: number, camperPlace: CamperPlaceN, event: MouseEvent) {
-    const  target = event.target as HTMLElement
+    const target = event.target as HTMLElement;
+    const date = new Date(year, month, day);
 
-    if(target.classList.contains('nextToCheckout') && !target.classList.contains('reserved')) {
-      this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
+    const isLeft = target.classList.contains('left');
+    const isRight = target.classList.contains('right');
+
+    let reservationToUpdate;
+
+    if (isLeft) {
+      reservationToUpdate = camperPlace.reservations.find(r => {
+        const checkout = this.reservationHelper.mapStringToDate(r.checkout);
+        return checkout.getTime() === date.getTime();
+      });
+    } else if (isRight) {
+      reservationToUpdate = camperPlace.reservations.find(r => {
+        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        return checkin.getTime() === date.getTime();
+      });
     } else {
-      if (this.isDayReserved(year, month, day, camperPlace)) {
-        this.popupFormService.openUpdateReservationFormPopup(camperPlace, year, month, day);
-      } else {
-        this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
-      }
+      reservationToUpdate = camperPlace.reservations.find(r => {
+        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        const checkout = this.reservationHelper.mapStringToDate(r.checkout);
+        return checkin <= date && date < checkout;
+      });
     }
-
+    if (reservationToUpdate) {
+      this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
+    } else {
+      this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
+    }
   }
 
   findWeekDay(year: number, month: number, day: number) {

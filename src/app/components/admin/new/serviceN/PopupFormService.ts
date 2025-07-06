@@ -82,17 +82,15 @@ export class PopupFormService {
 
   }
 
-  openUpdateReservationFormPopup(camperPlace: CamperPlaceN, year: number, month: number, day: number) {
+  openUpdateReservationFormPopup(reservationToUpdate: ReservationN, year: number, month: number, day: number) {
     const date = new Date(year, month, day);
-
-    const reservationToUpdate = camperPlace.reservations.find(
-      r =>
-        this.reservationHelper
-          .getDatesBetween(
-            this.reservationHelper.mapStringToDate(r.checkin),
-            this.reservationHelper.mapStringToDate(r.checkout))
-          .some(d => d.getTime() === date.getTime())
-    )
+    //
+    // const reservationToUpdate = camperPlace.reservations.find(r => {
+    //   const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+    //   const checkout = this.reservationHelper.mapStringToDate(r.checkout);
+    //   return (checkin <= date && date < checkout) || checkout.getTime() === date.getTime();
+    // });
+    console.log(reservationToUpdate)
     if (!reservationToUpdate) {
       return
     }
@@ -103,7 +101,7 @@ export class PopupFormService {
       formInputs: [
         { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: reservationToUpdate.checkin},
         { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
-        { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: camperPlace.index},
+        { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: reservationToUpdate.camperPlaceIndex},
         { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
         { name: 'Gość', field: 'user', type: 'text', defaultValue: reservationToUpdate.user.firstName + " " + reservationToUpdate.user.lastName, readonly: true},
       ]
