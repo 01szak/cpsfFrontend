@@ -6,6 +6,7 @@ import {
   ReservationMetadata,
   ReservationMetadataWithSets
 } from './../InterfaceN/ReservationMetadata';
+import {PaidReservations, PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
 
 @Injectable({providedIn: "root"})
 export class ReservationHelper {
@@ -72,6 +73,22 @@ export class ReservationHelper {
         checkout: new Set(raw.checkout)
       };
     }
+
     return mapped;
   }
+
+  mapPaidReservationsToSets(rawMap: Record<string, PaidReservations>): Record<string, PaidReservationsWithSets> {
+    const mapped: Record<string, PaidReservationsWithSets> = {};
+
+    for (const key in rawMap) {
+      const raw = rawMap[key];
+      console.log(raw)
+      mapped[key] = {
+        paidDates: new Set(raw.paidDates)
+      };
+    }
+
+    return mapped;
+  }
+
 }

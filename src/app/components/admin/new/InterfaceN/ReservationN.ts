@@ -7,5 +7,5 @@ export  interface ReservationN {
   user: UserN
   camperPlaceIndex: string;
   price: number;
-  isPaid: boolean;
+  paid: boolean;
  }

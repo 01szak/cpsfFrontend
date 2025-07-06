@@ -10,7 +10,6 @@ import {
   MatTable
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
 import {MatCard} from '@angular/material/card';
@@ -34,8 +33,6 @@ import {PopupService} from '../../../service/PopupService';
     MatRow,
     MatRowDef,
     MatPaginatorModule,
-    MatSortHeader,
-    MatSort,
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,
@@ -81,7 +78,7 @@ export class UsersComponent implements OnInit {
   }
 
   hasReservation(user: User) {
-    if (user.reservations.length > 0) {
+    if (user.reservations !== null ) {
       let nonExpiredReservationsCount = 0;
       user.reservations.forEach(r => {
         if (r.reservationStatus.toString() !== 'EXPIRED') {

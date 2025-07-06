@@ -63,7 +63,7 @@ export class PopupFormService {
               streetAddress: result['street']?.toString() ?? '',
             }
             const reservationToCreate: ReservationN = {
-              isPaid: false,
+              paid: false,
               camperPlaceIndex: result['camperPlaceIndex'].toString() ?? '',
               checkin: result['checkin'].toString() ?? '',
               checkout: result['checkout'].toString() ?? '',
@@ -71,7 +71,6 @@ export class PopupFormService {
               user: result['isNewGuest'] ? userToCreate : result['user']
             }
 
-            console.log(reservationToCreate)
 
             this.reservationService.createReservation(reservationToCreate);
             dialogRef.close();
@@ -94,7 +93,6 @@ export class PopupFormService {
             this.reservationHelper.mapStringToDate(r.checkout))
           .some(d => d.getTime() === date.getTime())
     )
-    console.log(reservationToUpdate)
     if (!reservationToUpdate) {
       return
     }
@@ -106,6 +104,7 @@ export class PopupFormService {
         { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: reservationToUpdate.checkin},
         { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
         { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: camperPlace.index},
+        { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
         { name: 'Gość', field: 'user', type: 'text', defaultValue: reservationToUpdate.user.firstName + " " + reservationToUpdate.user.lastName, readonly: true},
       ]
     }
@@ -121,7 +120,7 @@ export class PopupFormService {
         reservationToUpdate.checkin = result['checkin']?.toString() ?? reservationToUpdate.checkin;
         reservationToUpdate.checkout = result['checkout']?.toString() ?? reservationToUpdate.checkout;
         reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
-        console.log(reservationToUpdate)
+        reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
 
         this.popupConfirmationService.openConfirmationPopup(
           "Rezerwacja zostanie edytowana. Czy chcesz kontynuować?",

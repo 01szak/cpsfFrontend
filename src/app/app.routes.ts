@@ -3,7 +3,6 @@ import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
 import {AdminPageComponent} from './components/admin/admin-main-page/admin-page.component';
 import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
-import {CalendarComponent} from './components/admin/calendar/calendar.component';
 import {StatisticsComponent} from './components/admin/statistics/statistics.component';
 import {ReservationsComponent} from './components/admin/reservations/reservations.component';
 import {UsersComponent} from './components/admin/users/users.component';

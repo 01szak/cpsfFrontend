@@ -5,7 +5,6 @@ import {ConfirmationData, PopupConfirmationComponent} from './../popup-confirmat
 @Injectable({providedIn: "root"})
 export class PopupConfirmationService {
   readonly popupConfirmation: MatDialog = inject(MatDialog);
-
   openConfirmationPopup(message: string, action: () => void) {
     const confirmationData: ConfirmationData = {
       message: message,
