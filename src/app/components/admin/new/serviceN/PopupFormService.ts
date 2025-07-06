@@ -35,7 +35,7 @@ export class PopupFormService {
         { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true },
         { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true },
         { name: 'Email', field: 'email', type: 'email', additional: true },
-        { name: 'Numer Telefonu', field: 'phoneNumber', type: 'tel', additional: true },
+        { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true },
         { name: 'Kraj', field: 'country', type: 'text', additional: true },
         { name: 'Miasto', field: 'city', type: 'text', additional: true },
         { name: 'Adres', field: 'streetAddress', type: 'text', additional: true },
