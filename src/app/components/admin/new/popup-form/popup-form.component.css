@@ -16,6 +16,7 @@ mat-dialog-content {
   margin-top: 15px;
 }
 i {
+  color: black;
   margin-right: 10px;
 }
 i:hover {

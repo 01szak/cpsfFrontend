@@ -12,7 +12,6 @@ import {
   MatTable
 } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
 import {MatNativeDateModule} from '@angular/material/core';
@@ -21,6 +20,7 @@ import {MatCheckbox} from '@angular/material/checkbox';
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {CamperPlace} from '../calendar/CamperPlace';
 import {switchAll, switchMap} from 'rxjs';
+import {ReservationN} from './../new/InterfaceN/ReservationN';
 
 
 @Component({
@@ -38,8 +38,6 @@ import {switchAll, switchMap} from 'rxjs';
     MatRow,
     MatRowDef,
     MatPaginatorModule,
-    MatSortHeader,
-    MatSort,
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,
@@ -53,7 +51,7 @@ import {switchAll, switchMap} from 'rxjs';
 export class ReservationsComponent implements OnInit {
 
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status', 'paid'];
-  allReservations: Array<Reservation> = [];
+  allReservations: Array<ReservationN> = [];
   searchValue = '';
   searchForm!: FormGroup;
   isAsc: number = 0;

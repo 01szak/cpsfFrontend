@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {CamperPlace} from '../components/admin/calendar/CamperPlace';
 import {Reservation} from '../components/admin/calendar/Reservation';
 import {User} from '../components/admin/calendar/User';
+import {ReservationN} from './../components/admin/new/InterfaceN/ReservationN';
 
 @Injectable({providedIn: 'root'})
 export class ReservationService {
@@ -12,12 +13,12 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  getFilteredReservations(value: string): Observable<Reservation[]> {
+  getFilteredReservations(value: string): Observable<ReservationN[]> {
     if (value === '') {
-      return this.http.get<Reservation[]>(this.api + 'getFilteredReservations');
+      return this.http.get<ReservationN[]>(this.api + 'getFilteredReservations');
     } else {
 
-      return this.http.get<Reservation[]>(this.api + 'getFilteredReservations/' + value);
+      return this.http.get<ReservationN[]>(this.api + 'getFilteredReservations/' + value);
     }
   }
 
@@ -36,7 +37,7 @@ export class ReservationService {
 
 
   sortTable(header: string, isAsc: number) {
-    return this.http.get<Reservation[]>(this.api + 'sortTable/' + header + '/' + isAsc);
+    return this.http.get<ReservationN[]>(this.api + 'sortTable/' + header + '/' + isAsc);
   }
 
   updateReservation(reservation: {

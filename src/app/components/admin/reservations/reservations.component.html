@@ -45,7 +45,7 @@
       <th mat-header-cell *matHeaderCellDef>
         <button class="sortingButton" (click)="sorTable('guest')">Guest</button>
       </th>
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.userFirstName + " " + reservation.userLastName }}</td>
+      <td mat-cell *matCellDef="let reservation"> {{ reservation.user.firstName + " " + reservation.user.lastName }}</td>
     </ng-container>
 
     <!-- Kolumna Status -->

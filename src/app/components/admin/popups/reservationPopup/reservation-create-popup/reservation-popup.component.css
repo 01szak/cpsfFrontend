@@ -15,3 +15,6 @@ mat-hint{
   width: 100%;
   justify-content: end;
 }
+mat-card {
+  color: black;
+}

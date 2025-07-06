@@ -24,3 +24,7 @@ mat-form-field{
   display: flex;
   justify-content: space-evenly;
 }
+
+mat-card {
+  color: black;
+}
