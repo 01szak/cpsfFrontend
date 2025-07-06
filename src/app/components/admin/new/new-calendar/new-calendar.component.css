@@ -77,7 +77,13 @@ app-date-picker {
 .day {
 }
 .weekday {
+  width: 100%;
   font-size: xx-small;
+}
+p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .reserved {
   background-color: #fdc098 !important;

@@ -7,7 +7,9 @@
       @for (day of days; track day) {
         <th class="day">
           <p>{{ day }}</p>
-          <p class="weekday">{{findWeekDay(year, month, day)}}</p>
+          <div class="weekday">
+            <p >{{findWeekDay(year, month, day)}}</p>
+          </div>
         </th>
       }
     </tr>
