@@ -1,0 +1,242 @@
+
+h1 {
+  font-weight: lighter;
+  margin-left: 450px;;
+  margin-top: 30px;
+}
+h2 {
+  margin: 0 0 10px 0;
+}
+
+mat-card {
+  background-color: rgb(44, 33, 66);
+}
+
+.table {
+  display: table;
+  overflow: hidden;
+  padding: 10px 30px 10px 10px;
+  border-radius: 10px;
+  margin-left: 400px;
+  border: solid black;
+  border-collapse: collapse;
+}
+
+table {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 1px;
+
+}
+
+th {
+  width: auto;
+  height: auto;
+  color: darkgray;
+}
+
+.today {
+  color: white;
+}
+
+
+.button {
+  text-align: center;
+  margin-left: 6px;
+  border-radius: 3px;
+}
+
+.addDiv {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.button.add {
+  margin-right: 0;
+  border-color: lightgreen;
+  background-color: lightgreen;
+}
+
+.button.delete {
+
+  border-color: red;
+  background-color: red;
+}
+
+.button:hover {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+select {
+  color: white;
+  background-color: rgba(162, 120, 246, 0.19);
+  border: solid rgba(162, 120, 246, 0.19);
+  border-radius: 5px;
+  padding: 3px 3px 3px 3px;
+  margin: 0 0 10px 6px;
+
+}
+
+option {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+
+.weekdays {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+td {
+
+  border-radius: 1px;
+  width: auto;
+  height: auto;
+  padding: 0;
+  background-color: palegreen;
+  cursor: pointer;
+}
+
+
+td:hover {
+  background-color: lawngreen;
+
+
+}
+
+.reserved {
+  background-color: orange !important;
+}
+
+.reserved:hover {
+  background-color: darkorange !important;
+}
+
+.checkout.reserved {
+  background: linear-gradient(to right, orange 49.5%, black 55%, lightgreen 50.5%);
+}
+
+.checkout.reserved:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 55%, lightgreen 50.5%);
+}
+
+.checkin.reserved {
+  background: linear-gradient(to right, lightgreen 49.5%, black 55%, orange 50.5%);
+}
+
+
+.checkin.reserved:hover {
+  background: linear-gradient(to right, lightgreen 49.5%, black 55%, darkorange 50.5%);
+}
+
+.weekend {
+  background-color: springgreen;
+}
+
+.weekend:hover {
+  background-color: lime;
+}
+
+.reserved.checkout.weekend {
+  background: linear-gradient(to right, orange 49.5%, black 55%, springgreen 50.5%);
+
+}
+
+.reserved.checkout.weekend:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 55%, springgreen 50.5%);
+
+}
+
+
+
+.checkin.weekend.reserved {
+  background: linear-gradient(to right, springgreen 49.5%, black 55%, orange 50.5%) !important;
+}
+
+.checkin.weekend.reserved:hover {
+  background: linear-gradient(to right, springgreen 49.5%, black 55%, darkorange 50.5%) !important;
+}
+
+.checkin.checkout.reserved {
+  background: linear-gradient(to right, orange 49.5%, black 55%, orange 50.5%) !important;
+
+}
+
+.checkin.checkout.reserved:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 55%, darkorange 50.5%) !important;
+
+}
+
+
+.paid.reserved {
+  background-color: deepskyblue !important;
+}
+
+.paid.reserved:hover {
+  background-color: dodgerblue !important;
+}
+
+.paid.reserved.checkin {
+  background: linear-gradient(to right, lightgreen 49.5%, black 55%, deepskyblue 50.5%) !important;
+}
+
+.paid.reserved.checkin:hover {
+  background: linear-gradient(to right, lightgreen 49.5%, black 55%, dodgerblue 50.5%) !important;
+
+}
+
+.paid.reserved.checkout {
+  background: linear-gradient(to right, deepskyblue 49.5%, black 55%, lightgreen 50.5%) !important;
+}
+
+.paid.reserved.checkout:hover {
+  background: linear-gradient(to right, dodgerblue 49.5%, black 55%, lightgreen 50.5%) !important;
+}
+
+.paid.reserved.checkin.weekend {
+  background: linear-gradient(to right, springgreen 49.5%, black 55%, deepskyblue 50.5%) !important;
+}
+
+.paid.reserved.checkin.weekend:hover {
+  background: linear-gradient(to right, springgreen 49.5%, black 55%, dodgerblue 50.5%) !important;
+
+}
+
+.paid.reserved.checkout.weekend {
+  background: linear-gradient(to right, deepskyblue 49.5%, black 55%, springgreen 50.5%) !important;
+}
+
+.paid.reserved.checkout.weekend:hover {
+  background: linear-gradient(to right, dodgerblue 49.5%, black 55%, springgreen 50.5%) !important;
+}
+
+.paid.reserved.checkout.checkin {
+  background: linear-gradient(to right, deepskyblue 49.5%, black 55%, deepskyblue 50.5%) !important;
+}
+
+.paid.reserved.checkout.checkin:hover {
+  background: linear-gradient(to right, dodgerblue 49.5%, black 55%, dodgerblue 50.5%) !important;
+}
+
+.paid.reserved.checkout.checkin.mixedPaymentPaidFirst {
+  background: linear-gradient(to right, deepskyblue 49.5%, black 55%, orange 50.5%) !important;
+
+}
+
+.paid.reserved.checkout.checkin.mixedPaymentPaidFirst:hover {
+  background: linear-gradient(to right, dodgerblue 49.5%, black 55%, darkorange 50.5%) !important;
+
+}
+
+.paid.reserved.checkout.checkin.mixedPaymentUnpaidFirst {
+  background: linear-gradient(to right,orange 49.5%, black 55%, deepskyblue 50.5%) !important;
+
+}
+
+.paid.reserved.checkout.checkin.mixedPaymentUnpaidFirst:hover {
+  background: linear-gradient(to right, darkorange 49.5%, black 55%, dodgerblue 50.5%) !important;
+
+}

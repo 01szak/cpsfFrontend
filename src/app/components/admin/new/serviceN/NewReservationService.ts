@@ -26,6 +26,9 @@ export class NewReservationService {
   getPaidReservations(): Observable<Record<string, PaidReservations>> {
     return this.http.get<Record<string, PaidReservations>> (this.api + 'getPaidReservations');
   }
+  getUnPaidReservations(): Observable<Record<string, PaidReservations>> {
+    return this.http.get<Record<string, PaidReservations>> (this.api + 'getUnPaidReservations');
+  }
 
   createReservation(reservation: ReservationN) {
     return this.http.post<ReservationN>(this.api + 'createReservation', reservation).subscribe({

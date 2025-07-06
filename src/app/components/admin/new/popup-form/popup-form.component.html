@@ -1,0 +1,128 @@
+@if (formData.update) {
+  <div class="deleteIcon">
+    <i (click)="popupConfirmationService.openConfirmationPopup(
+    'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?',
+    reservationService.deleteReservation(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
+  </div>
+}
+<h1 mat-dialog-title>{{formData.header}}</h1>
+
+<mat-dialog-content>
+  @if(formData.update) {
+    @for (formInput of formData.formInputs; track formInput) {
+      @if (formInput.checkbox) {
+        <mat-checkbox
+          [checked]="formValues[formInput.field]"
+          (change)="formValues[formInput.field] = $event.checked">
+          {{formInput.name}}
+        </mat-checkbox>
+      } @else {
+        @if(!formInput.additional) {
+          <mat-form-field>
+            <mat-label>{{ formInput.name }}</mat-label>
+            <input matInput
+                   type="{{formInput.type}}"
+                   [(ngModel)]="formValues[formInput.field]"
+                   [readonly]="formInput.readonly ?? false">
+          </mat-form-field>
+        }
+      }
+    }
+  } @else {
+
+    @for (formInput of formData.formInputs; track formInput) {
+      @if (formInput.checkbox) {
+
+      } @else if (!formInput.select && !formInput.additional) {
+        <mat-form-field>
+          <mat-label>{{formInput.name}}</mat-label>
+          <input matInput
+                 type="{{formInput.type}}"
+                 [(ngModel)]="formValues[formInput.field]"
+                 [readonly]="formInput.readonly ?? false">
+        </mat-form-field>
+
+      } @else {
+        @if (!newGuest.checked && !formInput.additional) {
+          <mat-form-field>
+            <mat-label>{{formInput.name}}</mat-label>
+            <input matInput
+                   type="{{formInput.type}}"
+                   [formControl]="formControl"
+                   [matAutocomplete]="auto">
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto=matAutocomplete
+              [displayWith]="userDisplay"
+              (optionSelected)="onOptionSelected($event, formInput.field)">
+              @for (option of filteredOptions | async; track option) {
+                <mat-option [value]="option">
+                  {{option.firstName + " " + option.lastName}}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        }
+      }
+
+    }
+    <mat-checkbox [(ngModel)]="formValues['isNewGuest']" #newGuest>
+      {{!formValues['isNewGuest'] ? 'Nowy Gość' : 'Wróć do listy' }}
+    </mat-checkbox>
+
+    @if(newGuest.checked) {
+
+      <mat-form-field>
+        <mat-label> Imie</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['firstName']">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label> Nazwisko</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['lastName']">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label> Rejestracja</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['carRegistration']">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label> Email</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['email']">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label> Kraj</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['country']">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label> Miasto</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['city']">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label> Adres</mat-label>
+        <input matInput
+               type="text"
+               [(ngModel)]="formValues['street']">
+      </mat-form-field>
+    }
+  }
+
+</mat-dialog-content>
+
+<app-form-buttons
+  [firstAction]="firstAction"
+  [secondAction]="secondAction">
+</app-form-buttons>

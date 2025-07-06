@@ -1,0 +1,107 @@
+mat-card {
+  padding: 0 25px 25px 25px;
+  width: 100%;
+  max-width: 1850px;
+  overflow-y: auto;
+  height: 100%;
+  max-height: 700px;
+  justify-self: center;
+}
+table {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  z-index: 0;
+  overflow: hidden;
+}
+th {
+}
+td {
+  align-content: start;
+}
+.data {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height:100%;
+  margin: 0;
+  background-color:#beffd0;
+  border: solid black 1px ;
+}
+.data:hover {
+  cursor: pointer;
+}
+.cell {
+  width: 50%;
+}
+.left {
+}
+.right {
+}
+.days {
+  max-height: 30px;
+}
+thead {
+  position: sticky;
+  height: 100%;
+  width: 100%;
+  top: 35px;
+  z-index: 100;
+  margin: 0;
+  gap: 0;
+}
+.cover {
+  width: 100%;
+  height: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  z-index: 150;
+  max-height: 50px;
+}
+app-date-picker {
+  padding: 10px 5px;
+  z-index: 200;
+  justify-items: end;
+}
+.table-scroll {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+.day {
+}
+.weekday {
+  font-size: xx-small;
+}
+.reserved {
+  background-color: #fdc098 !important;
+}
+.weekend {
+  background-color: #4efa7a;
+}
+.paid.reserved, .paid.reserved.nextToCheckin {
+  background-color: #98b8fd !important;
+}
+
+.left:hover{
+  border-right: solid black 1px;
+}
+.right:hover {
+  border-left: solid black 1px;
+}
+.nextToCheckout {
+  border-left: solid black 1px;
+}
+.nextToCheckin {
+  border-right: solid black 1px;
+}
+.data.dataCheckin.dataCheckout {
+  background-color: #fdc098 !important;
+}
+

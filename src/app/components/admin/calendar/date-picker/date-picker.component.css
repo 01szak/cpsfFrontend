@@ -1,0 +1,34 @@
+.content {
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  justify-content: space-evenly;
+  border-radius: 30px;
+  font-size: small;
+  gap: 2px
+}
+.arrow {
+  border: none;
+  padding: 0;
+  background-color: inherit;
+  max-height: 30px;
+  align-self: center;
+}
+.arrow:hover {
+  cursor: pointer;
+  color: var(--bg-color-secondary);
+}
+i {
+  font-size: x-small;
+}
+p {
+  margin: 0;
+}
+mat-card {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 10px 15px 10px 15px;
+  width: 100%;
+  max-width: 130px;
+}

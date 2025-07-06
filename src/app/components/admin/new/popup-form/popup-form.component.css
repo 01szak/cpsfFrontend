@@ -1,0 +1,28 @@
+h1 {
+  text-align: center;
+  padding-top: 0;
+}
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.deleteIcon {
+  display: flex;
+  width: 100%;
+  max-height: 15px;
+  justify-content: end ;
+  align-items: end ;
+  margin-top: 15px;
+}
+i {
+  margin-right: 10px;
+}
+i:hover {
+  cursor: pointer;
+  color: red;
+}
+
+app-form-buttons {
+  padding: 10px;
+}
