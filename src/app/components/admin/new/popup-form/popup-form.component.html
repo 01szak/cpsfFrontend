@@ -78,27 +78,15 @@
                type="text"
                [(ngModel)]="formValues['firstName']">
       </mat-form-field>
+
       <mat-form-field>
         <mat-label> Nazwisko</mat-label>
         <input matInput
                type="text"
                [(ngModel)]="formValues['lastName']">
       </mat-form-field>
-      <mat-form-field>
-        <mat-label> Rejestracja</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['carRegistration']">
-      </mat-form-field>
 
       <mat-form-field>
-        <mat-label> Email</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['email']">
-      </mat-form-field>
-
-   <mat-form-field>
         <mat-label> Numer Telefonu</mat-label>
         <input matInput
                type="text"
@@ -106,24 +94,14 @@
       </mat-form-field>
 
       <mat-form-field>
-        <mat-label> Kraj</mat-label>
+        <mat-label> Rejestracja</mat-label>
         <input matInput
                type="text"
-               [(ngModel)]="formValues['country']">
+               [(ngModel)]="formValues['carRegistration']">
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-label> Miasto</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['city']">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label> Adres</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['street']">
-      </mat-form-field>
+
+
     }
   }
 
