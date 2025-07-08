@@ -132,18 +132,15 @@ export class NewCalendarComponent implements OnInit {
     if (isLeft) {
       reservationToUpdate = camperPlace.reservations.find(r => {
         const checkout = this.reservationHelper.mapStringToDate(r.checkout);
-        return checkout.getTime() === date.getTime();
+        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        return date.getTime() <= checkout.getTime() && date.getTime() > new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate() - 1).getTime();
       });
     } else if (isRight) {
       reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
-        return checkin.getTime() === date.getTime();
-      });
-    } else {
-      reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
         const checkout = this.reservationHelper.mapStringToDate(r.checkout);
-        return checkin <= date && date < checkout;
+        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        return date.getTime() >= checkin.getTime()
+              && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
       });
     }
     if (reservationToUpdate) {
@@ -151,6 +148,10 @@ export class NewCalendarComponent implements OnInit {
     } else {
       this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
     }
+  }
+
+  private stripTime(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   findWeekDay(year: number, month: number, day: number) {
