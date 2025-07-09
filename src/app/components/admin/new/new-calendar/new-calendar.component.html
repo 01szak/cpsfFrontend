@@ -23,7 +23,10 @@
             <th>{{camperPlace.index}}</th>
             @for (day of days; track day) {
               <td>
-                <div  #data [ngClass]="{
+                <div
+                   #data
+                   matTooltip="{{ getUserFromMap(camperPlace, year, month + 1, day) }}"
+                  [ngClass]="{
                 'data': true,
                 'dataCheckin': isCheckin(year, month, day , camperPlace),
                 'dataCheckout': isCheckout(year, month, day, camperPlace),
@@ -63,7 +66,6 @@
                         && isPaid(year, month, day + 1, camperPlace)
                         || isPaid(year, month, day, camperPlace)
                         && isPaid(year, month, day + 1, camperPlace)
-
                     }" (click)="openFormPopup(year, month, day, camperPlace, $event)"></div>
                 </div>
               </td>

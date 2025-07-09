@@ -10,13 +10,17 @@ import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from './../new-date-picker/new-date-picker.component';
 import {PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
+import {UserPerReservation} from './../InterfaceN/UserPerReservation';
+import {MatTooltip} from '@angular/material/tooltip';
+
 @Component({
   selector: 'app-new-calendar',
   imports: [
     MatCard,
     NgClass,
     AsyncPipe,
-    NewDatePickerComponent
+    NewDatePickerComponent,
+    MatTooltip
   ],
   templateUrl: './new-calendar.component.html',
   styleUrl: './new-calendar.component.css',
@@ -31,6 +35,8 @@ export class NewCalendarComponent implements OnInit {
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   paidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
+  userPerReservations: UserPerReservation = {};
+
   constructor(
     private camperPlaceService: NewCamperPlaceService,
     protected popupFormService: PopupFormService,
@@ -45,23 +51,19 @@ export class NewCalendarComponent implements OnInit {
 
     this.reservationService.getReservationMetadata().subscribe(r => {
         this.reservationMetadataWithSets = this.reservationHelper.mapReservationMetadataToSets(r);
-        console.log(this.reservationMetadataWithSets)
-
       }
     )
-
     this.reservationService.getPaidReservations().subscribe(r => {
-      console.log(r)
-
       this.paidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-      console.log(this.paidReservationsWithSet)
     })
     this.reservationService.getUnPaidReservations().subscribe(r => {
-      console.log(r)
-
       this.unPaidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-      console.log(this.paidReservationsWithSet)
     })
+    this.reservationService.getUserPerReservation().subscribe(r => {
+      this.userPerReservations = r
+      console.log(this.userPerReservations);
+    });
+
 
   }
 
@@ -72,7 +74,7 @@ export class NewCalendarComponent implements OnInit {
     }
   }
 
-  changeMonth(event:number) {
+  changeMonth(event: number) {
     this.month = event;
     this.generateDays()
   }
@@ -160,5 +162,31 @@ export class NewCalendarComponent implements OnInit {
   isWeekend(year: number, month: number, day: number) {
     const weekDay = new Date(year, month, day).getDay();
     return weekDay == 0 || weekDay == 6;
+  }
+
+  getUserFromMap(cp: CamperPlaceN, year: number, month: number, day: number) {
+
+    const dateStr =  (this.isCheckin(year, month, day, cp ) && this.isCheckout(year, month, day, cp)) ?
+      this.reservationHelper.mapDateToString(year, month, day - 1) : this.reservationHelper.mapDateToString(year, month, day);
+
+
+    if (cp === undefined || !this.userPerReservations?.[cp.index]) {
+      return ;
+    }
+
+    const userMap = this.userPerReservations[cp.index.toString()];
+
+    if(!userMap) {
+      return ;
+    }
+    const matchingUsers: string[] = [];
+
+    for (const [user, dates] of Object.entries(userMap)) {
+      if (dates.includes(dateStr)) {
+          matchingUsers.push(user)
+      }
+    }
+
+    return matchingUsers.length > 1 ? `${matchingUsers[0]} / ${matchingUsers[1]}` : matchingUsers[0];
   }
 }

@@ -6,6 +6,7 @@ import {ReservationN} from './../InterfaceN/ReservationN';
 import {PaidReservations} from './../InterfaceN/PaidReservations';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SnackBarComponent} from './../snack-bar/snack-bar.component';
+import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 
 @Injectable({providedIn: "root"})
 export class NewReservationService {
@@ -26,8 +27,13 @@ export class NewReservationService {
   getPaidReservations(): Observable<Record<string, PaidReservations>> {
     return this.http.get<Record<string, PaidReservations>> (this.api + 'getPaidReservations');
   }
+
   getUnPaidReservations(): Observable<Record<string, PaidReservations>> {
     return this.http.get<Record<string, PaidReservations>> (this.api + 'getUnPaidReservations');
+  }
+
+  getUserPerReservation(): Observable<UserPerReservation> {
+    return this.http.get<UserPerReservation> (this.api + 'getUserPerReservation');
   }
 
   createReservation(reservation: ReservationN) {
