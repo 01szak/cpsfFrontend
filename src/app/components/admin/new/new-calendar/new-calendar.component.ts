@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Component, Input, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {Observable, Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
@@ -26,11 +26,12 @@ import {MatTooltip} from '@angular/material/tooltip';
   styleUrl: './new-calendar.component.css',
   standalone: true,
 })
-export class NewCalendarComponent implements OnInit {
+export class NewCalendarComponent implements OnInit, OnDestroy {
   weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
   days: (number)[] = [];
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
+  subs: Subscription[] = []
   camperPlaces$: Observable<CamperPlaceN[]>;
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   paidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
@@ -44,27 +45,35 @@ export class NewCalendarComponent implements OnInit {
     private reservationHelper: ReservationHelper,
   ) {
     this.camperPlaces$ = this.camperPlaceService.getCamperPlaces();
+
   }
 
   ngOnInit(): void {
     this.generateDays()
 
-    this.reservationService.getReservationMetadata().subscribe(r => {
+    this.subs.push(this.reservationService.getReservationMetadata().subscribe(r => {
         this.reservationMetadataWithSets = this.reservationHelper.mapReservationMetadataToSets(r);
       }
+    ))
+    this.subs.push(
+      this.reservationService.getPaidReservations().subscribe(r => {
+        this.paidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
+      })
     )
-    this.reservationService.getPaidReservations().subscribe(r => {
-      this.paidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-    })
-    this.reservationService.getUnPaidReservations().subscribe(r => {
-      this.unPaidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-    })
-    this.reservationService.getUserPerReservation().subscribe(r => {
-      this.userPerReservations = r
-      console.log(this.userPerReservations);
-    });
+    this.subs.push(
+      this.reservationService.getUnPaidReservations().subscribe(r => {
+        this.unPaidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
+      }))
+    this.subs.push(
+      this.reservationService.getUserPerReservation().subscribe(r => {
+        this.userPerReservations = r
+      }))
 
-
+  }
+  ngOnDestroy() {
+    this.subs.forEach(sub => {
+      sub.unsubscribe()
+    })
   }
 
   ngOnChanges(changes: SimpleChanges) {
