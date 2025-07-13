@@ -16,13 +16,21 @@
   <mat-grid-tile
     [colspan]="6"
     [rowspan]="4">
-    <app-graph [results]="reservationCount"></app-graph>
+    <app-graph
+      [results]="reservationCount"
+      [xAxisLabel]="'Parcele'"
+      [yAxisLabel]="'Ilość rezerwacji'">
+    </app-graph>
   </mat-grid-tile>
 
   <mat-grid-tile
     [colspan]="6"
     [rowspan]="4">
-    <app-graph [results]="revenue"></app-graph>
+    <app-graph
+        [results]="revenue"
+        [xAxisLabel]="'Parcele'"
+        [yAxisLabel]="'Obrót'">
+    </app-graph>
   </mat-grid-tile>
 
 </mat-grid-list>

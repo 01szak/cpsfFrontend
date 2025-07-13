@@ -17,6 +17,8 @@ export class GraphComponent {
   @Input() month: number = 0;
   @Input()  year: number = 0;
   @Input() results: Statistic[] = []
+  @Input() xAxisLabel: string = '';
+  @Input() yAxisLabel: string = '';
 
   hideHalfNumbers(val: number) {
     if (val % 1 === 0) {
