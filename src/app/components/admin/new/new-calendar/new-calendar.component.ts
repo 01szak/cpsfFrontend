@@ -76,13 +76,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    const value = changes['reservationMap'];
-    if (value.currentValue) {
-
-    }
-  }
-
   changeMonth(event: number) {
     this.month = event;
     this.generateDays()

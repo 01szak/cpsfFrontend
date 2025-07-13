@@ -1,21 +1,35 @@
-<div class="selectors">
-  <app-month-selector (selectMonthEvent)="selectMonth(Number($event))"></app-month-selector>
-
-  <app-year-selector (selectYearEvent)="selectYear(Number($event))" class="yearSelector"></app-year-selector>
-
+<div class="datePicker">
+  <app-new-date-picker (month)="changeMonth($event)" (year)="changeYear($event)"></app-new-date-picker>
 </div>
-<div class="content">
+<mat-grid-list cols="10" rowHeight="100px" >
 
-  <mat-card class="tableCard">
 
+  <mat-grid-tile
+    [colspan]="3"
+    [rowspan]="8">
     <app-statistic-table
-      [camperPlaces]="camperPlaces"
-      [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
-      [revenuePerCamperPlace]="revenuePerCamperPlace"/>
-  </mat-card>
+      [revenue]="revenue"
+      [reservationCount]="reservationCount">
+    </app-statistic-table>
+  </mat-grid-tile>
 
-  <app-graph [camperPlaces]="camperPlaces"
-             [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"
-             [revenuePerCamperPlace]="revenuePerCamperPlace"
-             class="graph"/>
-</div>
+  <mat-grid-tile
+    [colspan]="6"
+    [rowspan]="4">
+    <app-graph [results]="reservationCount"></app-graph>
+  </mat-grid-tile>
+
+  <mat-grid-tile
+    [colspan]="6"
+    [rowspan]="4">
+    <app-graph [results]="revenue"></app-graph>
+  </mat-grid-tile>
+
+</mat-grid-list>
+
+<!--    <app-statist
+ic-table-->
+<!--      [camperPlaces]="camperPlaces"-->
+<!--      [reservationCountPerCamperPlace]="reservationCountPerCamperPlace"-->
+<!--      [revenuePerCamperPlace]="revenuePerCamperPlace"/>-->
+<!--  </mat-card>-->

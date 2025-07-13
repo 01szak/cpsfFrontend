@@ -2,10 +2,9 @@
   display: flex;
   width: 100%;
   max-width: 300px;
-  justify-content: space-evenly;
+  justify-content: space-between;
   border-radius: 30px;
   font-size: small;
-  gap: 2px
 }
 .arrow {
   border: none;
@@ -27,11 +26,11 @@ p {
 }
 mat-card {
   display: flex;
-  justify-content: center;
   align-content: center;
   padding: 10px 15px 10px 15px;
   width: 100%;
-  max-width: 130px;
+  max-width: 135px;
   color: black;
   font-weight: bold;
 }
+

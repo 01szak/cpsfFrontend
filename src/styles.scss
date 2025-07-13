@@ -8,6 +8,17 @@
   @include mat.snack-bar-overrides((
     container-color: red,
   ));
+  ::-webkit-scrollbar-thumb {
+    background-color: black;
+    width: 10px;
+    border-radius: 10px;
+    border: solid black;
+  }
+  ::-webkit-scrollbar {
+    background-color: unset;
+    width: 10px;
+  }
+
 }
 .primary {
   background-color: var(--bg-color-primary) !important;

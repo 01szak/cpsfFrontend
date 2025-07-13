@@ -14,15 +14,25 @@ app-month-selector{
   margin: 5px 0 10px 50px;
 
 }
-.content{
-  width: 98%;
+
+.datePicker {
+  width: 100%;
   display: flex;
-  align-content: space-between ;
-  align-items: center;
-  justify-items: center;
+  justify-content: center;
+}
+app-graph{
+  width: 100%;
+  height: 100%;
+  align-content: center;
+}
+app-statistic-table {
+  width: 80%;
+}
+app-new-date-picker {
+  width: 100%;
+  margin-left: 50vw;
 }
 
-.graph{
-margin-bottom: 35px;
-  max-width: 1000px;
+mat-grid-list {
+  height: 100%;
 }

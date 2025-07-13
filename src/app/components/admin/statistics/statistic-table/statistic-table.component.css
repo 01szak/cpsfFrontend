@@ -1,18 +1,27 @@
-.tableRow{
-  height: 27px;
-}
+
 table {
   background-color: inherit;
-
 }
-th,td,tr{
+
+th, td, tr {
   color: white;
 }
-.tableRow:hover{
-background-color: mediumpurple;
-}
 
-mat-card {
-     background-color: rgb(44, 33, 66);
-  max-width:inherit;
+.tableRow:hover {
+  background-color: mediumpurple;
+}
+.table {
+  overflow-y: auto;
+  height: 800px;
+}
+.header {
+  position: sticky;
+  top: 0
+}
+.footer {
+  position: sticky;
+  bottom: 0;
+}
+table mat-row.mat-row:nth-of-type(odd) {
+  background-color: #f0f0f0;
 }

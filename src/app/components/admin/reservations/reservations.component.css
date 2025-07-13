@@ -42,17 +42,7 @@ th {
   left: 80vw
 }
 
-.reservations::-webkit-scrollbar {
-  background-color: unset;
-  width: 10px;
-}
 
-.reservations::-webkit-scrollbar-thumb {
-  background-color: black;
-  width: 10px;
-  border-radius: 10px;
-  border: solid black;
-}
 
 
 .buttonDiv {

@@ -1,5 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {Statistic} from './../components/admin/new/InterfaceN/Statistic';
 
 @Injectable({
   providedIn: 'root',
@@ -9,36 +11,31 @@ export class StatisticsService {
   private currentMonth = new Date().getMonth() + 1;
   private currentYear = new Date().getFullYear();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) {}
+
+  getRevenue(month: number, year: number, camperPlaceIds: number[]): Observable<Statistic[]> {
+    return this.http.get<Statistic[]>(
+      this.api
+      + 'getRevenue/'
+      + (month + 1).toString()
+      + '/'
+      + year.toString()
+      + '/'
+      + camperPlaceIds
+    )
   }
 
-  getMonthlyReservationCount(ids: number[], month: number, year: number) {
-    if (year === 0) {
-      year = this.currentYear;
-    }
-    return this.http.get<[number,number][]>(this.api + 'getReservationCountMonthly/' + ids + '/' + month + '/' + year)
 
+  getReservationCount(month: number, year: number, camperPlaceIds: number[]): Observable<Statistic[]> {
+    return this.http.get<Statistic[]>(
+      this.api
+      + 'getReservationCount/'
+      + (month + 1).toString()
+      + '/'
+      + year.toString()
+      + '/'
+      + camperPlaceIds
+    )
   }
 
-  getMonthlyRevenue(ids: number[], month: number, year: number) {
-
-    if (year === 0) {
-      year = this.currentYear;
-    }
-    return this.http.get<[number,number][]>(this.api + 'geRevenueMonthly/' + ids + '/' + month + '/' + year)
-  }
-
-  getReservationCountForChart(month: number, year: number, camperPlaceId: number[]) {
-    if (year === 0) {
-      year = this.currentYear;
-    }
-    return this.http.get<number[]>(this.api + 'getReservationCountForChart/' + month + '/' + year + '/' + camperPlaceId)
-  }
-
-  getRevenueForChart(month: number, year: number, camperPlaceId: number[]) {
-    if (year === 0) {
-      year = this.currentYear;
-    }
-    return this.http.get<number[]>(this.api + 'getRevenueForChart/' + month + '/' + year + '/' + camperPlaceId)
-  }
 }
