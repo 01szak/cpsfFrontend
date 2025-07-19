@@ -1,7 +1,7 @@
 <div class="content ">
   <button class="arrow" (click)="decreaseMonth()"><i class="fa-solid fa-arrow-left"></i></button>
   <div class="selectors">
-    <mat-card>
+    <mat-card class="monthSelect">
       <mat-select (selectionChange)="changeMonth(currentMonth)" [(value)]="currentMonth">
         @for (month of months; track month) {
           <mat-option [value]="month">

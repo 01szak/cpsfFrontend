@@ -4,6 +4,7 @@
   --bg-color-primary: #2C2142FF;
   --bg-color-secondary: #FFFFFF;
   --bg-color-tertiary: #3B82F6;
+  --bg-color-quaternary: #3e3559;
   --container-blury: rgba(255, 255, 255, 0.8);
   @include mat.snack-bar-overrides((
     container-color: red,
@@ -18,7 +19,6 @@
     background-color: unset;
     width: 10px;
   }
-
 }
 .primary {
   background-color: var(--bg-color-primary) !important;
@@ -29,13 +29,18 @@
 .tertiary {
   background-color: var(--bg-color-tertiary) !important;
 }
+.quaternary {
+  background-color: var(--bg-color-quaternary) !important;
+}
 .blury {
   background-color: var(--container-blury) !important;
 }
 .shadow {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
+.table {
 
+}
 html{
 
   background-color: rgba(0, 0, 0, 0.88);

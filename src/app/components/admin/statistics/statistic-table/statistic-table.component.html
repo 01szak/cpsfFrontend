@@ -19,7 +19,10 @@
       </ng-container>
 
       <tr mat-header-row class="header" *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row class="tableRow" *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row  *matRowDef="let row; let i = index; columns: displayedColumns;"
+          [ngClass]="{
+          'quaternary': i % 2 !== 0,
+           }"></tr>
       <tr mat-row class="footer" *matFooterRowDef="displayedColumns;"></tr>
     </table>
   </div>

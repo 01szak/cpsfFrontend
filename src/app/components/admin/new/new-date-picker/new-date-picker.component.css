@@ -32,12 +32,15 @@ mat-card {
   max-width: 135px;
   color: black;
   font-weight: bold;
+  text-align: center;
 }
 .yearSelect {
-  max-width: 80px;
+  min-width: 100px;
+}
+.monthSelect {
+  min-width: 135px;
 }
 .selectors{
-  width: fit-content;
   display: flex;
   gap: 5px;
 }

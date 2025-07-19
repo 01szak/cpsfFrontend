@@ -75,7 +75,9 @@
     <tr mat-row
         (click)="openUpdatePopup(row,camperPlace)"
         class="row"
-        *matRowDef="let row; columns: displayedColumns;">
+        *matRowDef="let row;let i = index; columns: displayedColumns;"
+      [ngClass]="{'quaternary':  i % 2 !== 0}"
+    >
     </tr>
   </table>
 
