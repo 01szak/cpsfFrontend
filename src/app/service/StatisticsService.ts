@@ -17,9 +17,9 @@ export class StatisticsService {
     return this.http.get<Statistic[]>(
       this.api
       + 'getRevenue/'
-      + (month + 1).toString()
-      + '/'
       + year.toString()
+      + '/'
+      + month.toString()
       + '/'
       + camperPlaceIds
     )
@@ -30,9 +30,9 @@ export class StatisticsService {
     return this.http.get<Statistic[]>(
       this.api
       + 'getReservationCount/'
-      + (month + 1).toString()
-      + '/'
       + year.toString()
+      + '/'
+      + month.toString()
       + '/'
       + camperPlaceIds
     )
