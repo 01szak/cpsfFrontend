@@ -8,9 +8,6 @@ import {Statistic} from './../components/admin/new/InterfaceN/Statistic';
 })
 export class StatisticsService {
   private api = '/api/statistics/';
-  private currentMonth = new Date().getMonth() + 1;
-  private currentYear = new Date().getFullYear();
-
   constructor(private http: HttpClient) {}
 
   getRevenue(month: number, year: number, camperPlaceIds: number[]): Observable<Statistic[]> {
@@ -19,7 +16,7 @@ export class StatisticsService {
       + 'getRevenue/'
       + year.toString()
       + '/'
-      + month.toString()
+      + (month + 1).toString()
       + '/'
       + camperPlaceIds
     )
@@ -32,7 +29,7 @@ export class StatisticsService {
       + 'getReservationCount/'
       + year.toString()
       + '/'
-      + month.toString()
+      + (month + 1).toString()
       + '/'
       + camperPlaceIds
     )

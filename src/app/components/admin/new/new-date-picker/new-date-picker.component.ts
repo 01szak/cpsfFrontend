@@ -1,4 +1,4 @@
-import {Component, EventEmitter,  Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatCard} from '@angular/material/card';
 import {MatOption, MatSelect} from '@angular/material/select';
 
@@ -13,9 +13,9 @@ import {MatOption, MatSelect} from '@angular/material/select';
   standalone: true,
   styleUrl: './new-date-picker.component.css'
 })
-export class NewDatePickerComponent {
+export class NewDatePickerComponent implements OnInit {
   @Output() month = new EventEmitter<number>();
-  @Output() year= new EventEmitter<number>();
+  @Output() year = new EventEmitter<number>();
   months: string[] =
     [
       "Pokaż dla wszystkich",
@@ -32,53 +32,70 @@ export class NewDatePickerComponent {
       "Listopad",
       "Grudzień"
     ];
-  years: string[] = [
-    "2024",
-    "2025",
+  years: number[] = [
+    2024,
+    2025,
   ]
   currentMonth: string = this.months[new Date().getMonth() + 1];
-  yearForTemplate: number = new Date().getFullYear();
-  monthForTemplate: string = this.months[new Date().getMonth() + 1]
+  currentYear: number = new Date().getFullYear();
+
+  ngOnInit() {
+    this.addMissingYears()
+  }
+
 
   decreaseMonth() {
     let index = this.months.indexOf(this.currentMonth);
-    index --;
+    index--;
 
     if (index === 0) {
-      this.yearForTemplate --;
-      this.year.emit(this.yearForTemplate)
+      this.currentYear--;
+      if (!this.years.includes(this.currentYear)) {
+        this.years.unshift(this.currentYear);
+      }
+      this.year.emit(this.currentYear)
       index = this.months.length - 1;
     }
     let month = index;
     this.currentMonth = this.months[month];
-    this.monthForTemplate = this.months[month];
     this.month.emit(month - 1)
   }
 
   increaseMonth() {
-    let index = this.months.indexOf(this.currentMonth) ;
-     index ++;
+    let index = this.months.indexOf(this.currentMonth);
+    index++;
     if (index >= this.months.length) {
-      this.yearForTemplate ++;
-      this.year.emit(this.yearForTemplate)
+      this.currentYear++;
+      if (!this.years.includes(this.currentYear)) {
+        this.years.push(this.currentYear);
+      }
+      this.year.emit(this.currentYear)
       index = 1
     }
     let month = index;
     this.currentMonth = this.months[month];
-    this.monthForTemplate = this.months[month];
     this.month.emit(month - 1);
-    console.log(month)
   }
 
   changeMonth(month: string) {
-    let parsedMonth = this.months.indexOf(month);
+    let index = this.months.indexOf(month);
 
-    this.currentMonth = this.months[parsedMonth];
-    this.month.emit(parsedMonth);
+    this.currentMonth = this.months[index];
+    this.month.emit(index - 1);
   }
 
   changeYear(year: number) {
-    this.year.emit(year);
+    let index = this.years.indexOf(year)
+    this.currentYear = this.years[index];
+    this.year.emit(this.currentYear);
+  }
+
+  addMissingYears() {
+    let currentYear = new Date().getFullYear()
+    let lasYearInTab = this.years[this.years.length - 1];
+    while (currentYear > lasYearInTab) {
+      this.years.push(lasYearInTab++);
+    }
   }
 
 }

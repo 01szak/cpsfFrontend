@@ -85,7 +85,6 @@ export class ReservationHelper {
 
     for (const key in rawMap) {
       const raw = rawMap[key];
-      console.log(raw)
       mapped[key] = {
         paidDates: new Set(raw.paidDates)
       };
@@ -93,37 +92,5 @@ export class ReservationHelper {
 
     return mapped;
   }
-
-  // mapUserPerReservation(raw: UserPerReservation): UserPerReservationWithSets {
-  //   const mapped: UserPerReservationWithSets = {
-  //     userPerReservation: new Map()
-  //   };
-  //
-  //   if (!raw || !raw.userPerReservation) {
-  //     return mapped;
-  //   }
-  //
-  //   const outer = raw.userPerReservation;
-  //
-  //   for (const camperPlaceIndex in outer) {
-  //     if (Object.prototype.hasOwnProperty.call(outer, camperPlaceIndex)) {
-  //       const innerObj = outer[camperPlaceIndex];
-  //       const innerMap = new Map<string, Set<string>>();
-  //
-  //       for (const userName in innerObj) {
-  //         if (Object.prototype.hasOwnProperty.call(innerObj, userName)) {
-  //           const dateArray = innerObj[userName];
-  //           if (Array.isArray(dateArray)) {
-  //             innerMap.set(userName, new Set(dateArray));
-  //           }
-  //         }
-  //       }
-  //
-  //       mapped.userPerReservation.set(camperPlaceIndex, innerMap);
-  //     }
-  //   }
-  //
-  //   return mapped;
-  // }
 
 }

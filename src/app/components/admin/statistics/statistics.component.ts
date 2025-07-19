@@ -40,11 +40,13 @@ export class StatisticsComponent implements OnInit{
 
   changeMonth(event: number) {
     this.month = event;
+    console.log("month changed: " +  this.month)
     this.loadData();
   }
 
   changeYear(event:number) {
     this.year = event;
+    console.log("year changed: " +  this.year)
     this.loadData();
   }
 
@@ -56,13 +58,11 @@ export class StatisticsComponent implements OnInit{
       this.statisticsService.getRevenue(this.month, this.year, this.camperPlaceIds).subscribe(s => {
         this.revenue = [];
         this.revenue = s;
-        console.log(s)
       })
 
       this.statisticsService.getReservationCount(this.month, this.year, this.camperPlaceIds).subscribe(s => {
         this.reservationCount = [];
         this.reservationCount = s;
-        console.log(s)
       })
     })
   }

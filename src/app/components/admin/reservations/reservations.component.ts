@@ -1,4 +1,4 @@
-import {Component, numberAttribute, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ReservationService} from '../../../service/ReservationService';
 import {Reservation} from '../calendar/Reservation';
 import {CommonModule} from '@angular/common';
@@ -69,9 +69,7 @@ export class ReservationsComponent implements OnInit {
     this.reservationService.getFilteredReservations(this.searchValue).subscribe({
       next: (reservations) => {
         this.allReservations = reservations;
-        console.log(this.allReservations)
 this.allReservations.forEach(r =>{
-  console.log(r.paid)
 })
       }
     })
@@ -118,8 +116,6 @@ this.allReservations.forEach(r =>{
     this.camperPlaceService.findCamperPlaceByIndex(camperPlaceIndex).pipe(
       switchMap(cp => {
         this.camperPlace = cp;
-        console.log(this.camperPlace);
-
         const reservation = {
           id: id,
           checkin: new Date(checkin ).toISOString().split('T')[0],
@@ -128,13 +124,10 @@ this.allReservations.forEach(r =>{
           paid: paid
         };
 
-        console.log(reservation.paid);
         return this.reservationService.updateReservation(reservation);
       })
     ).subscribe({
       error: (err) => {
-        console.log(id)
-        console.log(err);
       }
     });
   }

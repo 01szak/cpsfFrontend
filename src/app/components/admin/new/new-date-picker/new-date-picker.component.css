@@ -33,4 +33,11 @@ mat-card {
   color: black;
   font-weight: bold;
 }
-
+.yearSelect {
+  max-width: 80px;
+}
+.selectors{
+  width: fit-content;
+  display: flex;
+  gap: 5px;
+}

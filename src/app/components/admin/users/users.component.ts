@@ -62,7 +62,6 @@ export class UsersComponent implements OnInit {
     this.userService.getFilteredUsers(this.searchValue).subscribe({
       next: (users) => {
         this.allUsers = users;
-        console.log(users);
       }
     })
   }
