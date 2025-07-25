@@ -37,29 +37,28 @@ export class NewReservationService {
   }
 
   createReservation(reservation: ReservationN) {
-    return this.http.post<ReservationN>(this.api + 'createReservation', reservation).subscribe({
+    return this.http.post(this.api + 'createReservation', reservation).subscribe({
       next: () => {
         window.location.reload();
       },
-      error:(error) => {
-        this.snackBar.open(error.error?.message || "Unexpected error", undefined, {
+      error: (error) => {
+        this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
           panelClass: 'errorSnackBar',
           duration: 5000,
           horizontalPosition: 'start',
           verticalPosition: 'top'
         });
       }
-      }
-    );
+    });
   }
 
   updateReservation(reservationToUpdate: ReservationN){
-    return this.http.patch<ReservationN>(this.api + 'updateReservation/' + reservationToUpdate.id!.toString(), reservationToUpdate).subscribe( {
+    return this.http.patch(this.api + 'updateReservation/' + reservationToUpdate.id, reservationToUpdate).subscribe({
       next: () => {
         window.location.reload();
       },
       error:(error) => {
-        this.snackBar.open(error.error?.message || "Unexpected error", undefined, {
+        this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
           panelClass: 'errorSnackBar',
           duration: 5000,
           horizontalPosition: 'start',
@@ -76,7 +75,7 @@ export class NewReservationService {
           window.location.reload();
         },
         error:(error) => {
-          this.snackBar.open(error.error?.message || "Unexpected error", undefined, {
+          this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
             panelClass: 'errorSnackBar',
             duration: 5000,
             horizontalPosition: 'start',

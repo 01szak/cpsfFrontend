@@ -16,23 +16,24 @@
     </thead>
   </table>
   <div class="table-scroll">
-    <table>
-      <tbody>
-        @for (camperPlace of camperPlaces$ | async; track camperPlace) {
-          <tr>
-            <th>{{camperPlace.index}}</th>
-            @for (day of days; track day) {
-              <td>
-                <div
-                   #data
-                   matTooltip="{{ getUserFromMap(camperPlace, year, month + 1, day) }}"
-                  [ngClass]="{
+    @if (camperPlaces) {
+      <table>
+        <tbody>
+          @for (camperPlace of camperPlaces; track camperPlace) {
+            <tr>
+              <th>{{camperPlace.index}}</th>
+              @for (day of days; track day) {
+                <td>
+                  <div
+                    #data
+                    matTooltip="{{ getUserFromMap(camperPlace, year, month + 1, day) }}"
+                    [ngClass]="{
                 'data': true,
                 'dataCheckin': isCheckin(year, month, day , camperPlace),
                 'dataCheckout': isCheckout(year, month, day, camperPlace),
                 }">
-                  <div #left
-                       [ngClass]="{
+                    <div #left
+                         [ngClass]="{
                       'cell': true,
                       'left': true,
                       'weekend': isWeekend(year, month, day),
@@ -49,8 +50,8 @@
                         || isPaid(year, month, day, camperPlace)
                         && isPaid(year, month, day - 1, camperPlace)
                     }" (click)="openFormPopup(year, month , day, camperPlace, $event)"></div>
-                  <div #right
-                       [ngClass]="{
+                    <div #right
+                         [ngClass]="{
                       'cell': true,
                       'right': true,
                       'weekend': isWeekend(year, month, day),
@@ -67,13 +68,15 @@
                         || isPaid(year, month, day, camperPlace)
                         && isPaid(year, month, day + 1, camperPlace)
                     }" (click)="openFormPopup(year, month, day, camperPlace, $event)"></div>
-                </div>
-              </td>
-            }
-          </tr>
-        }
-      </tbody>
-    </table>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
   </div>
 </mat-card>
 

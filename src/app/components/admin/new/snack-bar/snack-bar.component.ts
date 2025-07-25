@@ -4,7 +4,7 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarLabel, MatSnackBarRef} from '@angular/mat
 @Component({
   selector: 'app-snack-bar',
   imports: [
-    MatSnackBarLabel
+
   ],
   templateUrl: './snack-bar.component.html',
   styleUrl: './snack-bar.component.css'

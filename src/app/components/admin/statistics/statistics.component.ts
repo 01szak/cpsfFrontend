@@ -55,12 +55,12 @@ export class StatisticsComponent implements OnInit{
       this.camperPlaceIds = []
       cps.forEach(c => this.camperPlaceIds.push(c.id))
 
-      this.statisticsService.getRevenue(this.month, this.year, this.camperPlaceIds).subscribe(s => {
+      this.statisticsService.getRevenue(this.month, this.year).subscribe(s => {
         this.revenue = [];
         this.revenue = s;
       })
 
-      this.statisticsService.getReservationCount(this.month, this.year, this.camperPlaceIds).subscribe(s => {
+      this.statisticsService.getReservationCount(this.month, this.year).subscribe(s => {
         this.reservationCount = [];
         this.reservationCount = s;
       })

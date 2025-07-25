@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
@@ -7,7 +7,7 @@ import {ReservationHelper} from '../serviceN/ReservationHelper';
 import {ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
 import {CamperPlaceN} from './../InterfaceN/CamperPlaceN';
 import {MatCard} from '@angular/material/card';
-import {AsyncPipe, NgClass} from '@angular/common';
+import {NgClass} from '@angular/common';
 import {NewDatePickerComponent} from './../new-date-picker/new-date-picker.component';
 import {PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
@@ -18,7 +18,6 @@ import {MatTooltip} from '@angular/material/tooltip';
   imports: [
     MatCard,
     NgClass,
-    AsyncPipe,
     NewDatePickerComponent,
     MatTooltip
   ],
@@ -32,7 +31,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
   subs: Subscription[] = []
-  camperPlaces$: Observable<CamperPlaceN[]>;
+  camperPlaces: CamperPlaceN[] = [];
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   paidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
@@ -44,13 +43,14 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     private reservationService: NewReservationService,
     private reservationHelper: ReservationHelper,
   ) {
-    this.camperPlaces$ = this.camperPlaceService.getCamperPlaces();
-
   }
+
 
   ngOnInit(): void {
     this.generateDays()
-
+    this.subs.push(this.camperPlaceService.getCamperPlaces().subscribe(c => {
+      this.camperPlaces = c
+    }))
     this.subs.push(this.reservationService.getReservationMetadata().subscribe(r => {
         this.reservationMetadataWithSets = this.reservationHelper.mapReservationMetadataToSets(r);
       }

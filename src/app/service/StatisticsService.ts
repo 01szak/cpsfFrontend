@@ -10,28 +10,24 @@ export class StatisticsService {
   private api = '/api/statistics/';
   constructor(private http: HttpClient) {}
 
-  getRevenue(month: number, year: number, camperPlaceIds: number[]): Observable<Statistic[]> {
+  getRevenue(month: number, year: number): Observable<Statistic[]> {
     return this.http.get<Statistic[]>(
       this.api
       + 'getRevenue/'
       + year.toString()
       + '/'
       + (month + 1).toString()
-      + '/'
-      + camperPlaceIds
     )
   }
 
 
-  getReservationCount(month: number, year: number, camperPlaceIds: number[]): Observable<Statistic[]> {
+  getReservationCount(month: number, year: number): Observable<Statistic[]> {
     return this.http.get<Statistic[]>(
       this.api
       + 'getReservationCount/'
       + year.toString()
       + '/'
       + (month + 1).toString()
-      + '/'
-      + camperPlaceIds
     )
   }
 

@@ -71,7 +71,6 @@ export class PopupFormService {
               user: result['isNewGuest'] ? userToCreate : result['user']
             }
 
-
             this.reservationService.createReservation(reservationToCreate);
             dialogRef.close();
           }
