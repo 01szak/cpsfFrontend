@@ -19,6 +19,13 @@
     background-color: unset;
     width: 10px;
   }
+  @include mat.paginator-overrides((
+    container-text-color: var(--bg-color-secondary),
+    container-background-color: var(--bg-color-primary),
+  ));
+  @include mat.select-overrides((
+    enabled-trigger-text-color: var(--bg-color-quaternary),
+  ));
 }
 .primary {
   background-color: var(--bg-color-primary) !important;

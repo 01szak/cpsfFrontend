@@ -9,7 +9,7 @@ import {UserN} from './../InterfaceN/UserN';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatCheckbox} from '@angular/material/checkbox';
-import {MatOption} from '@angular/material/select';
+import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
 import {FormButtonsComponent} from './../form-buttons/form-buttons.component';
 import {AsyncPipe} from '@angular/common';
 
@@ -27,7 +27,8 @@ import {AsyncPipe} from '@angular/common';
     MatAutocompleteTrigger,
     MatAutocomplete,
     MatOption,
-    AsyncPipe
+    AsyncPipe,
+    MatSelect
   ],
   selector: 'app-popup-form',
   standalone: true,
@@ -55,7 +56,7 @@ export class PopupFormComponent implements OnInit {
       const value = input.defaultValue;
       if (input.checkbox === true) {
         this.formValues[input.field] = !!value
-      }else if (input.selectList) {
+      }else if (input.selectList && input.field === "user") {
         input.selectList.subscribe(users => {
             this.userList = users;
             this.filteredOptions = this.formControl.valueChanges.pipe(
@@ -86,8 +87,12 @@ export class PopupFormComponent implements OnInit {
     return value ? `${value.firstName} ${value.lastName}` : '';
   }
 
-  onOptionSelected(event: MatAutocompleteSelectedEvent, field: string) {
-    this.formValues[field] = event.option.value;
+  onOptionSelected(event: MatAutocompleteSelectedEvent | MatSelectChange, field: string) {
+    if (event instanceof  MatAutocompleteSelectedEvent) {
+      this.formValues[field] = event.option.value
+    }else {
+      this.formValues[field] = event.value;
+    }
   }
 
   close() {

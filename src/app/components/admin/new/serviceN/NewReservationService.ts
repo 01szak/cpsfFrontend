@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ReservationMetadata} from './../InterfaceN/ReservationMetadata';
 import {ReservationN} from './../InterfaceN/ReservationN';
@@ -7,6 +7,7 @@ import {PaidReservations} from './../InterfaceN/PaidReservations';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SnackBarComponent} from './../snack-bar/snack-bar.component';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
+import {PageEvent} from '@angular/material/paginator';
 
 @Injectable({providedIn: "root"})
 export class NewReservationService {
@@ -86,4 +87,19 @@ export class NewReservationService {
     };
   }
 
+  findAll(event?: PageEvent, page?: number, size?: number ): Observable<Page<ReservationN>> {
+    const params = new HttpParams()
+      .set('page', event?.pageIndex || page || 0)
+      .set('size', event?.pageSize || size || 0);
+
+    return this.http.get<Page<ReservationN>>(this.api + 'findAll', { params });
+  }
+
+}
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
 }

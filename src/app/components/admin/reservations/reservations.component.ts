@@ -11,7 +11,7 @@ import {
   MatHeaderRowDef, MatRow, MatRowDef,
   MatTable
 } from '@angular/material/table';
-import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PopupService} from '../../../service/PopupService';
 import {MatNativeDateModule} from '@angular/material/core';
@@ -19,8 +19,10 @@ import {MatCard} from '@angular/material/card';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {CamperPlace} from '../calendar/CamperPlace';
-import {switchAll, switchMap} from 'rxjs';
+import {switchMap} from 'rxjs';
 import {ReservationN} from './../new/InterfaceN/ReservationN';
+import {NewReservationService, Page} from '../new/serviceN/NewReservationService';
+import {PopupFormService} from '../new/serviceN/PopupFormService';
 
 
 @Component({
@@ -42,7 +44,7 @@ import {ReservationN} from './../new/InterfaceN/ReservationN';
     ReactiveFormsModule,
     MatNativeDateModule,
     MatCard,
-    MatCheckbox
+    MatCheckbox,
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
@@ -51,47 +53,70 @@ import {ReservationN} from './../new/InterfaceN/ReservationN';
 export class ReservationsComponent implements OnInit {
 
   displayedColumns: string[] = ['no', 'checkin', 'checkout', 'guest', 'camperPlace', 'status', 'paid'];
-  allReservations: Array<ReservationN> = [];
+  allReservations: ReservationN[] = []
   searchValue = '';
   searchForm!: FormGroup;
   isAsc: number = 0;
+  allReservationsSize: number = 0;
+  pageSize: number = 0;
+  pageSizeOptions: number[] = [20, 50, 100]
+
   camperPlace:CamperPlace = {
     id: 0, index: "", price: "", reservations: [], type: ""
 
   }
-  constructor(private reservationService: ReservationService, private popupService: PopupService, private fb: FormBuilder,private camperPlaceService:CamperPlaceService) {
+  constructor(
+    private reservationService: ReservationService,
+    private reservationServiceN: NewReservationService,
+    private popupService: PopupService,
+    private fb: FormBuilder,
+    private camperPlaceService: CamperPlaceService,
+    private formService: PopupFormService,
+  ) {
     this.searchForm = this.fb.nonNullable.group({
       searchValue: '',
     })
   }
 
-  fetchData() {
-    this.reservationService.getFilteredReservations(this.searchValue).subscribe({
-      next: (reservations) => {
-        this.allReservations = reservations;
-this.allReservations.forEach(r =>{
-})
-      }
+  ngOnInit() {
+    this.reservationServiceN.findAll(undefined,1,12).subscribe(p => {
+      this.allReservations = p.content;
+      console.log(this.allReservations);
+      this.allReservationsSize = p.totalElements;
+      this.pageSize = 12;
+      this.pageSizeOptions = this.pageSizeOptions.includes(p.totalElements)
+        ? this.pageSizeOptions
+        : [...this.pageSizeOptions, p.totalElements];
     })
   }
 
-  ngOnInit() {
-    this.fetchData();
 
+  fetchData(event: PageEvent) {
+//     this.reservationService.getFilteredReservations(this.searchValue).subscribe({
+//       next: (reservations) => {
+//         this.allReservations = reservations;
+// this.allReservations.forEach(r =>{
+// })
+//       }
+//     })
+     this.reservationServiceN.findAll(event).subscribe(r => {
+       this.allReservations = r.content;
+    });
   }
+
 
   onSearchSubmit() {
     this.searchValue = this.searchForm.value.searchValue;
-    this.fetchData();
+    // this.fetchData();
 
   }
 
   openCreatePopup() {
-    this.popupService.openCreateReservationPopup();
+    this.formService.openCreateReservationFormPopup();
   }
 
-  openUpdatePopup(reservation: Reservation,camperPlace:CamperPlace) {
-    this.popupService.openUpdateReservationPopup(reservation,camperPlace);
+  openUpdatePopup(reservation: ReservationN) {
+    this.formService.openUpdateReservationFormPopup(reservation);
   }
 
   checkStatus(reservation: Reservation) {
@@ -99,18 +124,18 @@ this.allReservations.forEach(r =>{
 
   }
 
-  sorTable(header: string) {
-    return this.reservationService.sortTable(header, this.isAsc).subscribe({
-      next: (reservation) => {
-        this.allReservations = reservation;
-        if (this.isAsc === 0) {
-          this.isAsc = 1;
-        } else {
-          this.isAsc = 0;
-        }
-      }
-    })
-  }
+  // sorTable(header: string) {
+  //   return this.reservationService.sortTable(header, this.isAsc).subscribe({
+  //     next: (reservation) => {
+  //       this.allReservations = reservation;
+  //       if (this.isAsc === 0) {
+  //         this.isAsc = 1;
+  //       } else {
+  //         this.isAsc = 0;
+  //       }
+  //     }
+  //   })
+  // }
 
   setIsPaid(id: number, paid: boolean, camperPlaceIndex: string,checkin: Date, checkout: Date) {
     this.camperPlaceService.findCamperPlaceByIndex(camperPlaceIndex).pipe(

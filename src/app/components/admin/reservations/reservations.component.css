@@ -20,9 +20,7 @@ td, th, tr {
 table {
   margin-top: 0;
   padding: 0 0 0 10px;
-  background-color:inherit;
-
-
+  background-color: inherit;
 }
 
 
@@ -35,14 +33,12 @@ th {
 
 .filter {
   border: solid 1px;
-    border-radius: 5px;
+  border-radius: 5px;
   padding: 5px;
   position: fixed;
   margin-bottom: 2px;
   left: 80vw
 }
-
-
 
 
 .buttonDiv {
@@ -62,37 +58,46 @@ th {
   margin-top: 2px;
 
 }
-.sortingButton{
+
+.sortingButton {
   background-color: unset;
   color: white;
   border: unset;
 }
-.sortingButton:hover{
+
+.sortingButton:hover {
   color: lightgray;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .headButton:hover {
   color: darkgray;
   cursor: pointer;
 }
-.expired{
+
+.expired {
   color: grey;
 }
-.active{
+
+.active {
   color: lightgreen;
 }
-.reserved{
+
+.reserved {
   color: yellow;
 }
 
-.row:hover{
+.row:hover {
   cursor: pointer;
   background-color: mediumpurple;
 }
-.deleteButton:hover{
-  color:red;
-}
-.checkBox{
 
+.deleteButton:hover {
+  color: red;
 }
+
+mat-paginator {
+  position: sticky;
+  bottom: 0;
+}
+

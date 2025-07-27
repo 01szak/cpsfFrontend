@@ -9,27 +9,31 @@ import {CamperPlaceN} from './../InterfaceN/CamperPlaceN';
 import {UserN} from './../InterfaceN/UserN';
 import {ReservationN} from './../InterfaceN/ReservationN';
 import {PopupFormComponent, FormData} from './../popup-form/popup-form.component';
+import {NewCamperPlaceService} from './NewCamperPlaceService';
 
 @Injectable({providedIn: "root"})
 export class PopupFormService {
   readonly popupForm: MatDialog = inject(MatDialog);
   users$: Observable<UserN[]>;
+  camperPlaces$: Observable<CamperPlaceN[]>;
   constructor(
     private popupConfirmationService: PopupConfirmationService,
     private reservationService: NewReservationService,
     private userService: NewUserService,
     private reservationHelper: ReservationHelper,
+    private camperPlaceService: NewCamperPlaceService
   ) {
     this.users$ = this.userService.getUsers()
+    this.camperPlaces$ = this.camperPlaceService.getCamperPlaces();
   }
-  openCreateReservationFormPopup(camperPlace: CamperPlaceN, year?: number, month?: number, day?: number) {
+  openCreateReservationFormPopup(camperPlace?: CamperPlaceN, year?: number, month?: number, day?: number) {
     const checkinDefaultDate = (year === undefined || month === undefined || day === undefined) ? undefined : new Date(year, month, day);
     const formData: FormData = {
       header: 'Nowa rezerwacja',
       formInputs: [
         { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: checkinDefaultDate, readonly: checkinDefaultDate instanceof Date},
         { name: 'Data wyjazdu', field: 'checkout', type: 'date'},
-        { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: camperPlace.index, readonly: camperPlace.index.length > 0},
+        { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: camperPlace?.index || undefined, selectList: camperPlace === undefined ? this.camperPlaces$ : undefined , readonly: (camperPlace?.index.length || 0) > 0},
         { name: 'Gość', field: 'user', type: 'text', select: true, selectList: this.users$},
         { name: 'Imię', field: 'firstName', type: 'text', additional: true },
         { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true },
@@ -81,8 +85,7 @@ export class PopupFormService {
 
   }
 
-  openUpdateReservationFormPopup(reservationToUpdate: ReservationN, year: number, month: number, day: number) {
-    const date = new Date(year, month, day);
+  openUpdateReservationFormPopup(reservationToUpdate: ReservationN, year?: number, month?: number, day?: number) {
     //
     // const reservationToUpdate = camperPlace.reservations.find(r => {
     //   const checkin = this.reservationHelper.mapStringToDate(r.checkin);

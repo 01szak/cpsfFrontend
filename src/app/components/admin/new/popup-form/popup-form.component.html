@@ -20,10 +20,11 @@
         @if(!formInput.additional) {
           <mat-form-field>
             <mat-label>{{ formInput.name }}</mat-label>
-            <input matInput
-                   type="{{formInput.type}}"
-                   [(ngModel)]="formValues[formInput.field]"
-                   [readonly]="formInput.readonly ?? false">
+              <input matInput
+                     type="{{formInput.type}}"
+                     [(ngModel)]="formValues[formInput.field]"
+                     [readonly]="formInput.readonly ?? false">
+
           </mat-form-field>
         }
       }
@@ -36,10 +37,21 @@
       } @else if (!formInput.select && !formInput.additional) {
         <mat-form-field>
           <mat-label>{{formInput.name}}</mat-label>
-          <input matInput
-                 type="{{formInput.type}}"
-                 [(ngModel)]="formValues[formInput.field]"
-                 [readonly]="formInput.readonly ?? false">
+          @if (formInput.selectList) {
+            <mat-select (selectionChange)="onOptionSelected($event, formInput.field)">
+              @for (el of formInput.selectList | async; track el) {
+                <mat-option
+                  [value]="el.index">
+                  {{el.index}}
+                </mat-option>
+              }
+            </mat-select>
+          } @else {
+            <input matInput
+                   type="{{formInput.type}}"
+                   [(ngModel)]="formValues[formInput.field]"
+                   [readonly]="formInput.readonly ?? false">
+          }
         </mat-form-field>
 
       } @else {
