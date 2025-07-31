@@ -4,8 +4,10 @@ export  interface ReservationN {
   id?: number
   checkin: string;
   checkout: string;
-  user: UserN
+  user?: UserN;
+  stringUser?: string;
   camperPlaceIndex: string;
-  price: number;
+  price?: number;
+  reservationStatus?: string;
   paid: boolean;
  }

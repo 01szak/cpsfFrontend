@@ -93,4 +93,8 @@ export class ReservationHelper {
     return mapped;
   }
 
+  formatToStringDate(dateToFormat: string) {
+    const [day, month, year] = dateToFormat.split('.').map(Number)
+    return this.mapDateToString(year, month - 1, day);
+  }
 }

@@ -43,7 +43,6 @@ export class PopupFormService {
         { name: 'Kraj', field: 'country', type: 'text', additional: true },
         { name: 'Miasto', field: 'city', type: 'text', additional: true },
         { name: 'Adres', field: 'streetAddress', type: 'text', additional: true },
-
       ]
     };
     const dialogRef = this.popupForm.open(PopupFormComponent, {
@@ -62,9 +61,6 @@ export class PopupFormService {
               carRegistration: result['carRegistration']?.toString() ?? '',
               email: result['email']?.toString() ?? '',
               phoneNumber: result['phoneNumber']?.toString() ?? '',
-              country: result['country']?.toString() ?? '',
-              city: result['city']?.toString() ?? '',
-              streetAddress: result['street']?.toString() ?? '',
             }
             const reservationToCreate: ReservationN = {
               paid: false,
@@ -85,16 +81,22 @@ export class PopupFormService {
 
   }
 
-  openUpdateReservationFormPopup(reservationToUpdate: ReservationN, year?: number, month?: number, day?: number) {
-    //
-    // const reservationToUpdate = camperPlace.reservations.find(r => {
-    //   const checkin = this.reservationHelper.mapStringToDate(r.checkin);
-    //   const checkout = this.reservationHelper.mapStringToDate(r.checkout);
-    //   return (checkin <= date && date < checkout) || checkout.getTime() === date.getTime();
-    // });
-    console.log(reservationToUpdate)
-    if (!reservationToUpdate) {
+  openUpdateReservationFormPopup(reservation: ReservationN, year?: number, month?: number, day?: number) {
+    if (!reservation) {
       return
+    }
+    let reservationToUpdate: ReservationN = {
+      id: reservation.id,
+      checkin: reservation.checkin,
+      checkout: reservation.checkout,
+      camperPlaceIndex: reservation.camperPlaceIndex,
+      user: reservation.user,
+      paid: reservation.paid
+    };
+      console.log(reservationToUpdate)
+    if(reservationToUpdate.checkin.includes('.')) {
+      reservationToUpdate.checkin = this.reservationHelper.formatToStringDate(reservationToUpdate.checkin);
+      reservationToUpdate.checkout = this.reservationHelper.formatToStringDate(reservationToUpdate.checkout);
     }
     const formData: FormData = {
       header: 'Edycja Rezerwacji',
@@ -105,7 +107,7 @@ export class PopupFormService {
         { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
         { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', defaultValue: reservationToUpdate.camperPlaceIndex},
         { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
-        { name: 'Gość', field: 'user', type: 'text', defaultValue: reservationToUpdate.user.firstName + " " + reservationToUpdate.user.lastName, readonly: true},
+        { name: 'Gość', field: 'user', type: 'text', defaultValue: reservationToUpdate.user!.firstName + " " + reservationToUpdate.user!.lastName, readonly: true},
       ]
     }
     reservationToUpdate.checkin
@@ -129,5 +131,44 @@ export class PopupFormService {
           }
         )}
     })
+  }
+
+  openCreateUserFormPopup() {
+    const formData: FormData = {
+      header: 'Nowy gość',
+      formInputs: [
+        { name: 'Imie', field: 'firstName', type: 'text'},
+        { name: 'Nazwisko', field: 'lastName', type: 'text'},
+        { name: 'Email', field: 'email', type: 'text'},
+        { name: 'Numer telefonu', field: 'phoneNumber', type: 'text'},
+        { name: 'Rejestracja', field: 'registration', type: 'text'},
+      ]
+    };
+    const dialogRef = this.popupForm.open(PopupFormComponent, {
+      data: formData
+    })
+    dialogRef.afterOpened().subscribe(() => {
+      dialogRef.componentInstance.secondAction = () => {
+        const result = dialogRef.componentInstance.formValues;
+        this.popupConfirmationService.openConfirmationPopup(
+          "Gość zostanie dodany. Czy chcesz kontynuować?",
+
+          () => {
+            const userToCreate: UserN = {
+              firstName: result['firstName']?.toString() ?? '',
+              lastName: result['lastName']?.toString() ?? '',
+              carRegistration: result['carRegistration']?.toString() ?? '',
+              email: result['email']?.toString() ?? '',
+              phoneNumber: result['phoneNumber']?.toString() ?? '',
+            }
+
+            this.userService.create(userToCreate);
+            dialogRef.close();
+          }
+        );
+
+      }
+    })
+
   }
 }

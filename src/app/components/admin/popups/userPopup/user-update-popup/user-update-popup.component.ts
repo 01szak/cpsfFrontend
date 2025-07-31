@@ -22,12 +22,8 @@ import {ConfirmationService} from '../../confirmation/confirmation.component';
     MatFormField,
     MatInput,
     MatLabel,
-    MatOption,
-    MatSelect,
-    NgForOf,
     ReactiveFormsModule,
     FormsModule,
-    MatCheckbox,
     MatHint
   ],
   templateUrl: './user-update-popup.component.html',

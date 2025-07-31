@@ -7,7 +7,6 @@ import {MatCard} from '@angular/material/card';
   imports: [
     NavbarComponent,
     RouterOutlet,
-    MatCard,
   ],
   templateUrl: './admin-page.component.html',
   styleUrl: './admin-page.component.css',

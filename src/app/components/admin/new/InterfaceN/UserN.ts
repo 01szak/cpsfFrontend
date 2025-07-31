@@ -4,8 +4,4 @@ export interface UserN  {
   email: string;
   phoneNumber: string;
   carRegistration: string,
-  country: string;
-  city: string;
-  streetAddress: string;
-
 }

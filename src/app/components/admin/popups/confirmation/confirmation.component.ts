@@ -1,6 +1,5 @@
 import {Component, Inject, Injectable, Input} from '@angular/core';
 import {MatCard} from '@angular/material/card';
-import {PopupService} from '../../../../service/PopupService';
 import {MatButton} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogContainer, MatDialogContent, MatDialogRef} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
@@ -8,9 +7,7 @@ import {Observable} from 'rxjs';
 @Component({
   selector: 'app-confirmation',
   imports: [
-    MatCard,
     MatButton,
-    MatDialogContainer,
     MatDialogContent
   ],
   templateUrl: './confirmation.component.html',

@@ -1,103 +1,74 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef, MatHeaderRow,
-  MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable
-} from '@angular/material/table';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {MatCard} from '@angular/material/card';
-import {User} from '../calendar/User';
-import {UserService} from '../../../service/UserService';
-import {PopupService} from '../../../service/PopupService';
-
+import {RegularTableComponent} from '../regular-table/regular-table.component';
+import {ReservationN} from '../new/InterfaceN/ReservationN';
+import {NewReservationService} from '../new/serviceN/NewReservationService';
+import {PopupFormService} from '../new/serviceN/PopupFormService';
+import {UserN} from '../new/InterfaceN/UserN';
+import {NewUserService} from '../new/serviceN/NewUserService';
 
 @Component({
   selector: 'reservations',
   imports: [
     CommonModule,
-    MatTable,
-    MatHeaderCell,
-    MatHeaderCellDef,
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
-    MatHeaderRowDef,
-    MatHeaderRow,
-    MatRow,
-    MatRowDef,
     MatPaginatorModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatNativeDateModule,
-    MatCard
+    RegularTableComponent,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
   standalone: true
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit{
 
-  displayedColumns: string[] = ['no', 'firstName', 'lastName', 'email','phoneNumber','carRegistration','address', 'hasReservation'];
-  allUsers: Array<User> = [];
-  sortedUsers: Array<User> = []
-  searchValue = '';
-  searchForm!: FormGroup;
-  isAsc: number = 0;
+  columns:  {type: string, field: string }[] = [
+    {type: 'text',field: 'firstName'},
+    {type: 'text',field: 'lastName'},
+    {type: 'text',field: 'email'},
+    {type: 'text',field: 'phoneNumber'},
+    {type: 'text',field: 'carRegistration'},
+  ]
+  displayedColumns: string[] = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja'];
+  allUsers: UserN[] = []
+  allUsersSize: number = 0;
+  pageSize: number = 0;
+  pageSizeOptions: number[] = [12, 24, 50, 100]
 
 
-  constructor(private userService: UserService, private fb: FormBuilder,private popupService: PopupService) {
-    this.searchForm = this.fb.nonNullable.group({
-      searchValue: '',
-    })
-  }
-
-  fetchData() {
-    this.userService.getFilteredUsers(this.searchValue).subscribe({
-      next: (users) => {
-        this.allUsers = users;
-      }
-    })
+  constructor(
+    private userServiceN: NewUserService,
+    protected formService: PopupFormService,
+  ) {
   }
 
   ngOnInit() {
-    this.fetchData()
+    this.fetchData(undefined, 1, 12);
   }
 
-  onSearchSubmit() {
-    this.searchValue = this.searchForm.value.searchValue;
-    this.fetchData();
 
-  }
-
-  hasReservation(user: User) {
-    if (user.reservations !== null ) {
-      let nonExpiredReservationsCount = 0;
-      user.reservations.forEach(r => {
-        if (r.reservationStatus.toString() !== 'EXPIRED') {
-          nonExpiredReservationsCount++;
-        }
+  fetchData(event?: PageEvent, page?: number, size?: number) {
+    this.userServiceN.findAll(
+      event,
+      event == undefined ? page : undefined,
+      event == undefined ? size : undefined)
+      .subscribe(p => {
+        this.allUsers = p.content
+        this.allUsersSize = p.totalElements;
+        this.pageSize = 12;
+        this.pageSizeOptions = this.pageSizeOptions.includes(p.totalElements)
+          ? this.pageSizeOptions
+          : [...this.pageSizeOptions, p.totalElements];
       })
-      if(nonExpiredReservationsCount > 0){
-        return 'YES';
-      }
-    }
-    return 'NO';
-
-
   }
 
-
-
-  openUpdatePopup(user: User) {
-    this.popupService.openUpdateUserPopup(user);
+  openCreatePopup() {
+    this.formService.openCreateUserFormPopup();
   }
 
+  openUpdatePopup(reservation: ReservationN) {
+    this.formService.openUpdateReservationFormPopup(reservation);
+  }
 
 }

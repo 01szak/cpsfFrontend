@@ -1,100 +1,11 @@
-<mat-card class="reservations primary">
-  <div class="buttonDiv">
-    <button (click)="openCreatePopup()" class="headButton"><i class="fa-solid fa-plus"></i></button>
-<!--    <button (click)="fetchData()" class="headButton filterButton"><i class="fa-solid fa-filter-circle-xmark"></i></button>-->
 
-  </div>
-  <table mat-table [dataSource]="allReservations" >
-    <!-- Kolumna numeru -->
-    <ng-container matColumnDef="no">
-
-      <th mat-header-cell *matHeaderCellDef> No.</th>
-
-      <td mat-cell *matCellDef="let reservation; let i = index">
-        {{ i + 1 }}
-      </td>
-    </ng-container>
-
-    <!-- Kolumna Checkin -->
-    <ng-container matColumnDef="checkin">
-      <th mat-header-cell *matHeaderCellDef>
-        <button class="sortingButton" >Checkin</button>
-      </th>
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkin}}</td>
-    </ng-container>
-
-    <!-- Kolumna Checkout -->
-    <ng-container matColumnDef="checkout">
-      <th mat-header-cell *matHeaderCellDef>
-        <button class="sortingButton">Checkout</button>
-<!--      </th>-->
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.checkout }}</td>
-    </ng-container>
-
-    <!-- Kolumna Camper Place -->
-    <ng-container matColumnDef="camperPlace">
-      <th mat-header-cell *matHeaderCellDef>
-        <button class="sortingButton">Camper Place</button>
-      </th>
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.camperPlaceIndex }}</td>
-    </ng-container>
-
-    <!-- Kolumna User -->
-    <ng-container matColumnDef="guest">
-      <th mat-header-cell *matHeaderCellDef>
-        <button class="sortingButton">Guest</button>
-      </th>
-      <td mat-cell *matCellDef="let reservation"> {{ reservation.user.firstName + " " + reservation.user.lastName }}</td>
-    </ng-container>
-
-    <!-- Kolumna Status -->
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef>
-        Status
-      </th>
-      <td mat-cell *matCellDef="let reservation"
-          [ngClass]="{'expired': checkStatus(reservation) === 'expired','active': checkStatus(reservation) === 'active', 'coming': checkStatus(reservation) === 'coming' }"> {{ reservation.reservationStatus }}
-      </td>
-
-    </ng-container>
-    <ng-container matColumnDef="paid" class="checkBox">
-      <th mat-header-cell *matHeaderCellDef>
-        Paid
-      </th>
-      <td mat-cell *matCellDef="let reservation" >
-      <mat-checkbox (click)="$event.stopPropagation()" (change)="setIsPaid(reservation.id,paid.checked,reservation.camperPlaceIndex,reservation.checkin,reservation.checkout)"  #paid [checked]="reservation.paid"></mat-checkbox>
-      </td>
-
-    </ng-container>
-
-    <!-- Nagłówki wiersza -->
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <!-- Wiersze -->
-    <tr mat-row
-        (click)="openUpdatePopup(row)"
-        class="row"
-        *matRowDef="let row;let i = index; columns: displayedColumns;"
-      [ngClass]="{'quaternary':  i % 2 !== 0}"
-    >
-    </tr>
-  </table>
-
-  <mat-paginator
-    [length]="allReservationsSize"
-    [pageSize]= "pageSize"
-    [pageSizeOptions]="pageSizeOptions"
-    (page)="fetchData($event)">
-  </mat-paginator>
-</mat-card>
-
-<div>
-<!--  <div class="filter">-->
-<!--    <form [formGroup]="searchForm" class="searchBar" (keyup)="onSearchSubmit()">-->
-<!--      <input type="text" placeholder="Search..." formControlName="searchValue" class="searchBarInput"/>-->
-<!--    </form>-->
-<!--  </div>-->
-<!--  <app-paginator></app-paginator>-->
-
-</div>
-
+<app-regular-table
+  [dataSource]="allReservations"
+  [tabColumns]="columns"
+  [displayedColumns]="displayedColumns"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [fetchFunc]="fetchData.bind(this)"
+  [onClickFunc]="openUpdatePopup.bind(this)"
+  [createFunc]="openCreatePopup.bind(this)">
+</app-regular-table>
