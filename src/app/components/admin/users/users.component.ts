@@ -67,8 +67,8 @@ export class UsersComponent implements OnInit{
     this.formService.openCreateUserFormPopup();
   }
 
-  openUpdatePopup(reservation: ReservationN) {
-    this.formService.openUpdateReservationFormPopup(reservation);
+  openUpdatePopup(user: UserN) {
+    this.formService.openUpdateUserPopup(user);
   }
 
 }

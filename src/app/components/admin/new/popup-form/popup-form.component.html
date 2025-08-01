@@ -1,122 +1,145 @@
-@if (formData.update) {
+@if (formData.update ) {
   <div class="deleteIcon">
+  @if (checkInstance(formData.objectToUpdate, {checkin: 'string', paid: 'boolean'})) {
     <i (click)="popupConfirmationService.openConfirmationPopup(
     'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?',
     reservationService.deleteReservation(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
+  } @else if (checkInstance(formData.objectToUpdate, {firstName: 'string', lastName: 'string'})) {
+    <i (click)="popupConfirmationService.openConfirmationPopup(
+    'Gość zostanie usunięty. Czy chcesz kontynuować?',
+    userService.delete(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
+  }
+
   </div>
 }
 <h1 mat-dialog-title>{{formData.header}}</h1>
 
 <mat-dialog-content>
   @if(formData.update) {
-    @for (formInput of formData.formInputs; track formInput) {
-      @if (formInput.checkbox) {
-        <mat-checkbox
-          [checked]="formValues[formInput.field]"
-          (change)="formValues[formInput.field] = $event.checked">
-          {{formInput.name}}
-        </mat-checkbox>
-      } @else {
-        @if(!formInput.additional) {
-          <mat-form-field>
-            <mat-label>{{ formInput.name }}</mat-label>
-              <input matInput
-                     type="{{formInput.type}}"
-                     [(ngModel)]="formValues[formInput.field]"
-                     [readonly]="formInput.readonly ?? false">
-
-          </mat-form-field>
+  <!--update form-->
+    @for (formInput of formData.formInputs; track formInput)  {
+        @if (!formInput.additional) {
+            @if (formInput.checkbox) {
+              <mat-checkbox
+              [checked]="formValues[formInput.field]"
+              (change)="formValues[formInput.field] = $event.checked">
+                          {{formInput.name}}
+              </mat-checkbox>
+            } @else if (formInput.select) {
+              <mat-form-field>
+                <mat-label>{{ formInput.name }}</mat-label>
+                <mat-select [(value)]="formValues[formInput.field]">
+                  @for (el of formInput.selectList  | async; track el) {
+                    <mat-option [value]="el">{{el.toString()}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            } @else {
+              <mat-form-field>
+                <mat-label>{{ formInput.name }}</mat-label>
+                  <input matInput
+                         type="{{formInput.type}}"
+                         [(ngModel)]="formValues[formInput.field]"
+                         [readonly]="formInput.readonly ?? false">
+                </mat-form-field>
+            }
         }
-      }
     }
   } @else {
-
+    <!--create form-->
     @for (formInput of formData.formInputs; track formInput) {
-      @if (formInput.checkbox) {
 
-      } @else if (!formInput.select && !formInput.additional) {
-        <mat-form-field>
-          <mat-label>{{formInput.name}}</mat-label>
-          @if (formInput.selectList) {
-            <mat-select (selectionChange)="onOptionSelected($event, formInput.field)">
-              @for (el of formInput.selectList | async; track el) {
-                <mat-option
-                  [value]="el.index">
-                  {{el.index}}
-                </mat-option>
+      @if (!formInput.additional) {
+          @if (!formInput.checkbox) {
+              @if (!additionalFieldsCheckbox && formInput.replacedByAdditional || !formInput.replacedByAdditional) {
+                <!--flag that checks whether the field is replaced by additional fields-->
+                  @if (!formInput.select) {
+                        <!--normal inputs-->
+                        <mat-form-field>
+                          <mat-label>{{ formInput.name }}</mat-label>
+                          <input matInput
+                                 type="{{formInput.type}}"
+                                 [(ngModel)]="formValues[formInput.field]"
+                                 [readonly]="formInput.readonly ?? false">
+                        </mat-form-field>
+                  } @else if (!formInput.readonly) {
+                        <!--select forms-->
+                        @if (formInput.autocomplete) {
+                        <!--autocomplete form (currently only for users)  -->
+                            <mat-form-field>
+                                <mat-label>{{formInput.name}}</mat-label>
+                                <input matInput
+                                       type="{{formInput.type}}"
+                                       [formControl]="formControl"
+                                       [matAutocomplete]="auto">
+                                <mat-autocomplete
+                                  autoActiveFirstOption
+                                  #auto=matAutocomplete
+                                  [displayWith]="userDisplay"
+                                  (optionSelected)="onOptionSelected($event, formInput.field)">
+                                  @for (option of filteredOptions | async; track option) {
+                                    <mat-option [value]="option">
+                                      {{option.firstName + " " + option.lastName}}
+                                    </mat-option>
+                                  }
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        } @else {
+                            <mat-form-field>
+                              <mat-label>{{ formInput.name }}</mat-label>
+                              <mat-select [(value)]="formValues[formInput.field]">
+                                @for (el of formInput.selectList  | async; track el) {
+                                  <mat-option [value]="el">{{el.toString()}}</mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+                        }
+                  } @else {
+                        <!--select forms with preselected value-->
+                        <mat-form-field>
+                          <mat-label>{{ formInput.name }}</mat-label>
+                          <input matInput
+                                 [(ngModel)]="formValues[formInput.field]"
+                                 [readonly]="true">
+                        </mat-form-field>
+                  }
               }
-            </mat-select>
+
           } @else {
-            <input matInput
-                   type="{{formInput.type}}"
-                   [(ngModel)]="formValues[formInput.field]"
-                   [readonly]="formInput.readonly ?? false">
+            <!--checkboxes-->
+            <mat-checkbox
+              [checked]="formValues[formInput.field]"
+              (change)="formValues[formInput.field] = $event.checked">
+              {{formInput.name}}
+            </mat-checkbox>
           }
-        </mat-form-field>
+      }
 
-      } @else {
-        @if (!newGuest.checked && !formInput.additional) {
-          <mat-form-field>
-            <mat-label>{{formInput.name}}</mat-label>
-            <input matInput
-                   type="{{formInput.type}}"
-                   [formControl]="formControl"
-                   [matAutocomplete]="auto">
-            <mat-autocomplete
-              autoActiveFirstOption
-              #auto=matAutocomplete
-              [displayWith]="userDisplay"
-              (optionSelected)="onOptionSelected($event, formInput.field)">
-              @for (option of filteredOptions | async; track option) {
-                <mat-option [value]="option">
-                  {{option.firstName + " " + option.lastName}}
-                </mat-option>
-              }
-            </mat-autocomplete>
-          </mat-form-field>
+    }
+    @if (hasAdditional(formData)) {
+      <!--checkbox to show additional inputs-->
+      <mat-checkbox  #checkbox (change)="changeAfterCheck()" >
+        {{checkbox.checked ? 'Schowaj' : 'Nowy' }}
+      </mat-checkbox>
+
+      @if (checkbox.checked) {
+        @for (additionalInput of formData.formInputs; track additionalInput) {
+          @if (additionalInput.additional) {
+            <!--additional inputs-->
+            <mat-form-field>
+              <mat-label>{{ additionalInput.name }}</mat-label>
+              <input matInput
+                     type="{{additionalInput.type}}"
+                     [(ngModel)]="formValues[additionalInput.field]"
+                     [readonly]="additionalInput.readonly ?? false">
+            </mat-form-field>
+          }
+
+        }
         }
       }
 
     }
-    <mat-checkbox [(ngModel)]="formValues['isNewGuest']" #newGuest>
-      {{!formValues['isNewGuest'] ? 'Nowy Gość' : 'Wróć do listy' }}
-    </mat-checkbox>
-
-    @if(newGuest.checked) {
-
-      <mat-form-field>
-        <mat-label> Imie</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['firstName']">
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label> Nazwisko</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['lastName']">
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label> Numer Telefonu</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['phoneNumber']">
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label> Rejestracja</mat-label>
-        <input matInput
-               type="text"
-               [(ngModel)]="formValues['carRegistration']">
-      </mat-form-field>
-
-
-
-    }
-  }
-
 </mat-dialog-content>
 
 <app-form-buttons

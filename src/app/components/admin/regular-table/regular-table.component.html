@@ -1,0 +1,52 @@
+<div class="tableDiv">
+  <table class="primary" mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="no">
+      <th mat-header-cell *matHeaderCellDef> Nr.</th>
+      <td mat-cell *matCellDef="let column; let i = index">
+        {{ i + 1 }}
+      </td>
+    </ng-container>
+
+    @for (column of tabColumns; track column) {
+
+      <ng-container [matColumnDef]="column.field">
+          <th mat-header-cell *matHeaderCellDef>
+            <button class="sortingButton">{{displayedColumns[$index]}}</button>
+          </th>
+        <td mat-cell *matCellDef="let element">
+
+        @if (column.type === 'checkbox') {
+          <mat-checkbox (change)="additionalFunc(element)" [checked]="element[column.field]" (click)="$event.stopPropagation()"></mat-checkbox>
+        } @else if (column.type === 'status') {
+            <app-status [status]="element[column.field]"></app-status>
+        } @else {
+            {{element[column.field]}}
+        }
+        </td>
+      </ng-container>
+    }
+    <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+    <tr mat-row
+        (click)="onClickFunc(row)"
+        [ngClass]="{
+        'quaternary':  i % 2 !== 0,
+        'row': true
+        }"
+        *matRowDef="let row;let i = index; columns: columnFields">
+    </tr>
+
+  </table>
+
+  <div class="tableFooter">
+    <i class="fa-solid fa-plus" (click)="createFunc()"></i>
+    <mat-paginator
+      [length]="pageSizeOptions[pageSizeOptions.length - 1]"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="fetchFunc($event)">
+    </mat-paginator>
+  </div>
+
+</div>
+<!--        (click)="openUpdatePopup(row)"-->
+<!--[ngClass]="{'quaternary':  i % 2 !== 0}"-->

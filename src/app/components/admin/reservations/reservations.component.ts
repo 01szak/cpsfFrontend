@@ -74,6 +74,10 @@ export class ReservationsComponent implements OnInit {
   openCreatePopup() {
     this.formService.openCreateReservationFormPopup();
   }
+  setIsPaid(r: ReservationN) {
+    r.paid = !r.paid
+    this.reservationServiceN.updateReservation(r);
+  }
 
   openUpdatePopup(reservation: ReservationN) {
     this.formService.openUpdateReservationFormPopup(reservation);

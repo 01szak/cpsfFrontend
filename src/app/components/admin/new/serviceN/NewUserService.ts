@@ -42,4 +42,37 @@ export class NewUserService {
       }
     });
   }
+  update(user: UserN) {
+    console.log(user)
+    return this.http.patch(this.api + 'update/' + user.id, user).subscribe({
+      next: () => {
+        window.location.reload();
+      },
+      error: (error) => {
+        this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
+          panelClass: 'errorSnackBar',
+          duration: 5000,
+          horizontalPosition: 'start',
+          verticalPosition: 'top'
+        });
+      }
+    });
+  }
+  delete(user: UserN): () => void {
+    return () => {
+      this.http.delete(this.api + 'deleteUser/' + user.id!.toString()).subscribe( {
+        next: () => {
+          window.location.reload();
+        },
+        error:(error) => {
+          this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
+            panelClass: 'errorSnackBar',
+            duration: 5000,
+            horizontalPosition: 'start',
+            verticalPosition: 'top'
+          });
+        }
+      });
+    };
+  }
 }

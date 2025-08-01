@@ -8,6 +8,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '../InterfaceN/Page';
+import {ReservationHelper} from './ReservationHelper';
 
 @Injectable({providedIn: "root"})
 export class NewReservationService {
@@ -15,7 +16,7 @@ export class NewReservationService {
   readonly api = '/api/reservations/'
   private snackBar = inject(MatSnackBar);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private reservationHelper: ReservationHelper) {}
 
   getReservations(): Observable<ReservationN[]> {
     return this.http.get<ReservationN[]>(this.api + 'getAll');
@@ -53,8 +54,10 @@ export class NewReservationService {
     });
   }
 
-  updateReservation(reservationToUpdate: ReservationN){
-    return this.http.patch(this.api + 'updateReservation/' + reservationToUpdate.id, reservationToUpdate).subscribe({
+  updateReservation(r: ReservationN){
+    r.checkin = this.reservationHelper.formatToStringDate(r.checkin);
+    r.checkout = this.reservationHelper.formatToStringDate(r.checkout);
+    return this.http.patch(this.api + 'updateReservation/' + r.id, r).subscribe({
       next: () => {
         window.location.reload();
       },

@@ -1,0 +1,10 @@
+<div
+  [ngClass]="{
+  'active': status.toLowerCase() === 'active',
+  'coming': status.toLowerCase() === 'coming',
+  'expired': status.toLowerCase() === 'expired',
+  'other': !statuses.includes(status.toLowerCase()),
+  'shadow' : true
+}">
+  <p>{{status}}</p>
+</div>

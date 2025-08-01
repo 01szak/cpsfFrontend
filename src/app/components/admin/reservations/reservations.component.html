@@ -1,4 +1,3 @@
-
 <app-regular-table
   [dataSource]="allReservations"
   [tabColumns]="columns"
@@ -7,5 +6,6 @@
   [pageSizeOptions]="pageSizeOptions"
   [fetchFunc]="fetchData.bind(this)"
   [onClickFunc]="openUpdatePopup.bind(this)"
-  [createFunc]="openCreatePopup.bind(this)">
+  [createFunc]="openCreatePopup.bind(this)"
+  [additionalFunc]="setIsPaid.bind(this)">
 </app-regular-table>

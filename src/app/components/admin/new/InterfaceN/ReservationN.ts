@@ -10,4 +10,5 @@ export  interface ReservationN {
   price?: number;
   reservationStatus?: string;
   paid: boolean;
+
  }

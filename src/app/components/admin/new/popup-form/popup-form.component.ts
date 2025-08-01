@@ -12,6 +12,7 @@ import {MatCheckbox} from '@angular/material/checkbox';
 import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
 import {FormButtonsComponent} from './../form-buttons/form-buttons.component';
 import {AsyncPipe} from '@angular/common';
+import {NewUserService} from '../serviceN/NewUserService';
 
 @Component({
   imports: [
@@ -24,11 +25,11 @@ import {AsyncPipe} from '@angular/common';
     MatLabel,
     MatCheckbox,
     ReactiveFormsModule,
-    MatAutocompleteTrigger,
-    MatAutocomplete,
     MatOption,
     AsyncPipe,
-    MatSelect
+    MatSelect,
+    MatAutocomplete,
+    MatAutocompleteTrigger
   ],
   selector: 'app-popup-form',
   standalone: true,
@@ -38,9 +39,11 @@ import {AsyncPipe} from '@angular/common';
 export class PopupFormComponent implements OnInit {
   readonly popupFormRef = inject(MatDialogRef<PopupFormComponent, FormData>);
   readonly formData = inject<FormData>(MAT_DIALOG_DATA);
+
   constructor(
     protected popupConfirmationService: PopupConfirmationService,
-    protected reservationService: NewReservationService
+    protected reservationService: NewReservationService,
+    protected userService: NewUserService
   ) {
   }
 
@@ -50,13 +53,14 @@ export class PopupFormComponent implements OnInit {
   formControl = new FormControl('');
   filteredOptions: Observable<UserN[]> = new Observable<UserN[]>();
   userList: UserN[] = [];
+  additionalFieldsCheckbox: boolean = false;
 
   ngOnInit() {
     for (const input of this.formData.formInputs) {
       const value = input.defaultValue;
       if (input.checkbox === true) {
         this.formValues[input.field] = !!value
-      }else if (input.selectList && input.field === "user") {
+      } else if (input.selectList && input.field === "user") {
         input.selectList.subscribe(users => {
             this.userList = users;
             this.filteredOptions = this.formControl.valueChanges.pipe(
@@ -73,6 +77,7 @@ export class PopupFormComponent implements OnInit {
       }
     }
   }
+
   private filterUsers(name: string): UserN[] {
     const filterValue = name.toLowerCase();
     return this.userList.filter(user =>
@@ -88,9 +93,9 @@ export class PopupFormComponent implements OnInit {
   }
 
   onOptionSelected(event: MatAutocompleteSelectedEvent | MatSelectChange, field: string) {
-    if (event instanceof  MatAutocompleteSelectedEvent) {
+    if (event instanceof MatAutocompleteSelectedEvent) {
       this.formValues[field] = event.option.value
-    }else {
+    } else {
       this.formValues[field] = event.value;
     }
   }
@@ -98,10 +103,34 @@ export class PopupFormComponent implements OnInit {
   close() {
     this.popupFormRef.close();
   }
+
   submit() {
     this.popupFormRef.close(this.formValues);
   }
 
+  hasAdditional(formData: FormData) {
+    return formData.formInputs.some(f => f.additional)
+  }
+
+  changeAfterCheck() {
+    // if additional appear sets the value as undefined to prevent data overriding
+    const index = this.formData.formInputs.findIndex(f => f.replacedByAdditional !== undefined);
+    const inputToBeReplacedByAdditional = this.formData.formInputs[index].field;
+    let valueOfTheInput = this.formValues[this.formData.formInputs[index].field]
+    valueOfTheInput = undefined
+
+    this.additionalFieldsCheckbox = !this.additionalFieldsCheckbox
+  }
+
+  protected readonly console = console;
+
+  checkInstance(obj: any, structure: { [K in keyof T]: 'string' | 'number' | 'boolean' | 'object' | 'undefined' | 'function' }): obj is T {
+    if (typeof obj !== 'object' || obj === null) return false;
+
+    return Object.entries(structure).every(([key, type]) => {
+      return typeof obj[key] === type;
+    });
+  }
 }
 export interface FormData {
   header: string,
@@ -120,4 +149,6 @@ export interface FormInput {
   defaultValue?: string | Date | number | UserN | boolean
   readonly?: boolean,
   additional?: boolean
+  replacedByAdditional?: boolean
+  autocomplete?: boolean;
 }

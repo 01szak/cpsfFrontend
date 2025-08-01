@@ -1,0 +1,94 @@
+.tableDiv {
+  max-height: 700px;
+  width: 100%;
+  max-width: 1850px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-self: center;
+  border-radius: 10px;
+  padding: 0;
+}
+
+table {
+  margin-top: 0;
+  justify-self: center;
+  width: inherit;
+}
+
+td, th, tr {
+  color: white;
+  padding: 0;
+  text-align: center;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.buttonDiv {
+  top: 0;
+  position: sticky;
+  font-size: small;
+  background-color: rgb(44, 33, 66);
+  z-index: 2;
+
+}
+
+.headButton {
+  background-color: unset;
+  color: white;
+  border: unset;
+  font-size: larger;
+  margin-top: 2px;
+
+}
+
+.sortingButton {
+  background-color: unset;
+  color: white;
+  border: unset;
+}
+
+.sortingButton:hover {
+  color: lightgray;
+  cursor: pointer;
+}
+
+.headButton:hover {
+  color: darkgray;
+  cursor: pointer;
+}
+
+.row:hover, .quaternary:hover {
+  cursor: pointer;
+  background-color: #50455e !important;
+}
+
+.deleteButton:hover {
+  color: red;
+}
+
+mat-paginator {
+  position: sticky;
+  bottom: 0;
+}
+i {
+  position: absolute;
+  padding: 10px;
+  font-size: large;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+}
+i:hover {
+  cursor: pointer;
+  color: #5ad65a
+}
+
+.tableFooter {
+  width: inherit;
+  position: sticky;
+  bottom: 0;
+}

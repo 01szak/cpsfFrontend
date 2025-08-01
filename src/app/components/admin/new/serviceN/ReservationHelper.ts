@@ -11,33 +11,6 @@ import {PaidReservations, PaidReservationsWithSets} from './../InterfaceN/PaidRe
 @Injectable({providedIn: "root"})
 export class ReservationHelper {
 
-  reservations$: Observable<ReservationN[]>;
-  reservationMap$: Observable<Map<string, Set<string>>>;
-
-  constructor(private reservationService: NewReservationService) {
-    this.reservations$ = reservationService.getReservations();
-
-    this.reservationMap$ = this.reservations$.pipe(
-      take(1),
-      map(reservations => {
-        const reservationMap = new Map<string, Set<string>>();
-
-        reservations.forEach(r => {
-          const key = r.camperPlaceIndex;
-          const dates = this.getDatesBetween(this.mapStringToDate(r.checkin), this.mapStringToDate(r.checkout));
-
-          if (!reservationMap.has(key)) {
-            reservationMap.set(key, new Set<string>());
-          }
-          dates.forEach(d => reservationMap.get(key)!.add(d.toDateString()));
-        });
-
-        return reservationMap;
-      }),
-      shareReplay(1)
-    );
-  }
-
   getDatesBetween(first: Date, last: Date) {
     let start = new Date(first);
     start.setHours(0, 0, 0, 0);
@@ -94,7 +67,10 @@ export class ReservationHelper {
   }
 
   formatToStringDate(dateToFormat: string) {
-    const [day, month, year] = dateToFormat.split('.').map(Number)
-    return this.mapDateToString(year, month - 1, day);
+    if (dateToFormat.includes('.')) {
+      const [day, month, year] = dateToFormat.split('.').map(Number)
+      return this.mapDateToString(year, month, day);
+    }
+    return dateToFormat
   }
 }

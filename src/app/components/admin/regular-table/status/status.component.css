@@ -1,0 +1,30 @@
+div {
+  border-radius: 8px;
+  text-align: center;
+  width: 100%;
+  max-width: 60px;
+  max-height: 30px;
+  justify-self: center;
+}
+.active {
+  border: solid 4px #036703;
+  background-color: #5ad65a;
+  color: #014201;
+}
+.coming {
+  border: solid 4px #9a9a04;
+  background-color: yellow;
+  color: #636303;
+}
+.expired {
+  border: solid 4px #535353;
+  background-color: #a5a3a3;
+  color: #4a4949;
+}
+p {
+  padding: 2px;
+  margin: 0;
+  font-size: small;
+  font-weight: bold;
+}
+
