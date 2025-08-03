@@ -130,21 +130,28 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
-
     let reservationToUpdate;
 
     if (isLeft) {
       reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkout = this.reservationHelper.mapStringToDate(r.checkout);
-        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
+        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
+        const checkin = new Date(checkinStr);
+        const checkout = new Date(checkoutStr);
+        checkin.setHours(0, 0, 0, 0);
+        checkout.setHours(0, 0, 0, 0);
         return date.getTime() <= checkout.getTime() && date.getTime() > new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate() - 1).getTime();
       });
     } else if (isRight) {
       reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkout = this.reservationHelper.mapStringToDate(r.checkout);
-        const checkin = this.reservationHelper.mapStringToDate(r.checkin);
+        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
+        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
+        const checkin = new Date(checkinStr);
+        const checkout = new Date(checkoutStr);
+        checkin.setHours(0, 0, 0, 0);
+        checkout.setHours(0, 0, 0, 0);
         return date.getTime() >= checkin.getTime()
-              && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
+          && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
       });
     }
     if (reservationToUpdate) {

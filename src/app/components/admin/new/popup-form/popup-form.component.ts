@@ -1,4 +1,13 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {map, Observable, startWith} from 'rxjs';
@@ -43,7 +52,8 @@ export class PopupFormComponent implements OnInit {
   constructor(
     protected popupConfirmationService: PopupConfirmationService,
     protected reservationService: NewReservationService,
-    protected userService: NewUserService
+    protected userService: NewUserService,
+    private cdRef: ChangeDetectorRef
   ) {
   }
 
@@ -114,22 +124,23 @@ export class PopupFormComponent implements OnInit {
 
   changeAfterCheck() {
     // if additional appear sets the value as undefined to prevent data overriding
+    this.additionalFieldsCheckbox = !this.additionalFieldsCheckbox
     const index = this.formData.formInputs.findIndex(f => f.replacedByAdditional !== undefined);
     const inputToBeReplacedByAdditional = this.formData.formInputs[index].field;
-    let valueOfTheInput = this.formValues[this.formData.formInputs[index].field]
-    valueOfTheInput = undefined
-
-    this.additionalFieldsCheckbox = !this.additionalFieldsCheckbox
+    this.formValues[inputToBeReplacedByAdditional] = undefined
+    this.formControl.setValue('');
   }
+
 
   protected readonly console = console;
 
-  checkInstance(obj: any, structure: { [K in keyof T]: 'string' | 'number' | 'boolean' | 'object' | 'undefined' | 'function' }): obj is T {
-    if (typeof obj !== 'object' || obj === null) return false;
-
-    return Object.entries(structure).every(([key, type]) => {
-      return typeof obj[key] === type;
-    });
+  checkInstance() {
+    // if (typeof obj !== 'object' || obj === null) return false;
+    //
+    // return Object.entries(structure).every(([key, type]) => {
+    //   return typeof obj[key] === type;
+    // });
+  return true;
   }
 }
 export interface FormData {

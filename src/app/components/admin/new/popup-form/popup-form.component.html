@@ -1,10 +1,10 @@
 @if (formData.update ) {
   <div class="deleteIcon">
-  @if (checkInstance(formData.objectToUpdate, {checkin: 'string', paid: 'boolean'})) {
+  @if (checkInstance()) {
     <i (click)="popupConfirmationService.openConfirmationPopup(
     'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?',
     reservationService.deleteReservation(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
-  } @else if (checkInstance(formData.objectToUpdate, {firstName: 'string', lastName: 'string'})) {
+  } @else if (checkInstance()) {
     <i (click)="popupConfirmationService.openConfirmationPopup(
     'Gość zostanie usunięty. Czy chcesz kontynuować?',
     userService.delete(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
@@ -69,6 +69,7 @@
                             <mat-form-field>
                                 <mat-label>{{formInput.name}}</mat-label>
                                 <input matInput
+                                       #autoCompleteInputRef
                                        type="{{formInput.type}}"
                                        [formControl]="formControl"
                                        [matAutocomplete]="auto">
