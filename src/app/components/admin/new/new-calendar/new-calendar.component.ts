@@ -196,6 +196,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
       }
     }
 
-    return matchingUsers.length > 1 ? `${matchingUsers[0]} / ${matchingUsers[1]}` : matchingUsers[0];
+    return matchingUsers.length > 1 ? `${matchingUsers[1]} / ${matchingUsers[0]}` : matchingUsers[0];
   }
 }
