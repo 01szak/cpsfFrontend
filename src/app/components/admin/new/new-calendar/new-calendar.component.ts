@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
@@ -67,8 +67,8 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.reservationService.getUserPerReservation().subscribe(r => {
         this.userPerReservations = r
-      }))
 
+      }))
   }
   ngOnDestroy() {
     this.subs.forEach(sub => {
@@ -175,27 +175,50 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   getUserFromMap(cp: CamperPlaceN, year: number, month: number, day: number) {
 
-    const dateStr =  (this.isCheckin(year, month, day, cp ) && this.isCheckout(year, month, day, cp)) ?
-      this.reservationHelper.mapDateToString(year, month, day - 1) : this.reservationHelper.mapDateToString(year, month, day);
+    const dateStr =  this.reservationHelper.mapDateToString(year, month, day);
 
 
     if (cp === undefined || !this.userPerReservations?.[cp.index]) {
       return ;
     }
-
     const userMap = this.userPerReservations[cp.index.toString()];
 
     if(!userMap) {
       return ;
     }
-    const matchingUsers: string[] = [];
-
+    const matchingUsers: { user: string; type: ReservationEventType }[] = [];
     for (const [user, dates] of Object.entries(userMap)) {
-      if (dates.includes(dateStr)) {
-          matchingUsers.push(user)
+      for (const dateWithTag of dates) {
+        // Rozbijamy np. "2025-09-15 in" → ["2025-09-15", "in"]
+        const [date, tag] = dateWithTag.split(' ');
+        if (date === dateStr) {
+          const type: ReservationEventType = tag === "in"
+            ? "checkin"
+            : tag === "out"
+              ? "checkout"
+              : "middle";
+          matchingUsers.push({ user, type });
+        }
       }
     }
 
-    return matchingUsers.length > 1 ? `${matchingUsers[1]} / ${matchingUsers[0]}` : matchingUsers[0];
+// Ustal kolejność: checkin < middle < checkout
+    const order: Record<ReservationEventType, number> = {
+      checkout: 0,
+      checkin: 1,
+      middle: 2,
+    };
+
+    matchingUsers.sort((a, b) => order[a.type] - order[b.type]);
+
+    if (matchingUsers.length > 1) {
+      console.log(matchingUsers)
+      console.log(userMap)
+    return matchingUsers[0].user + ' / ' + matchingUsers[1].user
+    } else {
+      return matchingUsers[0]?.user;
+    }
+
   }
 }
+type ReservationEventType = "checkin" | "checkout" | "middle";

@@ -60,7 +60,7 @@ export class NewUserService {
   }
   delete(user: UserN): () => void {
     return () => {
-      this.http.delete(this.api + 'deleteUser/' + user.id!.toString()).subscribe( {
+      this.http.delete(this.api + 'delete/' + user.id!.toString()).subscribe( {
         next: () => {
           window.location.reload();
         },

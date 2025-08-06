@@ -134,13 +134,18 @@ export class PopupFormComponent implements OnInit {
 
   protected readonly console = console;
 
-  checkInstance() {
-    // if (typeof obj !== 'object' || obj === null) return false;
-    //
-    // return Object.entries(structure).every(([key, type]) => {
-    //   return typeof obj[key] === type;
-    // });
-  return true;
+  checkInstance(objToUpdate: any): string {
+   const secondKey = Object.keys(objToUpdate)[1];
+    console.log(secondKey)
+
+    if (secondKey === 'checkin') {
+      return 'r';
+    }else if (secondKey === 'firstName') {
+      return 'u'
+    } else {
+      return ''
+    }
+
   }
 }
 export interface FormData {
