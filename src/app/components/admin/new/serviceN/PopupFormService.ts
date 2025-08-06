@@ -69,7 +69,6 @@ export class PopupFormService {
               price: 0,
               user: result['user'] === undefined ? userToCreate : result['user']
             }
-            console.log(reservationToCreate);
             this.reservationService.createReservation(reservationToCreate);
             dialogRef.close();
           }
@@ -92,7 +91,6 @@ export class PopupFormService {
       user: reservation.user,
       paid: reservation.paid
     };
-      console.log(reservationToUpdate)
     if(reservationToUpdate.checkin.includes('.')) {
       reservationToUpdate.checkin = this.reservationHelper.formatToStringDate(reservationToUpdate.checkin);
       reservationToUpdate.checkout = this.reservationHelper.formatToStringDate(reservationToUpdate.checkout);
@@ -203,7 +201,6 @@ export class PopupFormService {
 
       dialogRef.componentInstance.secondAction = () => {
         const result = dialogRef.componentInstance.formValues;
-        console.log(result)
         userToUpdate.firstName = result['firstName']?.toString() ?? userToUpdate.firstName;
         userToUpdate.lastName = result['lastName']?.toString() ?? userToUpdate.lastName;
         userToUpdate.carRegistration = result['carRegistration']?.toString() ?? userToUpdate.carRegistration;
@@ -213,7 +210,6 @@ export class PopupFormService {
         this.popupConfirmationService.openConfirmationPopup(
           "Rezerwacja zostanie edytowana. Czy chcesz kontynuować?",
           () => {
-            console.log(userToUpdate)
             this.userService.update(userToUpdate)
           }
         )}

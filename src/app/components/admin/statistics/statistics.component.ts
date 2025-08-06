@@ -40,13 +40,11 @@ export class StatisticsComponent implements OnInit{
 
   changeMonth(event: number) {
     this.month = event;
-    console.log("month changed: " +  this.month)
     this.loadData();
   }
 
   changeYear(event:number) {
     this.year = event;
-    console.log("year changed: " +  this.year)
     this.loadData();
   }
 

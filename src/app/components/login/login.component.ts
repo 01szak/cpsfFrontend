@@ -59,11 +59,9 @@ export class LoginComponent {
     this.loginService.login(this.request).subscribe({
       next: (req) => {
         this.isLogged = true;
-        console.log(JSON.stringify(req));
         this.router.navigate(["/admin-page/calendar"])
       },
       error: (error: Error) => {
-        console.log(this.request)
         this.errorMessage = "Wrong email or password"
           console.error(error);
       }

@@ -43,7 +43,6 @@ export class NewUserService {
     });
   }
   update(user: UserN) {
-    console.log(user)
     return this.http.patch(this.api + 'update/' + user.id, user).subscribe({
       next: () => {
         window.location.reload();

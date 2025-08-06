@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
@@ -212,8 +212,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     matchingUsers.sort((a, b) => order[a.type] - order[b.type]);
 
     if (matchingUsers.length > 1) {
-      console.log(matchingUsers)
-      console.log(userMap)
     return matchingUsers[0].user + ' / ' + matchingUsers[1].user
     } else {
       return matchingUsers[0]?.user;

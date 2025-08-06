@@ -136,8 +136,6 @@ export class PopupFormComponent implements OnInit {
 
   checkInstance(objToUpdate: any): string {
    const secondKey = Object.keys(objToUpdate)[1];
-    console.log(secondKey)
-
     if (secondKey === 'checkin') {
       return 'r';
     }else if (secondKey === 'firstName') {
