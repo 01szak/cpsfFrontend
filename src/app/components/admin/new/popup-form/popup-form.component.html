@@ -15,38 +15,6 @@
 <h1 mat-dialog-title>{{formData.header}}</h1>
 
 <mat-dialog-content>
-  @if(formData.update) {
-  <!--update form-->
-    @for (formInput of formData.formInputs; track formInput)  {
-        @if (!formInput.additional) {
-            @if (formInput.checkbox) {
-              <mat-checkbox
-              [checked]="formValues[formInput.field]"
-              (change)="formValues[formInput.field] = $event.checked">
-                          {{formInput.name}}
-              </mat-checkbox>
-            } @else if (formInput.select) {
-              <mat-form-field>
-                <mat-label>{{ formInput.name }}</mat-label>
-                <mat-select [(value)]="formValues[formInput.field]">
-                  @for (el of formInput.selectList  | async; track el) {
-                    <mat-option [value]="el">{{el.toString()}}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            } @else {
-              <mat-form-field>
-                <mat-label>{{ formInput.name }}</mat-label>
-                  <input matInput
-                         type="{{formInput.type}}"
-                         [(ngModel)]="formValues[formInput.field]"
-                         [readonly]="formInput.readonly ?? false">
-                </mat-form-field>
-            }
-        }
-    }
-  } @else {
-    <!--create form-->
     @for (formInput of formData.formInputs; track formInput) {
 
       @if (!formInput.additional) {
@@ -120,7 +88,11 @@
     @if (hasAdditional(formData)) {
       <!--checkbox to show additional inputs-->
       <mat-checkbox  #checkbox (change)="changeAfterCheck()" >
-        {{checkbox.checked ? 'Schowaj' : 'Nowy' }}
+        @if (formData.update) {
+          {{checkbox.checked ? 'Schowaj' : 'Edytuj gościa' }}
+        } @else {
+          {{checkbox.checked ? 'Schowaj' : 'Nowy' }}
+        }
       </mat-checkbox>
 
       @if (checkbox.checked) {
@@ -137,10 +109,9 @@
           }
 
         }
-        }
       }
-
     }
+
 </mat-dialog-content>
 
 <app-form-buttons

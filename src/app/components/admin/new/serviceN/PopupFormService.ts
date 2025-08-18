@@ -104,7 +104,12 @@ export class PopupFormService {
         { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
         { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlaceIndex},
         { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
-        { name: 'Gość', field: 'user', type: 'select', defaultValue: reservationToUpdate.user!.firstName + " " + reservationToUpdate.user!.lastName, readonly: true},
+        { name: 'Gość', field: 'user', type: 'select', defaultValue: reservationToUpdate.user!.firstName + " " + reservationToUpdate.user!.lastName,  replacedByAdditional: true, readonly: true},
+        { name: 'Imię', field: 'firstName', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.firstName },
+        { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.lastName },
+        { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.carRegistration },
+        { name: 'Email', field: 'email', type: 'email', additional: true, defaultValue: reservationToUpdate.user?.email },
+        { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.phoneNumber },
       ]
     }
     reservationToUpdate.checkin
@@ -120,6 +125,11 @@ export class PopupFormService {
         reservationToUpdate.checkout = result['checkout']?.toString() ?? reservationToUpdate.checkout;
         reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
         reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
+        reservationToUpdate.user!.firstName = result['firstName']?.toString() ?? reservationToUpdate.user?.firstName;
+        reservationToUpdate.user!.lastName = result['lastName']?.toString() ?? reservationToUpdate.user?.lastName;
+        reservationToUpdate.user!.carRegistration = result['carRegistration']?.toString() ?? reservationToUpdate.user?.carRegistration;
+        reservationToUpdate.user!.email = result['email']?.toString() ?? reservationToUpdate.user?.email;
+        reservationToUpdate.user!.phoneNumber = result['phoneNumber']?.toString() ?? reservationToUpdate.user?.phoneNumber;
 
         this.popupConfirmationService.openConfirmationPopup(
           "Rezerwacja zostanie edytowana. Czy chcesz kontynuować?",

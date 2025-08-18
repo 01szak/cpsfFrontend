@@ -123,12 +123,15 @@ export class PopupFormComponent implements OnInit {
   }
 
   changeAfterCheck() {
-    // if additional appear sets the value as undefined to prevent data overriding
     this.additionalFieldsCheckbox = !this.additionalFieldsCheckbox
-    const index = this.formData.formInputs.findIndex(f => f.replacedByAdditional !== undefined);
-    const inputToBeReplacedByAdditional = this.formData.formInputs[index].field;
-    this.formValues[inputToBeReplacedByAdditional] = undefined
-    this.formControl.setValue('');
+    // if additional appear sets the value as undefined to prevent data overriding
+    // disabled for update because default value is readonly
+    if (!this.formData.update) {
+      const index = this.formData.formInputs.findIndex(f => f.replacedByAdditional !== undefined);
+      const inputToBeReplacedByAdditional = this.formData.formInputs[index].field;
+      this.formValues[inputToBeReplacedByAdditional] = undefined
+      this.formControl.setValue('');
+    }
   }
 
 
