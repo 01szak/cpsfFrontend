@@ -11,7 +11,16 @@
 
       <ng-container [matColumnDef]="column.field">
           <th mat-header-cell *matHeaderCellDef>
-            <button class="sortingButton">{{displayedColumns[$index]}}</button>
+            <div class="headerDiv">
+              <i class="fa-regular fa-circle-up"
+                 [ngClass]="{
+                    'ascArrow' : isArrowAsc,
+                    'descArrow' : !isArrowAsc,
+                    'arrowClicked' : isClicked && clickedColumn === column.field
+                    }"
+                 (click)="click(column.field)"></i>
+              <p class="sortingButton">{{displayedColumns[$index]}}</p>
+            </div>
           </th>
         <td mat-cell *matCellDef="let element">
 
@@ -26,7 +35,7 @@
       </ng-container>
     }
     <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
-    <tr mat-row
+      <tr mat-row
         (click)="onClickFunc(row)"
         [ngClass]="{
         'quaternary':  i % 2 !== 0,
@@ -38,7 +47,7 @@
   </table>
 
   <div class="tableFooter">
-    <i class="fa-solid fa-plus" (click)="createFunc()"></i>
+    <i class="fa-solid fa-plus addIcon" (click)="createFunc()"></i>
     <mat-paginator
       [length]="pageSizeOptions[pageSizeOptions.length - 1]"
       [pageSize]="pageSize"

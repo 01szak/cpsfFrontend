@@ -7,5 +7,6 @@
   [fetchFunc]="fetchData.bind(this)"
   [onClickFunc]="openUpdatePopup.bind(this)"
   [createFunc]="openCreatePopup.bind(this)"
-  [additionalFunc]="setIsPaid.bind(this)">
+  [additionalFunc]="setIsPaid.bind(this)"
+  (sortInfo)="getSortInfo($event)" >
 </app-regular-table>

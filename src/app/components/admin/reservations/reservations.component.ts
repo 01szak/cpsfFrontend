@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -7,7 +7,7 @@ import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {ReservationN} from './../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
-import {RegularTableComponent} from '../regular-table/regular-table.component';
+import {RegularTableComponent, Sort} from '../regular-table/regular-table.component';
 
 
 @Component({
@@ -40,10 +40,12 @@ export class ReservationsComponent implements OnInit {
   pageSize: number = 0;
   pageSizeOptions: number[] = [12, 24, 50, 100]
 
+  sortInfo!: Sort;
 
   constructor(
     private reservationServiceN: NewReservationService,
     protected formService: PopupFormService,
+    protected cdr: ChangeDetectorRef,
   ) {
   }
 
@@ -52,11 +54,17 @@ export class ReservationsComponent implements OnInit {
   }
 
 
+  getSortInfo(sort: Sort) {
+    this.sortInfo = sort;
+    this.fetchData()
+  }
+
   fetchData(event?: PageEvent, page?: number, size?: number) {
     this.reservationServiceN.findAll(
       event,
       event == undefined ? page : undefined,
-      event == undefined ? size : undefined)
+      event == undefined ? size : undefined,
+      this.sortInfo )
       .subscribe(p => {
       this.allReservations = p.content.map(r => {
         r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
@@ -82,6 +90,7 @@ export class ReservationsComponent implements OnInit {
   openUpdatePopup(reservation: ReservationN) {
     this.formService.openUpdateReservationFormPopup(reservation);
   }
+
 
 }
 
