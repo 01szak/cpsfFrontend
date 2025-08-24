@@ -6,5 +6,6 @@
   [pageSizeOptions]="pageSizeOptions"
   [fetchFunc]="fetchData.bind(this)"
   [onClickFunc]="openUpdatePopup.bind(this)"
-  [createFunc]="openCreatePopup.bind(this)">
+  [createFunc]="openCreatePopup.bind(this)"
+  (sortInfo)="getSortInfo($event)">
 </app-regular-table>
