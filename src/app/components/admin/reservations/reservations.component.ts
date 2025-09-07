@@ -58,17 +58,18 @@ export class ReservationsComponent implements OnInit {
   }
 
   fetchData(event?: PageEvent, page?: number, size?: number) {
+
     this.reservationServiceN.findAll(
       event,
       event == undefined ? page : undefined,
       event == undefined ? size : undefined,
-      this.sortInfo )
+      this.sortInfo  )
       .subscribe(p => {
       this.allReservations = p.content.map(r => {
         r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
-
         return r;
-      });
+      }
+      );
       this.pageSizeOptions = this.setPageSizeOptions(this.pageSizeOptions, p.totalElements);
     })
   }

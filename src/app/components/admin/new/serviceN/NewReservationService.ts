@@ -96,6 +96,9 @@ export class NewReservationService {
       .set('page', event?.pageIndex || page || 0)
       .set('size', event?.pageSize || size || 0);
       if (sort) {
+        if (sort.columnName === 'stringUser') {
+          sort.columnName = 'user';
+        }
         params = params.set('sort', sort.columnName + ',' + sort.direction);
       }
 console.log(this.api + 'findAll', { params })
