@@ -9,6 +9,7 @@ import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '../InterfaceN/Page';
 import {ReservationHelper} from './ReservationHelper';
+import {Sort} from '../../regular-table/regular-table.component';
 
 @Injectable({providedIn: "root"})
 export class NewReservationService {
@@ -90,11 +91,14 @@ export class NewReservationService {
     };
   }
 
-  findAll(event?: PageEvent, page?: number, size?: number ): Observable<Page<ReservationN>> {
-    const params = new HttpParams()
+  findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort ): Observable<Page<ReservationN>> {
+    let params = new HttpParams()
       .set('page', event?.pageIndex || page || 0)
       .set('size', event?.pageSize || size || 0);
-
+      if (sort) {
+        params = params.set('sort', sort.columnName + ',' + sort.direction);
+      }
+console.log(this.api + 'findAll', { params })
     return this.http.get<Page<ReservationN>>(this.api + 'findAll', { params });
   }
 }

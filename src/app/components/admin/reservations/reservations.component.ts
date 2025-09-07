@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -7,7 +7,7 @@ import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {ReservationN} from './../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
-import {RegularTableComponent} from '../regular-table/regular-table.component';
+import {RegularTableComponent, Sort} from '../regular-table/regular-table.component';
 
 
 @Component({
@@ -36,10 +36,10 @@ export class ReservationsComponent implements OnInit {
     ]
   displayedColumns: string[] = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
   allReservations: ReservationN[] = []
-  allReservationsSize: number = 0;
   pageSize: number = 0;
-  pageSizeOptions: number[] = [12, 24, 50, 100]
+  pageSizeOptions: number[] = [10, 20, 50, 100]
 
+  sortInfo!: Sort;
 
   constructor(
     private reservationServiceN: NewReservationService,
@@ -48,27 +48,48 @@ export class ReservationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fetchData(undefined, 1, 12);
+    this.fetchData(undefined, 0, 10);
   }
 
+
+  getSortInfo(sort: Sort) {
+    this.sortInfo = sort;
+    this.fetchData()
+  }
 
   fetchData(event?: PageEvent, page?: number, size?: number) {
     this.reservationServiceN.findAll(
       event,
       event == undefined ? page : undefined,
-      event == undefined ? size : undefined)
+      event == undefined ? size : undefined,
+      this.sortInfo )
       .subscribe(p => {
       this.allReservations = p.content.map(r => {
         r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
 
         return r;
       });
-      this.allReservationsSize = p.totalElements;
-      this.pageSize = 12;
-      this.pageSizeOptions = this.pageSizeOptions.includes(p.totalElements)
-        ? this.pageSizeOptions
-        : [...this.pageSizeOptions, p.totalElements];
+      this.pageSizeOptions = this.setPageSizeOptions(this.pageSizeOptions, p.totalElements);
     })
+  }
+
+  setPageSizeOptions(pageSizeOptions: number[], totalElements: number ) {
+    if (totalElements <= pageSizeOptions[0]) {
+      return [totalElements];
+    }
+    if (!pageSizeOptions.includes(totalElements) || totalElements < pageSizeOptions[pageSizeOptions.length - 1]) {
+      for (let i = pageSizeOptions.length - 1 ; i >= 0; i--) {
+        if (pageSizeOptions[i] > totalElements) {
+          pageSizeOptions.pop();
+        }else {
+          if (pageSizeOptions.includes(totalElements)) {
+            return [...pageSizeOptions]
+          }
+          return [ ...pageSizeOptions, totalElements];
+        }
+      }
+    }
+    return pageSizeOptions
   }
 
   openCreatePopup() {
@@ -82,6 +103,8 @@ export class ReservationsComponent implements OnInit {
   openUpdatePopup(reservation: ReservationN) {
     this.formService.openUpdateReservationFormPopup(reservation);
   }
+
+
 
 }
 

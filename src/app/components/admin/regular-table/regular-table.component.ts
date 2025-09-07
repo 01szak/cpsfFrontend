@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -47,9 +47,40 @@ export class RegularTableComponent<T> {
   @Input() createFunc!: () => any;
   @Input() additionalFunc!: (t:T) => any;
 
+  @Output() sortInfo = new EventEmitter<Sort>();
+
+  isArrowAsc: boolean = false;
+  isClicked: boolean = false;
+  clickCount: number = 0;
+  clickedColumn: string = '';
+
   get columnFields(): string[] {
     return this.tabColumns.map(col => col.field);
   }
 
+  click(columnField: string) {
+     this.isArrowAsc = !this.isArrowAsc;
+     this.clickedColumn = columnField;
+
+     if (this.clickCount ++ > 3) {
+       this.clickCount = 0;
+       this.isClicked = false;
+       this.sendSortInfo();
+     } else {
+       this.sendSortInfo(columnField, this.isArrowAsc);
+       this.clickCount = this.clickCount + 1;
+       this.isClicked = true;
+     }
+  }
+
+  sendSortInfo(columnName?: string, directionB?: boolean) {
+    if (columnName === undefined || directionB === undefined) {
+      this.sortInfo.emit();
+    } else {
+      const sort: Sort = {columnName: columnName, direction: directionB ? 'asc' : 'desc'}
+      this.sortInfo.emit(sort);
+    }
+  }
 }
 export type column = { type: string, field: string }
+export interface Sort {columnName: string, direction: 'asc' | 'desc' }

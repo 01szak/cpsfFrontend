@@ -5,6 +5,7 @@
   --bg-color-secondary: #FFFFFF;
   --bg-color-tertiary: #3B82F6;
   --bg-color-quaternary: #3e3559;
+  --bg-color-primary-hover: #50455e;
   --container-blury: rgba(255, 255, 255, 0.8);
   @include mat.snack-bar-overrides((
     container-color: red,
