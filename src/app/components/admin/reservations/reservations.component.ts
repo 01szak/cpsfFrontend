@@ -40,6 +40,9 @@ export class ReservationsComponent implements OnInit {
   pageSizeOptions: number[] = [10, 20, 50, 100]
 
   sortInfo!: Sort;
+  event?: PageEvent;
+  page: number|undefined = 0;
+  size: number|undefined = 0
 
   constructor(
     private reservationServiceN: NewReservationService,
@@ -54,22 +57,23 @@ export class ReservationsComponent implements OnInit {
 
   getSortInfo(sort: Sort) {
     this.sortInfo = sort;
-    this.fetchData()
+    this.fetchData(this.event, this.page, this.size);
   }
 
   fetchData(event?: PageEvent, page?: number, size?: number) {
-
+    if (event) this.event = event;
+    if (page !== undefined) this.page = page;
+    if (size !== undefined) this.size = size;
     this.reservationServiceN.findAll(
-      event,
-      event == undefined ? page : undefined,
-      event == undefined ? size : undefined,
-      this.sortInfo  )
-      .subscribe(p => {
+      this.event,
+      this.page,
+      this.size,
+      this.sortInfo
+    ).subscribe(p => {
       this.allReservations = p.content.map(r => {
         r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
         return r;
-      }
-      );
+      });
       this.pageSizeOptions = this.setPageSizeOptions(this.pageSizeOptions, p.totalElements);
     })
   }

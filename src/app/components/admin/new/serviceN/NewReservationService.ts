@@ -92,16 +92,28 @@ export class NewReservationService {
   }
 
   findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort ): Observable<Page<ReservationN>> {
-    let params = new HttpParams()
-      .set('page', event?.pageIndex || page || 0)
-      .set('size', event?.pageSize || size || 0);
-      if (sort) {
-        if (sort.columnName === 'stringUser') {
-          sort.columnName = 'user';
+    let params = new HttpParams();
+      if (event) {
+        params = params
+          .set('page', event.pageIndex)
+          .set('size', event.pageSize);
+      } else {
+        if (page !== undefined) {
+          params = params.set('page', page);
         }
-        params = params.set('sort', sort.columnName + ',' + sort.direction);
+        if (size !== undefined) {
+          params = params.set('size', size);
+        }
       }
-console.log(this.api + 'findAll', { params })
+      if (sort) {
+        let columnName = sort.columnName;
+        if (columnName === 'stringUser') {
+          columnName = 'user';
+        }
+        params = params.set('sort', columnName + ',' + sort.direction);
+      }
+
+    console.log(this.api + 'findAll', { params })
     return this.http.get<Page<ReservationN>>(this.api + 'findAll', { params });
   }
 }
