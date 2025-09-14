@@ -49,8 +49,19 @@
 .table {
 
 }
-html{
+.searchDialog {
+  width: 220px !important;
+  max-width: 220px !important;
+  min-width: 0 !important;
+  max-height: 180px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+.mat-input-element {
+  height: 10px !important;
+}
 
+html{
   background-color: rgba(0, 0, 0, 0.88);
   color: white;
 }

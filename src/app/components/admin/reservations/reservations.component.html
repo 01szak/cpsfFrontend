@@ -4,9 +4,11 @@
   [displayedColumns]="displayedColumns"
   [pageSize]="pageSize"
   [pageSizeOptions]="pageSizeOptions"
+  [serviceInstance]="reservationServiceN"
   [fetchFunc]="fetchData.bind(this)"
   [onClickFunc]="openUpdatePopup.bind(this)"
   [createFunc]="openCreatePopup.bind(this)"
   [additionalFunc]="setIsPaid.bind(this)"
-  (sortInfo)="getSortInfo($event)" >
+  (sortInfo)="getSortInfo($event)"
+  (filterInfo)="getFilterInfo($event)" >
 </app-regular-table>

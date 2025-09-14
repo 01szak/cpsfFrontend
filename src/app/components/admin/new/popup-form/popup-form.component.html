@@ -46,11 +46,13 @@
                                   #auto=matAutocomplete
                                   [displayWith]="userDisplay"
                                   (optionSelected)="onOptionSelected($event, formInput.field)">
+                                  <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
                                   @for (option of filteredOptions | async; track option) {
                                     <mat-option [value]="option">
                                       {{option.firstName + " " + option.lastName}}
                                     </mat-option>
                                   }
+                                  </cdk-virtual-scroll-viewport>
                                 </mat-autocomplete>
                             </mat-form-field>
                         } @else {

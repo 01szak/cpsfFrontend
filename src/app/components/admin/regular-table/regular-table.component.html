@@ -10,7 +10,7 @@
     @for (column of tabColumns; track column) {
 
       <ng-container [matColumnDef]="column.field">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef (click)="openSearchDialog($event, displayedColumns[$index], column.field, column.type)">
             <div class="headerDiv">
               <i class="fa-regular fa-circle-up"
                  [ngClass]="{
@@ -18,7 +18,7 @@
                     'descArrow' : !isArrowAsc,
                     'arrowClicked' : isClicked && clickedColumn === column.field
                     }"
-                 (click)="click(column.field)"></i>
+                 (click)="click(column.field);$event.stopPropagation()"></i>
               <p class="sortingButton">{{displayedColumns[$index]}}</p>
             </div>
           </th>

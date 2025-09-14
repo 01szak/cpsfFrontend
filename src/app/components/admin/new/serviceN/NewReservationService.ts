@@ -9,7 +9,7 @@ import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '../InterfaceN/Page';
 import {ReservationHelper} from './ReservationHelper';
-import {Sort} from '../../regular-table/regular-table.component';
+import {Filter, Sort} from '../../regular-table/regular-table.component';
 
 @Injectable({providedIn: "root"})
 export class NewReservationService {
@@ -17,26 +17,27 @@ export class NewReservationService {
   readonly api = '/api/reservations/'
   private snackBar = inject(MatSnackBar);
 
-  constructor(private http: HttpClient, private reservationHelper: ReservationHelper) {}
+  constructor(private http: HttpClient, private reservationHelper: ReservationHelper) {
+  }
 
   getReservations(): Observable<ReservationN[]> {
     return this.http.get<ReservationN[]>(this.api + 'getAll');
   }
 
   getReservationMetadata(): Observable<Record<string, ReservationMetadata>> {
-    return this.http.get<Record<string, ReservationMetadata>> (this.api + 'getReservationMetadata');
+    return this.http.get<Record<string, ReservationMetadata>>(this.api + 'getReservationMetadata');
   }
 
   getPaidReservations(): Observable<Record<string, PaidReservations>> {
-    return this.http.get<Record<string, PaidReservations>> (this.api + 'getPaidReservations');
+    return this.http.get<Record<string, PaidReservations>>(this.api + 'getPaidReservations');
   }
 
   getUnPaidReservations(): Observable<Record<string, PaidReservations>> {
-    return this.http.get<Record<string, PaidReservations>> (this.api + 'getUnPaidReservations');
+    return this.http.get<Record<string, PaidReservations>>(this.api + 'getUnPaidReservations');
   }
 
   getUserPerReservation(): Observable<UserPerReservation> {
-    return this.http.get<UserPerReservation> (this.api + 'getUserPerReservation');
+    return this.http.get<UserPerReservation>(this.api + 'getUserPerReservation');
   }
 
   createReservation(reservation: ReservationN) {
@@ -55,14 +56,14 @@ export class NewReservationService {
     });
   }
 
-  updateReservation(r: ReservationN){
+  updateReservation(r: ReservationN) {
     r.checkin = this.reservationHelper.formatToStringDate(r.checkin);
     r.checkout = this.reservationHelper.formatToStringDate(r.checkout);
     return this.http.patch(this.api + 'updateReservation/' + r.id, r).subscribe({
       next: () => {
         window.location.reload();
       },
-      error:(error) => {
+      error: (error) => {
         this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
           panelClass: 'errorSnackBar',
           duration: 5000,
@@ -75,11 +76,11 @@ export class NewReservationService {
 
   deleteReservation(reservation: ReservationN): () => void {
     return () => {
-      this.http.delete(this.api + 'deleteReservation/' + reservation.id!.toString()).subscribe( {
+      this.http.delete(this.api + 'deleteReservation/' + reservation.id!.toString()).subscribe({
         next: () => {
           window.location.reload();
         },
-        error:(error) => {
+        error: (error) => {
           this.snackBar.open(error.error?.message || "Coś poszło nie tak", undefined, {
             panelClass: 'errorSnackBar',
             duration: 5000,
@@ -91,30 +92,32 @@ export class NewReservationService {
     };
   }
 
-  findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort ): Observable<Page<ReservationN>> {
+  findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<ReservationN>> {
     let params = new HttpParams();
-      if (event) {
-        params = params
-          .set('page', event.pageIndex)
-          .set('size', event.pageSize);
-      } else {
-        if (page !== undefined) {
-          params = params.set('page', page);
-        }
-        if (size !== undefined) {
-          params = params.set('size', size);
-        }
+    if (event) {
+      params = params
+        .set('page', event.pageIndex)
+        .set('size', event.pageSize);
+    } else {
+      if (page !== undefined) {
+        params = params.set('page', page);
       }
-      if (sort) {
-        let columnName = sort.columnName;
-        if (columnName === 'stringUser') {
-          columnName = 'user';
-        }
-        params = params.set('sort', columnName + ',' + sort.direction);
+      if (size !== undefined) {
+        params = params.set('size', size);
       }
-
-    console.log(this.api + 'findAll', { params })
-    return this.http.get<Page<ReservationN>>(this.api + 'findAll', { params });
+    }
+    if (sort) {
+      let columnName = sort.columnName;
+      if (columnName === 'stringUser') {
+        columnName = 'user';
+      }
+      params = params.set('sort', columnName + ',' + sort.direction);
+    }
+    if (filter) {
+      params = params
+        .set('by', filter.by)
+        .set('value', filter.value);
+    }
+    return this.http.get<Page<ReservationN>>(this.api, {params});
   }
 }
-

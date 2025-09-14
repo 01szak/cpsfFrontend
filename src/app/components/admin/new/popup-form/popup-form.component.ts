@@ -22,6 +22,7 @@ import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
 import {FormButtonsComponent} from './../form-buttons/form-buttons.component';
 import {AsyncPipe} from '@angular/common';
 import {NewUserService} from '../serviceN/NewUserService';
+import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @Component({
   imports: [
@@ -38,7 +39,9 @@ import {NewUserService} from '../serviceN/NewUserService';
     AsyncPipe,
     MatSelect,
     MatAutocomplete,
-    MatAutocompleteTrigger
+    MatAutocompleteTrigger,
+    CdkVirtualScrollViewport,
+    CdkFixedSizeVirtualScroll
   ],
   selector: 'app-popup-form',
   standalone: true,

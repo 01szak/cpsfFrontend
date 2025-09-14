@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {RegularTableComponent, Sort} from '../regular-table/regular-table.component';
+import {Filter, RegularTableComponent, Sort} from '../regular-table/regular-table.component';
 import {ReservationN} from '../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
@@ -36,13 +36,14 @@ export class UsersComponent implements OnInit{
   pageSizeOptions: number[] = [10, 20, 50, 100]
 
   sortInfo!: Sort;
+  filterInfo!: Filter;
   event?: PageEvent;
   page: number|undefined = 0;
   size: number|undefined = 0
 
 
   constructor(
-    private userServiceN: NewUserService,
+    protected userServiceN: NewUserService,
     protected formService: PopupFormService) {
   }
 
@@ -54,6 +55,10 @@ export class UsersComponent implements OnInit{
     this.sortInfo = sort;
     this.fetchData(this.event, this.page, this.size);
   }
+  getFilterInfo(filter: Filter) {
+    this.filterInfo = filter
+    this.fetchData(undefined, 0, 10, );
+  }
 
   fetchData(event?: PageEvent, page?: number, size?: number) {
     if (event) this.event = event;
@@ -63,7 +68,8 @@ export class UsersComponent implements OnInit{
       this.event,
       this.page,
       this.size,
-      this.sortInfo
+      this.sortInfo,
+      this.filterInfo
     ).subscribe(p => {
         this.allUsers = p.content
         this.pageSizeOptions = this.setPageSizeOptions(this.pageSizeOptions, p.totalElements);
@@ -98,4 +104,5 @@ export class UsersComponent implements OnInit{
     this.formService.openUpdateUserPopup(user);
   }
 
+  protected readonly NewUserService = NewUserService;
 }

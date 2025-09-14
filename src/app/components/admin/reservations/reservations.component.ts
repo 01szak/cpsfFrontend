@@ -7,7 +7,7 @@ import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {ReservationN} from './../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
-import {RegularTableComponent, Sort} from '../regular-table/regular-table.component';
+import {Filter, RegularTableComponent, Sort} from '../regular-table/regular-table.component';
 
 
 @Component({
@@ -27,8 +27,8 @@ import {RegularTableComponent, Sort} from '../regular-table/regular-table.compon
 export class ReservationsComponent implements OnInit {
 
   columns:  {type: string, field: string }[] = [
-    {type: 'data',field: 'checkin'},
-    {type: 'data',field: 'checkout'},
+    {type: 'date',field: 'checkin'},
+    {type: 'date',field: 'checkout'},
     {type: 'text',field: 'stringUser'},
     {type: 'text',field: 'camperPlaceIndex'},
     {type: 'status',field: 'reservationStatus'},
@@ -40,12 +40,13 @@ export class ReservationsComponent implements OnInit {
   pageSizeOptions: number[] = [10, 20, 50, 100]
 
   sortInfo!: Sort;
+  filterInfo!: Filter;
   event?: PageEvent;
   page: number|undefined = 0;
   size: number|undefined = 0
 
   constructor(
-    private reservationServiceN: NewReservationService,
+    protected reservationServiceN: NewReservationService,
     protected formService: PopupFormService,
   ) {
   }
@@ -54,10 +55,13 @@ export class ReservationsComponent implements OnInit {
     this.fetchData(undefined, 0, 10);
   }
 
-
   getSortInfo(sort: Sort) {
     this.sortInfo = sort;
     this.fetchData(this.event, this.page, this.size);
+  }
+  getFilterInfo(filter: Filter) {
+    this.filterInfo = filter
+    this.fetchData(undefined, 0, 10, );
   }
 
   fetchData(event?: PageEvent, page?: number, size?: number) {
@@ -68,7 +72,8 @@ export class ReservationsComponent implements OnInit {
       this.event,
       this.page,
       this.size,
-      this.sortInfo
+      this.sortInfo,
+      this.filterInfo
     ).subscribe(p => {
       this.allReservations = p.content.map(r => {
         r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
@@ -109,6 +114,8 @@ export class ReservationsComponent implements OnInit {
     this.formService.openUpdateReservationFormPopup(reservation);
   }
 
+
+  protected readonly NewReservationService = NewReservationService;
 
 
 }
