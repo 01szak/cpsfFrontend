@@ -1,0 +1,23 @@
+
+<div class="content">
+  <p mat-dialog-title>Szukaj</p>
+  <mat-dialog-actions>
+    <div class="searchDialogAction">
+      <mat-form-field>
+        <mat-label>{{ data.label }}</mat-label>
+        @if (data.type !== 'checkbox') {
+          <input matInput
+                  [type]=data.type
+                  [(ngModel)]="value">
+        } @else {
+          <input matInput type="text" placeholder="Wpisz 'tak' lub 'nie'" [(ngModel)]="value">
+        }
+      </mat-form-field>
+      <app-form-buttons
+        secondButtonText="Szukaj"
+      [firstAction]="firstAction"
+      [secondAction]="secondAction">
+      </app-form-buttons>
+    </div>
+  </mat-dialog-actions>
+</div>
