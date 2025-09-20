@@ -6,19 +6,20 @@
   --bg-color-tertiary: #3B82F6;
   --bg-color-quaternary: #3e3559;
   --bg-color-primary-hover: #50455e;
+  --bg-color-scrollbar: rgb(60, 59, 59);
   --container-blury: rgba(255, 255, 255, 0.8);
   @include mat.snack-bar-overrides((
     container-color: red,
   ));
   ::-webkit-scrollbar-thumb {
     background-color: black;
-    width: 10px;
-    border-radius: 10px;
-    border: solid black;
+    width: 5px;
+    border-radius: 8px;
+    border: solid var(--bg-color-scrollbar);
   }
   ::-webkit-scrollbar {
     background-color: unset;
-    width: 10px;
+    width: 5px;
   }
   @include mat.paginator-overrides((
     container-text-color: var(--bg-color-secondary),
@@ -57,10 +58,17 @@
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
-.mat-input-element {
-  height: 10px !important;
+.popupForm {
+  justify-content: space-between;
+  width: 100% !important;
+  max-width: 600px !important;
+  height: 100% !important;
+  max-height: 800px !important;
 }
 
+.invisible-select .mat-mdc-select-value {
+  display: none !important; /* ukrywa tekst wybrany w select */
+}
 html{
   background-color: rgba(0, 0, 0, 0.88);
   color: white;

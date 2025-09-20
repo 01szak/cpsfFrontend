@@ -44,7 +44,8 @@ export class PopupFormService {
       ]
     };
     const dialogRef = this.popupForm.open(PopupFormComponent, {
-      data: formData
+      data: formData,
+      panelClass: 'popupForm'
     })
     dialogRef.afterOpened().subscribe(() => {
       dialogRef.componentInstance.secondAction = () => {
@@ -67,8 +68,11 @@ export class PopupFormService {
               checkin: result['checkin'].toString() ?? '',
               checkout: result['checkout'].toString() ?? '',
               price: 0,
-              user: result['user'] === undefined ? userToCreate : result['user']
+              user: result['user'] === undefined || result['user'] === '' ? userToCreate : result['user']
             }
+            console.log(result['user'])
+            console.log(userToCreate)
+            console.log(reservationToCreate)
             this.reservationService.createReservation(reservationToCreate);
             dialogRef.close();
           }
@@ -114,7 +118,8 @@ export class PopupFormService {
     }
     reservationToUpdate.checkin
     const dialogRef = this.popupForm.open(PopupFormComponent, {
-      data: formData
+      data: formData,
+      panelClass: 'popupForm'
     })
     dialogRef.afterOpened().subscribe(() => {
 
@@ -152,7 +157,8 @@ export class PopupFormService {
       ]
     };
     const dialogRef = this.popupForm.open(PopupFormComponent, {
-      data: formData
+      data: formData,
+      panelClass: 'popupForm'
     })
     dialogRef.afterOpened().subscribe(() => {
       dialogRef.componentInstance.secondAction = () => {
@@ -205,7 +211,8 @@ export class PopupFormService {
       ]
     }
     const dialogRef = this.popupForm.open(PopupFormComponent, {
-      data: formData
+      data: formData,
+      panelClass: 'popupForm'
     })
     dialogRef.afterOpened().subscribe(() => {
 

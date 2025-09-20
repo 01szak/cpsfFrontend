@@ -1,9 +1,8 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
-import {CamperPlaceService} from '../../../service/CamperPlaceService';
 import {ReservationN} from './../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
@@ -113,10 +112,6 @@ export class ReservationsComponent implements OnInit {
   openUpdatePopup(reservation: ReservationN) {
     this.formService.openUpdateReservationFormPopup(reservation);
   }
-
-
-  protected readonly NewReservationService = NewReservationService;
-
 
 }
 

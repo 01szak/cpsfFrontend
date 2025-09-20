@@ -5,7 +5,8 @@ h1 {
 mat-dialog-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  height: 100%;
+  padding: 10px;
 }
 .deleteIcon {
   display: flex;
@@ -16,14 +17,27 @@ mat-dialog-content {
   margin-top: 15px;
 }
 i {
+  position: absolute;
+  top: 0;
+  right: 0;
   color: black;
-  margin-right: 10px;
+  padding: 20px;
+  font-size: large;
+  z-index: 1;
 }
 i:hover {
   cursor: pointer;
   color: red;
+  font-size: larger;
 }
 
 app-form-buttons {
-  padding: 10px;
+  padding: 10px 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0 !important;
+
+}
+.mat-mdc-select-min-line ng-tns-c1073613477-6 ng-star-inserted {
+  display: none !important;
 }

@@ -1,16 +1,10 @@
 import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  inject,
-  OnInit,
-  QueryList,
-  ViewChild,
-  ViewChildren
+  Component, ElementRef,
+  inject, Input, OnChanges, OnInit,
+  SimpleChanges, ViewChild,
 } from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
-import {map, Observable, startWith} from 'rxjs';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {distinctUntilChanged, filter, fromEvent, map, Observable, of, startWith, switchMap, tap} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {PopupConfirmationService} from './../serviceN/PopupConfirmationService';
 import {NewReservationService} from './../serviceN/NewReservationService';
@@ -22,7 +16,7 @@ import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
 import {FormButtonsComponent} from './../form-buttons/form-buttons.component';
 import {AsyncPipe} from '@angular/common';
 import {NewUserService} from '../serviceN/NewUserService';
-import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   imports: [
@@ -38,10 +32,7 @@ import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/
     MatOption,
     AsyncPipe,
     MatSelect,
-    MatAutocomplete,
-    MatAutocompleteTrigger,
-    CdkVirtualScrollViewport,
-    CdkFixedSizeVirtualScroll
+    MatSelectModule,
   ],
   selector: 'app-popup-form',
   standalone: true,
@@ -49,41 +40,31 @@ import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/
   templateUrl: './popup-form.component.html',
 })
 export class PopupFormComponent implements OnInit {
+
+  @ViewChild('select', {static: false}) select!: MatSelect;
+  @ViewChild('input', {static: false}) input!: ElementRef;
+
   readonly popupFormRef = inject(MatDialogRef<PopupFormComponent, FormData>);
   readonly formData = inject<FormData>(MAT_DIALOG_DATA);
+
+  formValues: Record<string, any> = {};
+  firstAction = () => this.close();
+  secondAction = () => this.submit();
+  userList: { name: string, user: UserN }[] = [];
+  additionalFieldsCheckbox: boolean = false;
+  inputValue: string = '';
 
   constructor(
     protected popupConfirmationService: PopupConfirmationService,
     protected reservationService: NewReservationService,
     protected userService: NewUserService,
-    private cdRef: ChangeDetectorRef
-  ) {
-  }
-
-  formValues: Record<string, any> = {};
-  firstAction = () => this.close();
-  secondAction = () => this.submit();
-  formControl = new FormControl('');
-  filteredOptions: Observable<UserN[]> = new Observable<UserN[]>();
-  userList: UserN[] = [];
-  additionalFieldsCheckbox: boolean = false;
+  ) {}
 
   ngOnInit() {
     for (const input of this.formData.formInputs) {
       const value = input.defaultValue;
       if (input.checkbox === true) {
         this.formValues[input.field] = !!value
-      } else if (input.selectList && input.field === "user") {
-        input.selectList.subscribe(users => {
-            this.userList = users;
-            this.filteredOptions = this.formControl.valueChanges.pipe(
-              startWith(''),
-              map(value => typeof value === 'string' ? value : this.userDisplay(value || '')),
-              map(name => this.filterUsers(name))
-            )
-          }
-        )
-
       } else {
         this.formValues[input.field] =
           value instanceof Date ? value.toLocaleDateString('en-CA') : value?.toString() ?? '';
@@ -91,26 +72,32 @@ export class PopupFormComponent implements OnInit {
     }
   }
 
-  private filterUsers(name: string): UserN[] {
-    const filterValue = name.toLowerCase();
-    return this.userList.filter(user =>
-      (user.firstName + ' ' + user.lastName).toLowerCase().includes(filterValue)
-    );
+  onInputChange() {
+    if (this.inputValue.length < 2 || this.inputValue.length > 15) return;
+    this.userService.findAll(undefined, 0, 100, undefined, {
+      by: 'fullName',
+      value: this.inputValue
+    })
+      .pipe(
+        map(e =>
+          e.content.map(u => ({
+            name: u.firstName + ' ' + u.lastName,
+            user: u
+          }))
+        )
+      )
+      .subscribe(list => {
+        this.userList = list;
+        if (list.length > 0) {
+          setTimeout(() => this.select?.open());
+        }
+      });
   }
 
-  userDisplay(value: UserN | string): string {
-    if (typeof value === 'string') {
-      return value;
-    }
-    return value ? `${value.firstName} ${value.lastName}` : '';
-  }
 
-  onOptionSelected(event: MatAutocompleteSelectedEvent | MatSelectChange, field: string) {
-    if (event instanceof MatAutocompleteSelectedEvent) {
-      this.formValues[field] = event.option.value
-    } else {
-      this.formValues[field] = event.value;
-    }
+  onOptionSelected(event: MatSelectChange, formField: any) {
+      this.inputValue = event.value.name;
+      this.formValues[formField] = event.value.user
   }
 
   close() {
@@ -133,7 +120,8 @@ export class PopupFormComponent implements OnInit {
       const index = this.formData.formInputs.findIndex(f => f.replacedByAdditional !== undefined);
       const inputToBeReplacedByAdditional = this.formData.formInputs[index].field;
       this.formValues[inputToBeReplacedByAdditional] = undefined
-      this.formControl.setValue('');
+      this.inputValue = '';
+
     }
   }
 

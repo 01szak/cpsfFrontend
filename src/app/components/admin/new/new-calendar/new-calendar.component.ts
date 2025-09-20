@@ -201,8 +201,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
         }
       }
     }
-
-// Ustal kolejność: checkin < middle < checkout
     const order: Record<ReservationEventType, number> = {
       checkout: 0,
       checkin: 1,

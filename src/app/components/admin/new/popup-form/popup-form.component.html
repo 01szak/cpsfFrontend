@@ -35,25 +35,22 @@
                         @if (formInput.autocomplete) {
                         <!--autocomplete form (currently only for users)  -->
                             <mat-form-field>
-                                <mat-label>{{formInput.name}}</mat-label>
-                                <input matInput
-                                       #autoCompleteInputRef
-                                       type="{{formInput.type}}"
-                                       [formControl]="formControl"
-                                       [matAutocomplete]="auto">
-                                <mat-autocomplete
-                                  autoActiveFirstOption
-                                  #auto=matAutocomplete
-                                  [displayWith]="userDisplay"
-                                  (optionSelected)="onOptionSelected($event, formInput.field)">
-                                  <cdk-virtual-scroll-viewport itemSize="40" style="height: 200px;">
-                                  @for (option of filteredOptions | async; track option) {
-                                    <mat-option [value]="option">
-                                      {{option.firstName + " " + option.lastName}}
+                              <mat-label>{{formInput.name}}</mat-label>
+                              <input matInput
+                                     #input
+                                     type="{{formInput.type}}"
+                                     [(ngModel)]="inputValue"
+                                     (ngModelChange)="onInputChange()">
+                                <mat-select
+                                  #select
+                                  (selectionChange)="onOptionSelected($event, formInput.field)">
+                                  <mat-select-trigger></mat-select-trigger>
+                                  @for (user of userList; track user) {
+                                    <mat-option [value]="user">
+                                      {{user.name}}
                                     </mat-option>
                                   }
-                                  </cdk-virtual-scroll-viewport>
-                                </mat-autocomplete>
+                                </mat-select>
                             </mat-form-field>
                         } @else {
                             <mat-form-field>
