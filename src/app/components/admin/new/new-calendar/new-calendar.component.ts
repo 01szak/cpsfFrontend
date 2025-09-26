@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {map, Observable, Subscription, tap} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
@@ -7,7 +7,7 @@ import {ReservationHelper} from '../serviceN/ReservationHelper';
 import {ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
 import {CamperPlaceN} from './../InterfaceN/CamperPlaceN';
 import {MatCard} from '@angular/material/card';
-import {NgClass} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from './../new-date-picker/new-date-picker.component';
 import {PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
@@ -19,19 +19,28 @@ import {MatTooltip} from '@angular/material/tooltip';
     MatCard,
     NgClass,
     NewDatePickerComponent,
-    MatTooltip
+    MatTooltip,
+    AsyncPipe,
   ],
   templateUrl: './new-calendar.component.html',
   styleUrl: './new-calendar.component.css',
   standalone: true,
 })
 export class NewCalendarComponent implements OnInit, OnDestroy {
-  weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
-  days: (number)[] = [];
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
+
+  weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+  days: (number)[] = [];
+
   subs: Subscription[] = []
-  camperPlaces: CamperPlaceN[] = [];
+
+  reservationMetadataWithSets$!: Observable<Record<string, ReservationMetadataWithSets>>;
+  paidReservationsWithSet$!: Observable<Record<string, PaidReservationsWithSets>>;
+  unPaidReservationsWithSet$!: Observable<Record<string, PaidReservationsWithSets>>;
+  userPerReservations$!: Observable<UserPerReservation>;
+  camperPlaces$!: Observable<CamperPlaceN[]>;
+
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   paidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
@@ -48,27 +57,40 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.generateDays()
-    this.subs.push(this.camperPlaceService.getCamperPlaces().subscribe(c => {
-      this.camperPlaces = c
-    }))
-    this.subs.push(this.reservationService.getReservationMetadata().subscribe(r => {
-        this.reservationMetadataWithSets = this.reservationHelper.mapReservationMetadataToSets(r);
-      }
-    ))
-    this.subs.push(
-      this.reservationService.getPaidReservations().subscribe(r => {
-        this.paidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-      })
-    )
-    this.subs.push(
-      this.reservationService.getUnPaidReservations().subscribe(r => {
-        this.unPaidReservationsWithSet = this.reservationHelper.mapPaidReservationsToSets(r)
-      }))
-    this.subs.push(
-      this.reservationService.getUserPerReservation().subscribe(r => {
-        this.userPerReservations = r
+    this.reservationService.getReservationMetadata();
+    this.reservationService.getPaidReservations();
+    this.reservationService.getUnPaidReservations();
+    this.reservationService.getUserPerReservation();
+    this.camperPlaceService.getCamperPlacesAsync();
 
-      }))
+    this.reservationMetadataWithSets$ = this.reservationService.reservationsMetadata$.pipe(
+      map(r => this.reservationHelper.mapReservationMetadataToSets(r))
+    );
+
+    this.paidReservationsWithSet$ = this.reservationService.paidReservations$.pipe(
+      map(r => this.reservationHelper.mapPaidReservationsToSets(r))
+    );
+
+    this.unPaidReservationsWithSet$ = this.reservationService.unPaidReservations$.pipe(
+      map(r => this.reservationHelper.mapPaidReservationsToSets(r))
+    );
+
+    this.userPerReservations$ = this.reservationService.userPerReservations$;
+
+    this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
+
+    this.subs.push(
+      this.reservationMetadataWithSets$.subscribe(r => this.reservationMetadataWithSets = r)
+    );
+    this.subs.push(
+      this.paidReservationsWithSet$.subscribe(r => this.paidReservationsWithSet = r)
+    );
+    this.subs.push(
+      this.userPerReservations$.subscribe(r => this.userPerReservations = r)
+    );
+    this.subs.push(
+      this.unPaidReservationsWithSet$.subscribe(r => this.unPaidReservationsWithSet = r)
+    );
   }
   ngOnDestroy() {
     this.subs.forEach(sub => {
@@ -99,10 +121,10 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   isDayReserved(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr = this.formatDate(year, month, day);
     return this.reservationMetadataWithSets[camperPlace.index]?.reserved.has(dateStr);
-  }
+    }
 
   isCheckin(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
-    const dateStr = this.formatDate(year, month, day);
+    const dateStr: string = this.formatDate(year, month, day);
     return this.reservationMetadataWithSets[camperPlace.index]?.checkin.has(dateStr);
   }
 
@@ -115,9 +137,10 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     const dateStr = this.formatDate(year, month, day);
     return this.paidReservationsWithSet[camperPlace.index]?.paidDates.has(dateStr);
   }
+
   isUnPaid(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr = this.formatDate(year, month, day);
-    return this.unPaidReservationsWithSet[camperPlace.index]?.paidDates.has(dateStr);
+    return !this.paidReservationsWithSet[camperPlace.index]?.paidDates.has(dateStr);
   }
 
   formatDate(year: number, month: number, day: number): string {
@@ -178,14 +201,16 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     const dateStr =  this.reservationHelper.mapDateToString(year, month, day);
 
 
-    if (cp === undefined || !this.userPerReservations?.[cp.index]) {
-      return ;
+    if (cp === undefined || !this.userPerReservations[cp.index]) {
+      return;
     }
-    const userMap = this.userPerReservations[cp.index.toString()];
+
+    let userMap: Map<string, string[]> = this.userPerReservations[cp.index];
 
     if(!userMap) {
-      return ;
+      return;
     }
+
     const matchingUsers: { user: string; type: ReservationEventType }[] = [];
     for (const [user, dates] of Object.entries(userMap)) {
       for (const dateWithTag of dates) {
@@ -217,4 +242,5 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   }
 }
+// @ts-ignore
 type ReservationEventType = "checkin" | "checkout" | "middle";

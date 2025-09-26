@@ -12,10 +12,10 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 
 import {MatCheckbox} from '@angular/material/checkbox';
 import {StatusComponent} from './status/status.component';
-import {NgClass} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '../popups/search-by-popup/search-by-popup.component';
-import {fromEvent} from 'rxjs';
+import {fromEvent, Observable, of} from 'rxjs';
 
 
 
@@ -35,13 +35,14 @@ import {fromEvent} from 'rxjs';
     MatPaginator,
     MatCheckbox,
     StatusComponent,
-    NgClass
+    NgClass,
+    AsyncPipe
   ],
   templateUrl: './regular-table.component.html',
   styleUrl: './regular-table.component.css'
 })
 export class RegularTableComponent<T> {
-  @Input() dataSource: any[] = [];
+  @Input() dataSource$!: Observable<any[]>;
   @Input() tabColumns: column[] = [];
   @Input() displayedColumns: string[] = [];
   @Input() pageSize: number = 0;

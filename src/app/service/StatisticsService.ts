@@ -13,7 +13,7 @@ export class StatisticsService {
   getRevenue(month: number, year: number): Observable<Statistic[]> {
     return this.http.get<Statistic[]>(
       this.api
-      + 'getRevenue/'
+      + 'revenue/'
       + year.toString()
       + '/'
       + (month + 1).toString()
@@ -24,7 +24,7 @@ export class StatisticsService {
   getReservationCount(month: number, year: number): Observable<Statistic[]> {
     return this.http.get<Statistic[]>(
       this.api
-      + 'getReservationCount/'
+      + 'reservationCount/'
       + year.toString()
       + '/'
       + (month + 1).toString()

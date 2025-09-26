@@ -1,8 +1,9 @@
 <mat-card class="primary">
   <app-new-date-picker class="primary" (month)="changeMonth($event)" (year)="changeYear($event)"></app-new-date-picker>
+  @if (reservationMetadataWithSets) {
   <table class="header primary">
     <thead>
-    <tr >
+    <tr>
       <th class="day"></th>
       @for (day of days; track day) {
         <th class="day">
@@ -16,10 +17,9 @@
     </thead>
   </table>
   <div class="table-scroll">
-    @if (camperPlaces) {
       <table>
         <tbody>
-          @for (camperPlace of camperPlaces; track camperPlace) {
+          @for (camperPlace of camperPlaces$ | async; track camperPlace) {
             <tr>
               <th>{{camperPlace.index}}</th>
               @for (day of days; track day) {
@@ -75,8 +75,7 @@
           }
         </tbody>
       </table>
-    }
-
   </div>
+  }
 </mat-card>
 

@@ -7,6 +7,7 @@ import {ReservationN} from './../new/InterfaceN/ReservationN';
 import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
 import {Filter, RegularTableComponent, Sort} from '../regular-table/regular-table.component';
+import {Observable, of} from 'rxjs';
 
 
 @Component({
@@ -34,9 +35,12 @@ export class ReservationsComponent implements OnInit {
     {type: 'checkbox',field: 'paid'},
     ]
   displayedColumns: string[] = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
+
+  reservations$!: Observable<ReservationN[]>;
+
   allReservations: ReservationN[] = []
   pageSize: number = 0;
-  pageSizeOptions: number[] = [10, 20, 50, 100]
+  pageSizeOptions: number[] = [10, 20, 50, 100, 150]
 
   sortInfo!: Sort;
   filterInfo!: Filter;
@@ -51,7 +55,8 @@ export class ReservationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fetchData(undefined, 0, 10);
+    this.reservations$ = this.reservationServiceN.reservations$;
+    this.reservationServiceN.findAll(undefined, 0, 10);
   }
 
   getSortInfo(sort: Sort) {
@@ -73,32 +78,7 @@ export class ReservationsComponent implements OnInit {
       this.size,
       this.sortInfo,
       this.filterInfo
-    ).subscribe(p => {
-      this.allReservations = p.content.map(r => {
-        r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
-        return r;
-      });
-      this.pageSizeOptions = this.setPageSizeOptions(this.pageSizeOptions, p.totalElements);
-    })
-  }
-
-  setPageSizeOptions(pageSizeOptions: number[], totalElements: number ) {
-    if (totalElements <= pageSizeOptions[0]) {
-      return [totalElements];
-    }
-    if (!pageSizeOptions.includes(totalElements) || totalElements < pageSizeOptions[pageSizeOptions.length - 1]) {
-      for (let i = pageSizeOptions.length - 1 ; i >= 0; i--) {
-        if (pageSizeOptions[i] > totalElements) {
-          pageSizeOptions.pop();
-        }else {
-          if (pageSizeOptions.includes(totalElements)) {
-            return [...pageSizeOptions]
-          }
-          return [ ...pageSizeOptions, totalElements];
-        }
-      }
-    }
-    return pageSizeOptions
+    );
   }
 
   openCreatePopup() {

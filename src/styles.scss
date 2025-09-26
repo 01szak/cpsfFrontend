@@ -6,21 +6,23 @@
   --bg-color-tertiary: #3B82F6;
   --bg-color-quaternary: #3e3559;
   --bg-color-primary-hover: #50455e;
+  --bg-color-success: #4CAF50;
+  --bg-color-error: #f44336;
   --bg-color-scrollbar: rgb(60, 59, 59);
   --container-blury: rgba(255, 255, 255, 0.8);
-  @include mat.snack-bar-overrides((
-    container-color: red,
-  ));
+
   ::-webkit-scrollbar-thumb {
     background-color: black;
     width: 5px;
     border-radius: 8px;
     border: solid var(--bg-color-scrollbar);
   }
+
   ::-webkit-scrollbar {
     background-color: unset;
     width: 5px;
   }
+
   @include mat.paginator-overrides((
     container-text-color: var(--bg-color-secondary),
     container-background-color: var(--bg-color-primary),
@@ -29,6 +31,21 @@
     enabled-trigger-text-color: var(--bg-color-quaternary),
   ));
 }
+
+.successSnackBar {
+  .mdc-snackbar__surface {
+    background-color: var(--bg-color-success) !important;
+    color: white !important;
+  }
+}
+
+.errorSnackBar {
+  .mdc-snackbar__surface {
+    background-color: var(--bg-color-error) !important; // czerwony
+    color: white !important;
+  }
+}
+
 .primary {
   background-color: var(--bg-color-primary) !important;
 }
@@ -67,7 +84,7 @@
 }
 
 .invisible-select .mat-mdc-select-value {
-  display: none !important; /* ukrywa tekst wybrany w select */
+  display: none !important;
 }
 html{
   background-color: rgba(0, 0, 0, 0.88);

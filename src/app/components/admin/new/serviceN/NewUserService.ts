@@ -10,14 +10,14 @@ import {Filter, Sort} from '../../regular-table/regular-table.component';
 @Injectable({providedIn: "root"})
 export class NewUserService {
 
-  readonly api = '/api/users/'
+  readonly api = '/api/users'
   private snackBar = inject(MatSnackBar);
 
   constructor(private http: HttpClient) {
   }
 
   getUsers(): Observable<UserN[]> {
-    return this.http.get<UserN[]>(this.api + 'getAll');
+    return this.http.get<UserN[]>(this.api);
   }
 
   findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<UserN>> {
@@ -33,12 +33,11 @@ export class NewUserService {
         .set('by', filter.by)
         .set('value', filter.value);
     }
-
-    return this.http.get<Page<UserN>>(this.api, { params });
+    return this.http.get<Page<UserN>>(this.api, {params});
   }
 
   create(user: UserN) {
-    return this.http.post(this.api + 'create', user).subscribe({
+    return this.http.post(this.api, user).subscribe({
       next: () => {
         window.location.reload();
       },
@@ -53,7 +52,7 @@ export class NewUserService {
     });
   }
   update(user: UserN) {
-    return this.http.patch(this.api + 'update/' + user.id, user).subscribe({
+    return this.http.patch(this.api + '/' + user.id, user).subscribe({
       next: () => {
         window.location.reload();
       },
@@ -69,7 +68,7 @@ export class NewUserService {
   }
   delete(user: UserN): () => void {
     return () => {
-      this.http.delete(this.api + 'delete/' + user.id!.toString()).subscribe( {
+      this.http.delete(this.api + '/' + user.id!.toString()).subscribe( {
         next: () => {
           window.location.reload();
         },
