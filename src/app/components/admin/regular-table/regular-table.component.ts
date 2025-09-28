@@ -42,7 +42,7 @@ import {fromEvent, Observable, of} from 'rxjs';
   styleUrl: './regular-table.component.css'
 })
 export class RegularTableComponent<T> {
-  @Input() dataSource$!: Observable<any[]>;
+  @Input() dataSource!: any[];
   @Input() tabColumns: column[] = [];
   @Input() displayedColumns: string[] = [];
   @Input() pageSize: number = 0;
@@ -71,7 +71,7 @@ export class RegularTableComponent<T> {
      this.isArrowAsc = !this.isArrowAsc;
      this.clickedColumn = columnField;
 
-     if (this.clickCount ++ > 3) {
+     if (this.clickCount++ > 3) {
        this.clickCount = 0;
        this.isClicked = false;
        this.sendSortInfo();

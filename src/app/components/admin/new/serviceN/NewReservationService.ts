@@ -18,20 +18,6 @@ export class NewReservationService {
 
   readonly api = '/api/reservations'
 
-  private reservationsSubject = new BehaviorSubject<ReservationN[]>([]);
-  public reservations$: Observable<ReservationN[]> = this.reservationsSubject.asObservable();
-
-  private reservationsMetadataSubject = new BehaviorSubject<Record<string, ReservationMetadata>>({});
-  public reservationsMetadata$: Observable<Record<string, ReservationMetadata>> = this.reservationsMetadataSubject.asObservable();
-
-  private paidReservationsSubject = new BehaviorSubject<Record<string, PaidReservations>>({});
-  public paidReservations$: Observable<Record<string, PaidReservations>> = this.paidReservationsSubject.asObservable();
-
-  private unPaidReservationsSubject = new BehaviorSubject<Record<string, PaidReservations>>({});
-  public unPaidReservations$: Observable<Record<string, PaidReservations>> = this.unPaidReservationsSubject.asObservable();
-
-  private userPerReservationsSubject = new BehaviorSubject<UserPerReservation>({});
-  public userPerReservations$: Observable<UserPerReservation> = this.userPerReservationsSubject.asObservable();
 
   private snackBar = inject(MatSnackBar);
   private formDialog = inject(MatDialog);
@@ -41,6 +27,14 @@ export class NewReservationService {
   private size?: number;
   private sort?: Sort;
   private filter?: Filter;
+
+  private reloadDataSubject = new BehaviorSubject<void>(undefined);
+
+  reloadData$ = this.reloadDataSubject.asObservable();
+
+  public triggerReload() {
+    this.reloadDataSubject.next();
+  }
 
   private success (response: {[key: string]: string } ) {
     this.snackBar.open(response['success'], undefined, {
@@ -66,32 +60,32 @@ export class NewReservationService {
   }
 
   public getReservationMetadata() {
-    this.http.get<Record<string, ReservationMetadata>>(this.api + '/getReservationMetadata')
-      .subscribe(r => {
-        this.reservationsMetadataSubject.next(r);
-      });
+    return this.http.get<Record<string, ReservationMetadata>>(this.api + '/getReservationMetadata');
+      // .subscribe(r => {
+      //   this.reservationsMetadataSubject.next(r);
+      // });
   }
 
   public getPaidReservations() {
-   this.http.get<Record<string, PaidReservations>>(this.api + '/getPaidReservations')
-      .subscribe(r => {
-          this.paidReservationsSubject.next(r);
-        });
+    return this.http.get<Record<string, PaidReservations>>(this.api + '/getPaidReservations');
+      // .subscribe(r => {
+      //     this.paidReservationsSubject.next(r);
+      //   });
   }
 
   public getUnPaidReservations() {
-     this.http.get<Record<string, PaidReservations>>(this.api + '/getUnPaidReservations')
-       .subscribe(r => {
-         this.unPaidReservationsSubject.next(r);
-       });
+     return this.http.get<Record<string, PaidReservations>>(this.api + '/getUnPaidReservations');
+       // .subscribe(r => {
+       //   this.unPaidReservationsSubject.next(r);
+       // });
   }
 
 
   public getUserPerReservation() {
-     this.http.get<UserPerReservation>(this.api + '/getUserPerReservation')
-       .subscribe(r => {
-         this.userPerReservationsSubject.next(r);
-       });
+     return this.http.get<UserPerReservation>(this.api + '/getUserPerReservation');
+       // .subscribe(r => {
+       //   this.userPerReservationsSubject.next(r);
+       // });
   }
 
   public createReservation(reservation: ReservationN) {
@@ -128,10 +122,6 @@ export class NewReservationService {
         next: (response ) => {
           this.success(response);
           this.formDialog.closeAll();
-          const current = this.reservationsSubject.value;
-          this.reservationsSubject.next(
-            current.filter(r => r.id !== reservation.id)
-          );
           this.fetchAllData();
         },
         error: (error) => {
@@ -173,7 +163,7 @@ export class NewReservationService {
         .set('by', filter.by)
         .set('value', filter.value);
     }
-    this.http.get<Page<ReservationN>>(this.api, {params})
+    return this.http.get<Page<ReservationN>>(this.api, {params})
       .pipe(map(p => {
         const reservations = p.content
         reservations.forEach(r => {
@@ -181,10 +171,10 @@ export class NewReservationService {
         })
         return p;
       }))
-      .subscribe(r => {
-
-      this.reservationsSubject.next(r.content)
-    })
+    //   .subscribe(r => {
+    //
+    //   this.reservationsSubject.next(r.content)
+    // })
   }
   private fetchAllData() {
     this.findAll(
@@ -200,4 +190,6 @@ export class NewReservationService {
     this.getUserPerReservation();
     this.camperPlaceService.getCamperPlacesAsync();
   }
+
+
 }

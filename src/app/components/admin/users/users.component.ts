@@ -2,9 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {Filter, RegularTableComponent, Sort} from '../regular-table/regular-table.component';
-import {ReservationN} from '../new/InterfaceN/ReservationN';
-import {NewReservationService} from '../new/serviceN/NewReservationService';
+import {Filter, Sort} from '../regular-table/regular-table.component';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
 import {UserN} from '../new/InterfaceN/UserN';
 import {NewUserService} from '../new/serviceN/NewUserService';
@@ -15,7 +13,6 @@ import {NewUserService} from '../new/serviceN/NewUserService';
     CommonModule,
     MatPaginatorModule,
     MatNativeDateModule,
-    RegularTableComponent,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',

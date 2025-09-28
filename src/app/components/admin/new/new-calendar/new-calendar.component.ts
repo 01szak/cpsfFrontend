@@ -1,17 +1,18 @@
 import { Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {map, Observable, Subscription, tap} from 'rxjs';
+import {BehaviorSubject, map, Observable, Subscription, tap} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
 import {ReservationHelper} from '../serviceN/ReservationHelper';
-import {ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
+import {ReservationMetadata, ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
 import {CamperPlaceN} from './../InterfaceN/CamperPlaceN';
 import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from './../new-date-picker/new-date-picker.component';
-import {PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
+import {PaidReservations, PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
+import {ReservationN} from '../InterfaceN/ReservationN';
 
 @Component({
   selector: 'app-new-calendar',
@@ -35,63 +36,66 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   subs: Subscription[] = []
 
-  reservationMetadataWithSets$!: Observable<Record<string, ReservationMetadataWithSets>>;
-  paidReservationsWithSet$!: Observable<Record<string, PaidReservationsWithSets>>;
-  unPaidReservationsWithSet$!: Observable<Record<string, PaidReservationsWithSets>>;
-  userPerReservations$!: Observable<UserPerReservation>;
-  camperPlaces$!: Observable<CamperPlaceN[]>;
+  private  reservations$!: Observable<ReservationN[]>;
+
+  private  reservationsMetadata$!: Observable<Record<string, ReservationMetadata>>;
+
+  private  paidReservations$!: Observable<Record<string, PaidReservations>>;
+
+  private  unPaidReservations$!: Observable<Record<string, PaidReservations>>;
+
+  private userPerReservations$!: Observable<UserPerReservation>;
+
+  protected  camperPlaces$!: Observable<CamperPlaceN[]>;
 
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
-  paidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
+  paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
   unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   userPerReservations: UserPerReservation = {};
 
   constructor(
     private camperPlaceService: NewCamperPlaceService,
-    protected popupFormService: PopupFormService,
     private reservationService: NewReservationService,
     private reservationHelper: ReservationHelper,
+    protected popupFormService: PopupFormService,
   ) {
+    this.reservationsMetadata$ = this.reservationService.getReservationMetadata();
+    this.paidReservations$ = this.reservationService.getPaidReservations();
+    this.unPaidReservations$ = this.reservationService.getUnPaidReservations();
+    this.userPerReservations$ = this.reservationService.getUserPerReservation();
   }
 
 
   ngOnInit(): void {
     this.generateDays()
-    this.reservationService.getReservationMetadata();
-    this.reservationService.getPaidReservations();
-    this.reservationService.getUnPaidReservations();
-    this.reservationService.getUserPerReservation();
     this.camperPlaceService.getCamperPlacesAsync();
-
-    this.reservationMetadataWithSets$ = this.reservationService.reservationsMetadata$.pipe(
-      map(r => this.reservationHelper.mapReservationMetadataToSets(r))
-    );
-
-    this.paidReservationsWithSet$ = this.reservationService.paidReservations$.pipe(
-      map(r => this.reservationHelper.mapPaidReservationsToSets(r))
-    );
-
-    this.unPaidReservationsWithSet$ = this.reservationService.unPaidReservations$.pipe(
-      map(r => this.reservationHelper.mapPaidReservationsToSets(r))
-    );
-
-    this.userPerReservations$ = this.reservationService.userPerReservations$;
-
     this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
 
     this.subs.push(
-      this.reservationMetadataWithSets$.subscribe(r => this.reservationMetadataWithSets = r)
+      this.reservationsMetadata$.pipe(map(r => this.reservationHelper.mapReservationMetadataToSets(r))).subscribe(r => {
+        this.reservationMetadataWithSets = r;
+      })
     );
+
     this.subs.push(
-      this.paidReservationsWithSet$.subscribe(r => this.paidReservationsWithSet = r)
+      this.paidReservations$.pipe(map(r => this.reservationHelper.mapPaidReservationsToSets(r))).subscribe(r => {
+        this.paidReservationsWithSets = r;
+      })
     );
+
     this.subs.push(
-      this.userPerReservations$.subscribe(r => this.userPerReservations = r)
+      this.unPaidReservations$.pipe(map(r => this.reservationHelper.mapPaidReservationsToSets(r))).subscribe(r => {
+        this.unPaidReservationsWithSet = r;
+      })
     );
+
     this.subs.push(
-      this.unPaidReservationsWithSet$.subscribe(r => this.unPaidReservationsWithSet = r)
+      this.userPerReservations$.subscribe(r => {
+        this.userPerReservations = r;
+      })
     );
   }
+
   ngOnDestroy() {
     this.subs.forEach(sub => {
       sub.unsubscribe()
@@ -135,12 +139,12 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   isPaid(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr = this.formatDate(year, month, day);
-    return this.paidReservationsWithSet[camperPlace.index]?.paidDates.has(dateStr);
+    return this.paidReservationsWithSets[camperPlace.index]?.paidDates.has(dateStr);
   }
 
   isUnPaid(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr = this.formatDate(year, month, day);
-    return !this.paidReservationsWithSet[camperPlace.index]?.paidDates.has(dateStr);
+    return !this.paidReservationsWithSets[camperPlace.index]?.paidDates.has(dateStr);
   }
 
   formatDate(year: number, month: number, day: number): string {
@@ -241,6 +245,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     }
 
   }
+
 }
 // @ts-ignore
 type ReservationEventType = "checkin" | "checkout" | "middle";
