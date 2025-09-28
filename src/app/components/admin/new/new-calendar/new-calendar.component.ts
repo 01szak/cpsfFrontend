@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {BehaviorSubject, map, Observable, Subscription, tap} from 'rxjs';
+import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {map, Observable, Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
@@ -13,6 +13,7 @@ import {PaidReservations, PaidReservationsWithSets} from './../InterfaceN/PaidRe
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import {ReservationN} from '../InterfaceN/ReservationN';
+import moment from 'moment';
 
 @Component({
   selector: 'app-new-calendar',
@@ -31,35 +32,37 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
-  weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+  weekDays: string[] = moment.weekdays();
   days: (number)[] = [];
 
   subs: Subscription[] = []
 
-  private  reservations$!: Observable<ReservationN[]>;
+  private reservations$!: Observable<ReservationN[]>;
 
-  private  reservationsMetadata$!: Observable<Record<string, ReservationMetadata>>;
+  private reservationsMetadata$!: Record<string, ReservationMetadata>;
 
-  private  paidReservations$!: Observable<Record<string, PaidReservations>>;
+  private paidReservations$!: Observable<Record<string, PaidReservations>>;
 
-  private  unPaidReservations$!: Observable<Record<string, PaidReservations>>;
+  private unPaidReservations$!: Observable<Record<string, PaidReservations>>;
 
   private userPerReservations$!: Observable<UserPerReservation>;
 
-  protected  camperPlaces$!: Observable<CamperPlaceN[]>;
+  protected camperPlaces$!: Observable<CamperPlaceN[]>;
 
   reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
   unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   userPerReservations: UserPerReservation = {};
 
+  private reservationMetadataSub!: Subscription;
+
   constructor(
     private camperPlaceService: NewCamperPlaceService,
     private reservationService: NewReservationService,
     private reservationHelper: ReservationHelper,
     protected popupFormService: PopupFormService,
+    private cdr: ChangeDetectorRef
   ) {
-    this.reservationsMetadata$ = this.reservationService.getReservationMetadata();
     this.paidReservations$ = this.reservationService.getPaidReservations();
     this.unPaidReservations$ = this.reservationService.getUnPaidReservations();
     this.userPerReservations$ = this.reservationService.getUserPerReservation();
@@ -70,13 +73,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     this.generateDays()
     this.camperPlaceService.getCamperPlacesAsync();
     this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
-
-    this.subs.push(
-      this.reservationsMetadata$.pipe(map(r => this.reservationHelper.mapReservationMetadataToSets(r))).subscribe(r => {
-        this.reservationMetadataWithSets = r;
-      })
-    );
-
+    this.getReservationMetadata();
     this.subs.push(
       this.paidReservations$.pipe(map(r => this.reservationHelper.mapPaidReservationsToSets(r))).subscribe(r => {
         this.paidReservationsWithSets = r;
@@ -96,6 +93,14 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     );
   }
 
+  getReservationMetadata(): void {
+    this.reservationMetadataSub?.unsubscribe()
+    this.reservationMetadataSub = this.reservationService.fetchReservationMetadata().subscribe(data => {
+      this.reservationMetadataWithSets = data;
+      this.cdr.detectChanges();
+    });
+  }
+
   ngOnDestroy() {
     this.subs.forEach(sub => {
       sub.unsubscribe()
@@ -107,25 +112,20 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     this.generateDays()
   }
 
-  changeYear(event:number) {
+  changeYear(event: number) {
     this.year = event;
     this.generateDays()
   }
 
   generateDays() {
-    this.days = []
-    const firstDay = new Date(this.year, this.month, 1).getDay();
-    const daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
-
-    for (let i = 1; i <= daysInMonth; i++) {
-      this.days.push(i);
-    }
+    const daysInMonth = moment({year: this.year, month: this.month}).daysInMonth();
+    this.days = Array.from({length: daysInMonth}, (_, i) => i + 1);
   }
 
   isDayReserved(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr = this.formatDate(year, month, day);
     return this.reservationMetadataWithSets[camperPlace.index]?.reserved.has(dateStr);
-    }
+  }
 
   isCheckin(year: number, month: number, day: number, camperPlace: CamperPlaceN) {
     const dateStr: string = this.formatDate(year, month, day);
@@ -195,6 +195,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   findWeekDay(year: number, month: number, day: number) {
     return this.weekDays.at(new Date(year, month, day).getDay())
   }
+
   isWeekend(year: number, month: number, day: number) {
     const weekDay = new Date(year, month, day).getDay();
     return weekDay == 0 || weekDay == 6;
@@ -202,7 +203,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
   getUserFromMap(cp: CamperPlaceN, year: number, month: number, day: number) {
 
-    const dateStr =  this.reservationHelper.mapDateToString(year, month, day);
+    const dateStr = this.reservationHelper.mapDateToString(year, month, day);
 
 
     if (cp === undefined || !this.userPerReservations[cp.index]) {
@@ -211,7 +212,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
 
     let userMap: Map<string, string[]> = this.userPerReservations[cp.index];
 
-    if(!userMap) {
+    if (!userMap) {
       return;
     }
 
@@ -226,7 +227,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
             : tag === "out"
               ? "checkout"
               : "middle";
-          matchingUsers.push({ user, type });
+          matchingUsers.push({user, type});
         }
       }
     }
@@ -239,7 +240,7 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     matchingUsers.sort((a, b) => order[a.type] - order[b.type]);
 
     if (matchingUsers.length > 1) {
-    return matchingUsers[0].user + ' / ' + matchingUsers[1].user
+      return matchingUsers[0].user + ' / ' + matchingUsers[1].user
     } else {
       return matchingUsers[0]?.user;
     }
@@ -247,5 +248,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   }
 
 }
+
 // @ts-ignore
 type ReservationEventType = "checkin" | "checkout" | "middle";

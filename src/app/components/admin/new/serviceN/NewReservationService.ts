@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {BehaviorSubject, map, Observable} from 'rxjs';
+import {BehaviorSubject, map} from 'rxjs';
 import {ReservationMetadata} from './../InterfaceN/ReservationMetadata';
 import {ReservationN} from './../InterfaceN/ReservationN';
 import {PaidReservations} from './../InterfaceN/PaidReservations';
@@ -36,7 +36,7 @@ export class NewReservationService {
     this.reloadDataSubject.next();
   }
 
-  private success (response: {[key: string]: string } ) {
+  private success(response: { [key: string]: string }) {
     this.snackBar.open(response['success'], undefined, {
       panelClass: 'successSnackBar',
       duration: 5000,
@@ -44,7 +44,8 @@ export class NewReservationService {
       verticalPosition: 'top'
     });
   }
-  private error (error: any) {
+
+  private error(error: any) {
     this.snackBar.open(error.error?.message || 'Coś poszło nie tak', undefined, {
       panelClass: 'errorSnackBar',
       duration: 5000,
@@ -59,37 +60,36 @@ export class NewReservationService {
     private camperPlaceService: NewCamperPlaceService) {
   }
 
-  public getReservationMetadata() {
-    return this.http.get<Record<string, ReservationMetadata>>(this.api + '/getReservationMetadata');
-      // .subscribe(r => {
-      //   this.reservationsMetadataSubject.next(r);
-      // });
+  public fetchReservationMetadata() {
+    return this.http.get<Record<string, ReservationMetadata>>(this.api + '/getReservationMetadata').pipe(map(r => {
+      return this.reservationHelper.mapReservationMetadataToSets(r)
+    }))
   }
 
   public getPaidReservations() {
     return this.http.get<Record<string, PaidReservations>>(this.api + '/getPaidReservations');
-      // .subscribe(r => {
-      //     this.paidReservationsSubject.next(r);
-      //   });
+    // .subscribe(r => {
+    //     this.paidReservationsSubject.next(r);
+    //   });
   }
 
   public getUnPaidReservations() {
-     return this.http.get<Record<string, PaidReservations>>(this.api + '/getUnPaidReservations');
-       // .subscribe(r => {
-       //   this.unPaidReservationsSubject.next(r);
-       // });
+    return this.http.get<Record<string, PaidReservations>>(this.api + '/getUnPaidReservations');
+    // .subscribe(r => {
+    //   this.unPaidReservationsSubject.next(r);
+    // });
   }
 
 
   public getUserPerReservation() {
-     return this.http.get<UserPerReservation>(this.api + '/getUserPerReservation');
-       // .subscribe(r => {
-       //   this.userPerReservationsSubject.next(r);
-       // });
+    return this.http.get<UserPerReservation>(this.api + '/getUserPerReservation');
+    // .subscribe(r => {
+    //   this.userPerReservationsSubject.next(r);
+    // });
   }
 
   public createReservation(reservation: ReservationN) {
-    return this.http.post<{[key: string]: string}>(this.api, reservation).subscribe({
+    return this.http.post<{ [key: string]: string }>(this.api, reservation).subscribe({
       next: (response) => {
         this.success(response);
         this.formDialog.closeAll();
@@ -104,22 +104,22 @@ export class NewReservationService {
   public updateReservation(r: ReservationN) {
     r.checkin = this.reservationHelper.formatToStringDate(r.checkin);
     r.checkout = this.reservationHelper.formatToStringDate(r.checkout);
-    return this.http.patch<{[key: string]: string}>(this.api + '/' + r.id, r).subscribe({
+    return this.http.patch<{ [key: string]: string }>(this.api + '/' + r.id, r).subscribe({
       next: (response) => {
         this.success(response);
         this.formDialog.closeAll();
         this.fetchAllData();
       },
       error: (error) => {
-      this.error(error);
+        this.error(error);
       }
     });
   }
 
   public deleteReservation(reservation: ReservationN): () => void {
     return () => {
-      this.http.delete<{[key: string]: string}>(this.api + '/' + reservation.id!.toString()).subscribe({
-        next: (response ) => {
+      this.http.delete<{ [key: string]: string }>(this.api + '/' + reservation.id!.toString()).subscribe({
+        next: (response) => {
           this.success(response);
           this.formDialog.closeAll();
           this.fetchAllData();
@@ -167,7 +167,7 @@ export class NewReservationService {
       .pipe(map(p => {
         const reservations = p.content
         reservations.forEach(r => {
-           r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
+          r.stringUser = r.user?.firstName + " " + r.user?.lastName || '';
         })
         return p;
       }))
@@ -176,6 +176,7 @@ export class NewReservationService {
     //   this.reservationsSubject.next(r.content)
     // })
   }
+
   private fetchAllData() {
     this.findAll(
       this.event,
