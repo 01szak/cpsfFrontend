@@ -43,7 +43,6 @@ export class CamperPlacePopupComponent {
     this.camperPlaceService.getCamperPlaceTypes().subscribe({
       next: (type: string[]) => {
         this.camperPlaceTypes = type;
-        console.log(type);
       },
       error: (error: Error) => {
         console.error('failed to get camper place types');

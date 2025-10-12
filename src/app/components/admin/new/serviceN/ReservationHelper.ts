@@ -49,7 +49,6 @@ export class ReservationHelper {
         checkout: new Set(raw.checkout)
       };
     }
-
     return mapped;
   }
 
@@ -62,7 +61,6 @@ export class ReservationHelper {
         paidDates: new Set(raw.paidDates)
       };
     }
-
     return mapped;
   }
 

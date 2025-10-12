@@ -1,18 +1,17 @@
-import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {map, Observable, Subscription} from 'rxjs';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Observable, Subscription} from 'rxjs';
 import {NewCamperPlaceService} from '../serviceN/NewCamperPlaceService';
 import {NewReservationService} from '../serviceN/NewReservationService';
 import {PopupFormService} from '../serviceN/PopupFormService';
 import {ReservationHelper} from '../serviceN/ReservationHelper';
-import {ReservationMetadata, ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
+import {ReservationMetadataWithSets} from './../InterfaceN/ReservationMetadata';
 import {CamperPlaceN} from './../InterfaceN/CamperPlaceN';
 import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from './../new-date-picker/new-date-picker.component';
-import {PaidReservations, PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
+import {PaidReservationsWithSets} from './../InterfaceN/PaidReservations';
 import {UserPerReservation} from './../InterfaceN/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
-import {ReservationN} from '../InterfaceN/ReservationN';
 import moment from 'moment';
 
 @Component({
@@ -27,84 +26,47 @@ import moment from 'moment';
   templateUrl: './new-calendar.component.html',
   styleUrl: './new-calendar.component.css',
   standalone: true,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NewCalendarComponent implements OnInit, OnDestroy {
+export class NewCalendarComponent implements OnInit, OnDestroy{
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
   weekDays: string[] = moment.weekdays();
   days: (number)[] = [];
-
-  subs: Subscription[] = []
-
-  private reservations$!: Observable<ReservationN[]>;
-
-  private reservationsMetadata$!: Record<string, ReservationMetadata>;
-
-  private paidReservations$!: Observable<Record<string, PaidReservations>>;
-
-  private unPaidReservations$!: Observable<Record<string, PaidReservations>>;
-
-  private userPerReservations$!: Observable<UserPerReservation>;
+  sub!: Subscription;
 
   protected camperPlaces$!: Observable<CamperPlaceN[]>;
 
-  reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
-  paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
-  unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
-  userPerReservations: UserPerReservation = {};
-
-  private reservationMetadataSub!: Subscription;
+  protected reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
+  private paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
+  private unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
+  private userPerReservation: UserPerReservation = {};
 
   constructor(
     private camperPlaceService: NewCamperPlaceService,
     private reservationService: NewReservationService,
     private reservationHelper: ReservationHelper,
     protected popupFormService: PopupFormService,
-    private cdr: ChangeDetectorRef
   ) {
-    this.paidReservations$ = this.reservationService.getPaidReservations();
-    this.unPaidReservations$ = this.reservationService.getUnPaidReservations();
-    this.userPerReservations$ = this.reservationService.getUserPerReservation();
   }
 
 
   ngOnInit(): void {
-    this.generateDays()
-    this.camperPlaceService.getCamperPlacesAsync();
+    this.generateDays();
+    this.reservationService.fetchAllData().subscribe();
     this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
-    this.getReservationMetadata();
-    this.subs.push(
-      this.paidReservations$.pipe(map(r => this.reservationHelper.mapPaidReservationsToSets(r))).subscribe(r => {
-        this.paidReservationsWithSets = r;
-      })
-    );
-
-    this.subs.push(
-      this.unPaidReservations$.pipe(map(r => this.reservationHelper.mapPaidReservationsToSets(r))).subscribe(r => {
-        this.unPaidReservationsWithSet = r;
-      })
-    );
-
-    this.subs.push(
-      this.userPerReservations$.subscribe(r => {
-        this.userPerReservations = r;
-      })
-    );
-  }
-
-  getReservationMetadata(): void {
-    this.reservationMetadataSub?.unsubscribe()
-    this.reservationMetadataSub = this.reservationService.fetchReservationMetadata().subscribe(data => {
-      this.reservationMetadataWithSets = data;
-      this.cdr.detectChanges();
+    this.sub = this.reservationService.calendarData$.subscribe(data => {
+      this.reservationMetadataWithSets = data.metadata || {};
+      this.paidReservationsWithSets = data.paid;
+      this.unPaidReservationsWithSet = data.unpaid;
+      this.userPerReservation = data.users;
     });
+
   }
 
-  ngOnDestroy() {
-    this.subs.forEach(sub => {
-      sub.unsubscribe()
-    })
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   changeMonth(event: number) {
@@ -152,6 +114,9 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
   }
 
   openFormPopup(year: number, month: number, day: number, camperPlace: CamperPlaceN, event: MouseEvent) {
+   if (!camperPlace) {
+     return;
+   }
     const target = event.target as HTMLElement;
     const date = new Date(year, month, day);
 
@@ -206,11 +171,11 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     const dateStr = this.reservationHelper.mapDateToString(year, month, day);
 
 
-    if (cp === undefined || !this.userPerReservations[cp.index]) {
+    if (cp === undefined || !this.userPerReservation[cp.index]) {
       return;
     }
 
-    let userMap: Map<string, string[]> = this.userPerReservations[cp.index];
+    let userMap: Map<string, string[]> = this.userPerReservation[cp.index];
 
     if (!userMap) {
       return;
@@ -238,7 +203,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy {
     };
 
     matchingUsers.sort((a, b) => order[a.type] - order[b.type]);
-
     if (matchingUsers.length > 1) {
       return matchingUsers[0].user + ' / ' + matchingUsers[1].user
     } else {

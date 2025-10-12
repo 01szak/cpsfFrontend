@@ -1,7 +1,8 @@
 import {UserN} from './UserN';
-import {BackendEntities} from './BackendEntities';
+import {BackendEntity} from './BackendEntity';
 
-export  interface ReservationN extends BackendEntities{
+export  interface ReservationN extends BackendEntity{
+  __type?: 'ReservationN';
   id?: number
   checkin: string;
   checkout: string;

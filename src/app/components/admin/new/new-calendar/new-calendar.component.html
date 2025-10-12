@@ -18,7 +18,7 @@
   <div class="table-scroll">
       <table>
         <tbody>
-          @for (camperPlace of camperPlaces$ | async; track camperPlace) {
+          @for (camperPlace of camperPlaces$ | async; track camperPlace.id) {
             <tr>
               <th>{{camperPlace.index}}</th>
               @for (day of days; track day) {

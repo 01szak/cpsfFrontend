@@ -3,26 +3,27 @@ import {PageEvent} from '@angular/material/paginator';
 import {Filter, Sort} from '../../regular-table/regular-table.component';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Page} from '../InterfaceN/Page';
-import {BehaviorSubject, map} from 'rxjs';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {inject} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
-import {BackendEntities} from '../InterfaceN/BackendEntities';
+import {BackendEntity} from '../InterfaceN/BackendEntity';
 
-export class BackendService<T extends BackendEntities> {
+export class BackendService<T extends BackendEntity> {
 
+  protected pageDataBs: BehaviorSubject<Page<T>>;
   private snackBar = inject(MatSnackBar);
-  private formDialog = inject(MatDialog);
 
-  private event?: PageEvent;
-  private page?: number;
-  private size?: number;
-  private sort?: Sort;
-  private filter?: Filter;
+  protected formDialog = inject(MatDialog);
+  protected event?: PageEvent;
+  protected page?: number;
+  protected size?: number;
+  protected sort?: Sort;
+  protected filter?: Filter;
 
-  protected  backendEntitiesSubjet =  new BehaviorSubject<T>({});
+  public pageData$: Observable<Page<T>>;
 
-  private successSnackBar (response: {[key: string]: string } ) {
+  protected successSnackBar (response: {[key: string]: string } ) {
     this.snackBar.open(response['success'], undefined, {
       panelClass: 'successSnackBar',
       duration: 5000,
@@ -30,7 +31,7 @@ export class BackendService<T extends BackendEntities> {
       verticalPosition: 'top'
     });
   }
-  private errorSnackBar (error: any) {
+  protected errorSnackBar (error: any) {
     this.snackBar.open(error.error?.message || 'Coś poszło nie tak', undefined, {
       panelClass: 'errorSnackBar',
       duration: 5000,
@@ -40,55 +41,67 @@ export class BackendService<T extends BackendEntities> {
   }
 
   constructor(
-    private api: string,
-    private http: HttpClient) {
-  }
-  public create(reservation: ReservationN) {
-    return this.http.post<{[key: string]: string}>(this.api, reservation).subscribe({
-      next: (response) => {
-        this.successSnackBar(response);
-        this.formDialog.closeAll();
-        this.fetchAllData();
-      },
-      error: (error) => {
-        this.error(error);
-      }
-    });
+    protected api: string,
+    protected http: HttpClient,
+    protected allDataSubject: BehaviorSubject<any | null>
+  ) {
+    this.pageDataBs = new BehaviorSubject<Page<T>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
+    this.pageData$ = this.pageDataBs.asObservable();
   }
 
-  public update(r: ReservationN) {
-    return this.http.patch<{[key: string]: string}>(this.api + '/' + r.id, r).subscribe({
-      next: (response) => {
-        this.successSnackBar(response);
-        this.formDialog.closeAll();
-      },
-      error: (error) => {
-        this.errorSnackBar(error);
-      }
-    });
+  public create(t: T) {
+    return this.http.post<{[key: string]: string}>(this.api, t)
+      .pipe(
+        tap({
+          next: (response) => {
+            this.successSnackBar(response);
+            this.formDialog.closeAll();
+            this.fetchAllData();
+          },
+          error: (error) => {
+            this.errorSnackBar(error);
+          }
+        })
+      );
   }
 
-  public delete(reservation: ReservationN): () => void {
-    return () => {
-      this.http.delete<{[key: string]: string}>(this.api + '/' + reservation.id!.toString()).subscribe({
-        next: (response ) => {
-          this.successSnackBar(response);
-          this.formDialog.closeAll();
-        },
-        error: (error) => {
-          this.errorSnackBar(error);
-        }
-      });
-    };
+  public update(t: T) {
+    return this.http.patch<{[key: string]: string}>(this.api + '/' + t.id, t)
+      .pipe(
+        tap({
+            next: (response) => {
+              this.successSnackBar(response);
+              this.formDialog.closeAll();
+            },
+            error: (error) => {
+              this.errorSnackBar(error);
+            }
+          }
+        )
+      );
   }
 
-  public findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter) {
+  public delete<T extends BackendEntity>(t: T) {
+    return this.http.delete<{[key: string]: string}>(this.api + '/' + t.id!.toString())
+        .pipe(
+          tap({
+            next: (response ) => {
+              this.successSnackBar(response);
+              this.formDialog.closeAll();
+            },
+            error: (error) => {
+              this.errorSnackBar(error);
+            }
+          })
+        )
+  }
+
+  public findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<T>> {
     this.event = event;
     this.page = page;
     this.size = size;
     this.sort = sort;
     this.filter = filter;
-
     let params = new HttpParams();
     if (event) {
       params = params
@@ -99,6 +112,7 @@ export class BackendService<T extends BackendEntities> {
         params = params.set('page', page);
       }
       if (size !== undefined) {
+        size === 0 ? size = 10 : size
         params = params.set('size', size);
       }
     }
@@ -114,17 +128,12 @@ export class BackendService<T extends BackendEntities> {
         .set('by', filter.by)
         .set('value', filter.value);
     }
-    this.http.get<Page<ReservationN>>(this.api, {params})
-      .pipe(map(p => {
-        const reservations = p.content
-        reservations.forEach(r => {
-          r.stringUser = r.user?.firstName + " " + r.user?.lastName  || '';
-        })
-        return p;
-      }))
-      .subscribe(r => {
 
-        this.reservationsSubject.next(r.content)
-      })
+    return this.http.get<Page<T>>(this.api, {params})
+  }
+
+  protected fetchAllData(): Observable<any> {
+    // @ts-ignore
+    return ;
   }
 }

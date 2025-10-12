@@ -1,78 +1,61 @@
-import {Observable} from 'rxjs';
-import {ReservationN} from '../new/InterfaceN/ReservationN';
-import {Filter, Sort} from '../regular-table/regular-table.component';
 import {PageEvent} from '@angular/material/paginator';
-import {NewReservationService} from '../new/serviceN/NewReservationService';
 import {PopupFormService} from '../new/serviceN/PopupFormService';
+import {Filter, Sort} from '../regular-table/regular-table.component';
+import {Observable, Subscription} from 'rxjs';
+import {Page} from '../new/InterfaceN/Page';
+import {BackendEntity} from '../new/InterfaceN/BackendEntity';
+import {BackendService} from '../new/serviceN/BackendService';
 
-export class BaseTablePage {
+export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>> {
 
-  columns:  {type: string, field: string }[] = [
-    {type: 'date',field: 'checkin'},
-    {type: 'date',field: 'checkout'},
-    {type: 'text',field: 'stringUser'},
-    {type: 'text',field: 'camperPlaceIndex'},
-    {type: 'status',field: 'reservationStatus'},
-    {type: 'checkbox',field: 'paid'},
-  ]
-  displayedColumns: string[] = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
+  protected pagedData!: Observable<Page<T>>;
+  protected pageSize: number = 0;
+  protected pageSizeOptions: number[] = [10, 20, 50, 100, 150];
+  protected filterInfo!: Filter;
+  protected sortInfo!: Sort;
+  protected event?: PageEvent;
+  protected page: number = 0;
+  protected size: number = 0
+  protected sub!: Subscription;
+  protected additionalFunc?: (t: T) => any;
+  protected columns!:  {type: string, field: string }[];
+  protected displayedColumns!: string[];
+  protected formService!: PopupFormService;
 
-  reservations$!: Observable<ReservationN[]>;
-
-  pageSize: number = 0;
-  pageSizeOptions: number[] = [10, 20, 50, 100, 150]
-
-  sortInfo!: Sort;
-  filterInfo!: Filter;
-  event?: PageEvent;
-  page: number|undefined = 0;
-  size: number|undefined = 0
-
-  constructor(
-    protected reservationServiceN: NewReservationService,
-    protected formService: PopupFormService,
-  ) {
+  constructor(protected backendService: S) {
+    this.pagedData = this.backendService.pageData$;
   }
 
-  ngOnInit() {
-    this.reservations$ = this.reservationServiceN.reservations$;
-    this.reservationServiceN.findAll(undefined, 0, 10);
-  }
-
-  getSortInfo(sort: Sort) {
-    this.sortInfo = sort;
-    this.fetchData(this.event, this.page, this.size);
-  }
-  getFilterInfo(filter: Filter) {
-    this.filterInfo = filter
-    this.fetchData(undefined, 0, 10, );
-  }
-
-  fetchData(event?: PageEvent, page?: number, size?: number) {
+  protected fetchData(event?: PageEvent, page?: number, size?: number) {
     if (event) this.event = event;
     if (page !== undefined) this.page = page;
     if (size !== undefined) this.size = size;
-    this.reservationServiceN.findAll(
+    this.sub = this.backendService.findAll(
       this.event,
       this.page,
       this.size,
       this.sortInfo,
       this.filterInfo
-    );
+    ).subscribe();
   }
 
-  openCreatePopup() {
-    this.formService.openCreateReservationFormPopup();
-  }
-  setIsPaid(r: ReservationN) {
-    r.paid = !r.paid
-    this.reservationServiceN.updateReservation(r);
+  protected getSortInfo(sort: Sort) {
+    this.sortInfo = sort;
+    this.fetchData(this.event, this.page, this.size);
   }
 
-  openUpdatePopup(reservation: ReservationN) {
-    this.formService.openUpdateReservationFormPopup(reservation);
+  protected getFilterInfo(filter: Filter) {
+    this.filterInfo = filter;
+    this.fetchData(this.event, this.page, this.size);
   }
 
+  protected openCreatePopup() {
+    // to implement by inheritors
+  }
+
+  protected  openUpdatePopup(t: T) {
+  // to implement by inheritors
+  }
 
 }
 

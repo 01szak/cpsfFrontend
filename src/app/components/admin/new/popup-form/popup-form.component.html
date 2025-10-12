@@ -1,15 +1,6 @@
 @if (formData.update ) {
   <div class="deleteIcon">
-  @if (checkInstance(formData.objectToUpdate) === 'r') {
-    <i (click)="popupConfirmationService.openConfirmationPopup(
-    'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?',
-    reservationService.deleteReservation(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
-  } @else if (checkInstance(formData.objectToUpdate) === 'u') {
-    <i (click)="popupConfirmationService.openConfirmationPopup(
-    'Gość zostanie usunięty a z nim wszystkie jego rezerwacje (Może to wpłynąć na statystki, narazie nie zalecane!). Czy chcesz kontynuować?',
-    userService.delete(formData.objectToUpdate))" class="fa-regular fa-trash-can"></i>
-  }
-
+    <i (click)="deleteObject(formData.objectToUpdate)" class="fa-regular fa-trash-can"></i>
   </div>
 }
 <h1 mat-dialog-title>{{formData.header}}</h1>

@@ -4,10 +4,10 @@ import {RegisterComponent} from './components/register/register.component';
 import {AdminPageComponent} from './components/admin/admin-main-page/admin-page.component';
 import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
 import {StatisticsComponent} from './components/admin/statistics/statistics.component';
-import {ReservationsComponent} from './components/admin/reservations/reservations.component';
-import {UsersComponent} from './components/admin/users/users.component';
+import {UsersComponent} from './components/admin/page/users/users.component';
 import {OptionsComponent} from './components/admin/options/options.component';
 import {NewCalendarComponent} from './components/admin/new/new-calendar/new-calendar.component';
+import {ReservationsComponent} from './components/admin/page/reservations/reservations.component';
 
 export const routes: Routes = [
   {

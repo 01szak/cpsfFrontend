@@ -17,6 +17,7 @@ import {FormButtonsComponent} from './../form-buttons/form-buttons.component';
 import {AsyncPipe} from '@angular/common';
 import {NewUserService} from '../serviceN/NewUserService';
 import { MatSelectModule } from '@angular/material/select';
+import {ReservationN} from '../InterfaceN/ReservationN';
 
 @Component({
   imports: [
@@ -50,6 +51,10 @@ export class PopupFormComponent implements OnInit {
   formValues: Record<string, any> = {};
   firstAction = () => this.close();
   secondAction = () => this.submit();
+  deleteRes = (r: ReservationN) => {
+    this.reservationService.deleteReservation(r)
+  }
+  deleteUser = (u: UserN) => this.userService.delete(u)
   userList: { name: string, user: UserN }[] = [];
   additionalFieldsCheckbox: boolean = false;
   inputValue: string = '';
@@ -128,16 +133,22 @@ export class PopupFormComponent implements OnInit {
 
   protected readonly console = console;
 
-  checkInstance(objToUpdate: any): string {
-   const secondKey = Object.keys(objToUpdate)[1];
-    if (secondKey === 'checkin') {
-      return 'r';
-    }else if (secondKey === 'firstName') {
-      return 'u'
-    } else {
-      return ''
-    }
+  deleteObject(objectToUpdate: any) {
+    const secondKey: string = Object.keys(objectToUpdate)[1];
+    let deleteFunc: () => void;
+    let message: string = '';
 
+    if (secondKey === 'checkin') {
+      message = 'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?';
+      deleteFunc = () => this.reservationService.deleteReservation(objectToUpdate).subscribe();
+      this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
+    }else if (secondKey === 'firstName') {
+      message = 'Gość zostanie usunięty a z nim wszystkie jego rezerwacje (Może to wpłynąć na statystki, narazie nie zalecane!). Czy chcesz kontynuować?';
+      deleteFunc = () => this.userService.delete(objectToUpdate).subscribe();
+      this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
+    } else {
+      return;
+    }
   }
 }
 export interface FormData {

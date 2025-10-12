@@ -1,0 +1,14 @@
+<app-regular-table
+  [page$]="pagedData"
+  [tabColumns]="columns"
+  [displayedColumns]="displayedColumns"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [serviceInstance]="reservationService"
+  [fetchFunc]="fetchData.bind(this)"
+  [onClickFunc]="openUpdatePopup.bind(this)"
+  [createFunc]="openCreatePopup.bind(this)"
+  [additionalFunc]="additionalFunc"
+  (sortInfo)="getSortInfo($event)"
+  (filterInfo)="getFilterInfo($event)" >
+</app-regular-table>
