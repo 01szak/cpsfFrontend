@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Statistic} from './../components/admin/new/InterfaceN/Statistic';
+import {Statistic} from '../components/Interface/Statistic';
 
 @Injectable({
   providedIn: 'root',

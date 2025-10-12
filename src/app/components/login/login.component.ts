@@ -4,12 +4,10 @@ import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
 import {MatAnchor, MatButton} from '@angular/material/button';
-import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
+import {MatCard, MatCardContent} from '@angular/material/card';
 import {AuthenticatorRequest, LoginService} from '../../service/LoginService';
-import {CommonModule, NgIf} from '@angular/common';
-import {AdminPageComponent} from '../admin/admin-main-page/admin-page.component';
+import {CommonModule} from '@angular/common';
 import {Router, RouterLink, RouterModule} from '@angular/router';
-import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-login',

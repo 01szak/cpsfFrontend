@@ -1,10 +1,10 @@
 import {PageEvent} from '@angular/material/paginator';
-import {PopupFormService} from '../new/serviceN/PopupFormService';
+import {PopupFormService} from '../../../service/PopupFormService';
 import {Filter, Sort} from '../regular-table/regular-table.component';
 import {Observable, Subscription} from 'rxjs';
-import {Page} from '../new/InterfaceN/Page';
-import {BackendEntity} from '../new/InterfaceN/BackendEntity';
-import {BackendService} from '../new/serviceN/BackendService';
+import {Page} from '../../Interface/Page';
+import {BackendEntity} from '../../Interface/BackendEntity';
+import {BackendService} from '../../../service/BackendService';
 
 export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>> {
 

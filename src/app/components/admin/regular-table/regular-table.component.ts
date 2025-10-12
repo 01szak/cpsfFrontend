@@ -19,8 +19,8 @@ import {AsyncPipe, NgClass} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '../popups/search-by-popup/search-by-popup.component';
 import {fromEvent, Observable} from 'rxjs';
-import {Page} from '../new/InterfaceN/Page';
-import {BackendEntity} from '../new/InterfaceN/BackendEntity';
+import {Page} from '../../Interface/Page';
+import {BackendEntity} from '../../Interface/BackendEntity';
 
 
 @Component({
