@@ -43,6 +43,7 @@ td {
   max-height: 30px;
 }
 thead {
+  position: sticky;
   height: 100%;
   width: 100%;
   top: 35px;
