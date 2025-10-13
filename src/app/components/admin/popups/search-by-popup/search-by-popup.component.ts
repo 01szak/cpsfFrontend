@@ -6,10 +6,10 @@ import {
 } from '@angular/material/dialog';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
-import {FormButtonsComponent} from '../../new/form-buttons/form-buttons.component';
-import {FormData} from '../../new/popup-form/popup-form.component';
-import {NewReservationService} from '../../new/serviceN/NewReservationService';
-import {NewUserService} from '../../new/serviceN/NewUserService';
+import {FormButtonsComponent} from '../../form-buttons/form-buttons.component';
+import {FormData} from '../popup-form/popup-form.component';
+import {ReservationService} from '../../../../service/ReservationService';
+import {UserService} from '../../../../service/UserService';
 
 @Component({
   selector: 'app-search-by-popup',

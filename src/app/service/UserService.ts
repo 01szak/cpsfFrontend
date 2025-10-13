@@ -1,47 +1,28 @@
-// import {Injectable} from '@angular/core';
-// import {HttpClient} from '@angular/common/http';
-// import {User} from '../components/admin/calendar/User';
-// import {Reservation} from '../components/admin/calendar/Reservation';
-//
-// @Injectable({providedIn: 'root'})
-// export class UserService {
-//   api = '/api/users/';
-//
-//   constructor(private http: HttpClient) {
-//   }
-//
-//   getFilteredUsers(value?: string) {
-//     if(value === '') {
-//       return this.http.get<User[]>(this.api + 'getFilteredUsers');
-//     }else {
-//       return this.http.get<User[]>(this.api + 'getFilteredUsers/' + value);
-//     }
-//   }
-//
-//   updateReservation(userRequest: {
-//     firstName: string;
-//     lastName: string;
-//     country: string;
-//     phoneNumber: string;
-//     reservations: Array<Reservation>;
-//     city: string;
-//     streetAddress: string | undefined;
-//     carRegistration: string | undefined;
-//     id: number;
-//     email: string
-//   }) {
-//     return this.http.patch<User>(this.api + 'updateUser/' + userRequest.id, userRequest)
-//
-//   }
-//
-//   getAllUsers() {
-//     return this.http.get<User[]>(this.api + 'getAll')
-//   }
-//   getUserById(id: number){
-//     return this.http.get<User>(this.api + 'getUser/' + id.toString())
-//   }
-//
-//   deleteUserById(id: number) {
-//     return this.http.delete(this.api + 'delete/' + id.toString())
-//   }
-// }
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {User} from '../components/Interface/User';
+import {BackendService} from './BackendService';
+import {PageEvent} from '@angular/material/paginator';
+import {Filter, Sort} from '../components/admin/regular-table/regular-table.component';
+import {Page} from '../components/Interface/Page';
+import {Reservation} from '../components/Interface/Reservation';
+
+@Injectable({providedIn: "root"})
+export class UserService extends BackendService<User>{
+
+  constructor(http: HttpClient) {
+    super(
+      '/api/users',
+      http,
+      new BehaviorSubject<User | null>(null))
+  }
+  public override findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<User>> {
+    return super.findAll(event, page, size, sort, filter).pipe(
+      tap(p => {
+        this.pageDataBs.next(p);
+      })
+    );
+  }
+
+}

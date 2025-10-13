@@ -1,13 +1,12 @@
 import {Routes} from '@angular/router';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
-import {AdminPageComponent} from './components/admin/admin-main-page/admin-page.component';
 import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
-import {StatisticsComponent} from './components/admin/statistics/statistics.component';
-import {ReservationsComponent} from './components/admin/reservations/reservations.component';
-import {UsersComponent} from './components/admin/users/users.component';
-import {OptionsComponent} from './components/admin/options/options.component';
-import {NewCalendarComponent} from './components/admin/new/new-calendar/new-calendar.component';
+import {StatisticsPage} from './components/admin/page/statistics-page/statistics-page';
+import {UserPage} from './components/admin/page/user-page/user-page';
+import {ReservationPage} from './components/admin/page/reservation-page/reservation-page';
+import {AdminPageComponent} from './components/admin/page/main-page/admin-page.component';
+import {CalendarPage} from './components/admin/page/calendar-page/calendar-page';
 
 export const routes: Routes = [
   {
@@ -28,22 +27,19 @@ export const routes: Routes = [
     component: AdminPageComponent,
     children:[{
       path: 'calendar',
-      component: NewCalendarComponent
+      component: CalendarPage
     },
       {
         path: 'statistics',
-        component: StatisticsComponent
+        component: StatisticsPage
       },
       {
         path: 'reservations',
-        component: ReservationsComponent
+        component: ReservationPage
       },
       {
         path: 'users',
-        component: UsersComponent
-      }, {
-        path: 'options',
-        component: OptionsComponent
+        component: UserPage
       },
     ]
   },

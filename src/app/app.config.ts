@@ -5,6 +5,9 @@ import {routes} from './app.routes';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
+import moment from 'moment';
+
+moment.locale('pl');
 
 export const appConfig: ApplicationConfig = {
   providers: [

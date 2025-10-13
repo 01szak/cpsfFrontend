@@ -1,22 +1,26 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
   MatColumnDef,
   MatHeaderCell,
   MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
   MatTable
 } from '@angular/material/table';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 
 import {MatCheckbox} from '@angular/material/checkbox';
 import {StatusComponent} from './status/status.component';
-import {NgClass} from '@angular/common';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {AsyncPipe, NgClass} from '@angular/common';
+import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '../popups/search-by-popup/search-by-popup.component';
-import {fromEvent} from 'rxjs';
-
+import {fromEvent, Observable} from 'rxjs';
+import {Page} from '../../Interface/Page';
+import {BackendEntity} from '../../Interface/BackendEntity';
 
 
 @Component({
@@ -35,42 +39,44 @@ import {fromEvent} from 'rxjs';
     MatPaginator,
     MatCheckbox,
     StatusComponent,
-    NgClass
+    NgClass,
+    AsyncPipe,
   ],
   templateUrl: './regular-table.component.html',
-  styleUrl: './regular-table.component.css'
+  styleUrl: './regular-table.component.css',
 })
-export class RegularTableComponent<T> {
-  @Input() dataSource: any[] = [];
-  @Input() tabColumns: column[] = [];
-  @Input() displayedColumns: string[] = [];
-  @Input() pageSize: number = 0;
-  @Input() pageSizeOptions: number[] = [];
-  @Input() serviceInstance: any = {};
-  @Input() fetchFunc!: ($event: PageEvent) => any;
-  @Input() onClickFunc!: (t:T) => any;
-  @Input() createFunc!: () => any;
-  @Input() additionalFunc!: (t:T) => any;
+export class RegularTableComponent<T extends BackendEntity> {
 
-  @Output() sortInfo = new EventEmitter<Sort>();
-  @Output() filterInfo = new EventEmitter<Filter>();
+  @Input() public page$!: Observable<Page<T>>;
+  @Input() public tabColumns: column[] = [];
+  @Input() public displayedColumns: string[] = [];
+  @Input() public pageSize: number = 0;
+  @Input() public pageSizeOptions: number[] = [];
+  @Input() public serviceInstance: any = {};
+  @Input() public fetchFunc!: ($event: PageEvent) => any;
+  @Input() public onClickFunc!: (t:T) => any;
+  @Input() public createFunc!: () => any;
+  @Input() public additionalFunc?: (t:T) => any;
 
-  readonly dialog = inject(MatDialog)
+  @Output() public sortInfo = new EventEmitter<Sort>();
+  @Output() public filterInfo = new EventEmitter<Filter>();
 
-  isArrowAsc: boolean = false;
-  isClicked: boolean = false;
-  clickCount: number = 0;
-  clickedColumn: string = '';
+  private readonly dialog = inject(MatDialog)
 
-  get columnFields(): string[] {
+  protected isArrowAsc: boolean = false;
+  protected isClicked: boolean = false;
+  protected clickCount: number = 0;
+  protected clickedColumn: string = '';
+
+  protected get columnFields(): string[] {
     return this.tabColumns.map(col => col.field);
   }
 
-  click(columnField: string) {
+  protected click(columnField: string) {
      this.isArrowAsc = !this.isArrowAsc;
      this.clickedColumn = columnField;
 
-     if (this.clickCount ++ > 3) {
+     if (this.clickCount++ > 3) {
        this.clickCount = 0;
        this.isClicked = false;
        this.sendSortInfo();
@@ -81,7 +87,8 @@ export class RegularTableComponent<T> {
      }
   }
 
-  sendSortInfo(columnName?: string, directionB?: boolean) {
+
+  protected sendSortInfo(columnName?: string, directionB?: boolean) {
     if (columnName === undefined || directionB === undefined) {
       this.sortInfo.emit();
     } else {
@@ -89,12 +96,13 @@ export class RegularTableComponent<T> {
       this.sortInfo.emit(sort);
     }
   }
-  sendFilterInfo(by: string, value: string) {
+
+  protected sendFilterInfo(by: string, value: string) {
     const filter: Filter = {by: by, value: value}
     this.filterInfo.emit(filter);
   }
 
-  openSearchDialog(event: MouseEvent,label: string, by: string, type: string) {
+  protected openSearchDialog(event: MouseEvent,label: string, by: string, type: string) {
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const service = this.serviceInstance;
