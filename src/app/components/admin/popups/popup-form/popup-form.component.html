@@ -7,7 +7,6 @@
 
 <mat-dialog-content>
     @for (formInput of formData.formInputs; track formInput) {
-
       @if (!formInput.additional) {
           @if (!formInput.checkbox) {
               @if (!additionalFieldsCheckbox && formInput.replacedByAdditional || !formInput.replacedByAdditional) {

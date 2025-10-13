@@ -32,7 +32,7 @@ export class BackendService<T extends BackendEntity> {
     });
   }
   protected errorSnackBar (error: any) {
-    this.snackBar.open(error.error?.message || 'Coś poszło nie tak', undefined, {
+    this.snackBar.open(error.error || 'Coś poszło nie tak', undefined, {
       panelClass: 'errorSnackBar',
       duration: 5000,
       horizontalPosition: 'start',
@@ -74,6 +74,7 @@ export class BackendService<T extends BackendEntity> {
               this.formDialog.closeAll();
             },
             error: (error) => {
+              console.log(error)
               this.errorSnackBar(error);
             }
           }
