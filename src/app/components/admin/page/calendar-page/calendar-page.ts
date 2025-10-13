@@ -31,7 +31,7 @@ export class CalendarPage implements OnInit, OnDestroy{
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
-  weekDays: string[] = moment.weekdays();
+  weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
   days: (number)[] = [];
   sub!: Subscription;
 
