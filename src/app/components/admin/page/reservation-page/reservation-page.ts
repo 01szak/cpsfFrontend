@@ -40,9 +40,13 @@ export class ReservationPage extends BaseTablePage<Reservation, ReservationServi
       {type: 'checkbox',field: 'paid'}
     ];
     this.displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
+
     this.additionalFunc =  (r: Reservation) => {
+      let previousPaidStaus = r.paid;
       r.paid = !r.paid;
-      this.reservationService.updateReservation(r).subscribe();
+      this.reservationService.updateReservation(r).subscribe( {
+        error: () => r.paid = previousPaidStaus
+      });
     };
   };
 

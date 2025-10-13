@@ -4,9 +4,9 @@ import {RegisterComponent} from './components/register/register.component';
 import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
 import {StatisticsPage} from './components/admin/page/statistics-page/statistics-page';
 import {UserPage} from './components/admin/page/user-page/user-page';
-import {NewCalendarComponent} from './components/admin/page/calendar-page/new-calendar.component';
 import {ReservationPage} from './components/admin/page/reservation-page/reservation-page';
 import {AdminPageComponent} from './components/admin/page/main-page/admin-page.component';
+import {CalendarPage} from './components/admin/page/calendar-page/calendar-page';
 
 export const routes: Routes = [
   {
@@ -27,7 +27,7 @@ export const routes: Routes = [
     component: AdminPageComponent,
     children:[{
       path: 'calendar',
-      component: NewCalendarComponent
+      component: CalendarPage
     },
       {
         path: 'statistics',

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {ReservationService} from '../../../../service/ReservationService';
@@ -15,7 +15,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
 
 @Component({
-  selector: 'app-new-calendar',
+  selector: 'calendar',
   imports: [
     MatCard,
     NgClass,
@@ -23,12 +23,11 @@ import moment from 'moment';
     MatTooltip,
     AsyncPipe,
   ],
-  templateUrl: './new-calendar.component.html',
-  styleUrl: './new-calendar.component.css',
+  templateUrl: './calendar-page.html',
+  styleUrl: './calendar-page.css',
   standalone: true,
-  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NewCalendarComponent implements OnInit, OnDestroy{
+export class CalendarPage implements OnInit, OnDestroy{
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
@@ -40,7 +39,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy{
 
   protected reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
   private paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
-  private unPaidReservationsWithSet: Record<string, PaidReservationsWithSets> = {};
   private userPerReservation: UserPerReservation = {};
 
   constructor(
@@ -59,7 +57,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy{
     this.sub = this.reservationService.calendarData$.subscribe(data => {
       this.reservationMetadataWithSets = data.metadata || {};
       this.paidReservationsWithSets = data.paid;
-      this.unPaidReservationsWithSet = data.unpaid;
       this.userPerReservation = data.users;
     });
 
@@ -151,10 +148,6 @@ export class NewCalendarComponent implements OnInit, OnDestroy{
     } else {
       this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
     }
-  }
-
-  private stripTime(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   findWeekDay(year: number, month: number, day: number) {

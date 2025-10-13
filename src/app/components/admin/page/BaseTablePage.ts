@@ -30,6 +30,7 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
     if (event) this.event = event;
     if (page !== undefined) this.page = page;
     if (size !== undefined) this.size = size;
+    this.sub?.unsubscribe();
     this.sub = this.backendService.findAll(
       this.event,
       this.page,

@@ -100,7 +100,7 @@
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
           { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlaceIndex},
           { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
-          { name: 'Gość', field: 'user', type: 'select', defaultValue: reservationToUpdate.user!.firstName + " " + reservationToUpdate.user!.lastName,  replacedByAdditional: true, readonly: true},
+          { name: 'Gość', field: 'user', type: 'select', defaultValue: reservationToUpdate.user ? (reservationToUpdate.user.firstName + " " + reservationToUpdate.user.lastName) : '',  replacedByAdditional: true, readonly: true},
           { name: 'Imię', field: 'firstName', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.firstName },
           { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.lastName },
           { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true, defaultValue: reservationToUpdate.user?.carRegistration },
@@ -143,7 +143,7 @@
           { name: 'Nazwisko', field: 'lastName', type: 'text'},
           { name: 'Email', field: 'email', type: 'text'},
           { name: 'Numer telefonu', field: 'phoneNumber', type: 'text'},
-          { name: 'Rejestracja', field: 'registration', type: 'text'},
+          { name: 'Rejestracja', field: 'carRegistration', type: 'text'},
         ]
       };
       const dialogRef = this.popupForm.open(PopupFormComponent, {
@@ -210,7 +210,7 @@
           userToUpdate.phoneNumber = result['phoneNumber']?.toString() ?? userToUpdate.phoneNumber;
 
           this.popupConfirmationService.openConfirmationPopup(
-            "Rezerwacja zostanie edytowana. Czy chcesz kontynuować?",
+            "Gość zostanie edytowany. Czy chcesz kontynuować?",
             () => this.userService.update(userToUpdate).subscribe()
           );
         }

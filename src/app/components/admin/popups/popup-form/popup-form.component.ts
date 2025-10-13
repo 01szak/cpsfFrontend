@@ -1,10 +1,10 @@
 import {
   Component, ElementRef,
-  inject, Input, OnChanges, OnInit,
-  SimpleChanges, ViewChild,
+  inject, OnInit,
+ ViewChild,
 } from '@angular/core';
 import { FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {distinctUntilChanged, filter, fromEvent, map, Observable, of, startWith, switchMap, tap} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {PopupConfirmationService} from '../../../../service/PopupConfirmationService';
 import {ReservationService} from '../../../../service/ReservationService';
@@ -134,15 +134,14 @@ export class PopupFormComponent implements OnInit {
   protected readonly console = console;
 
   deleteObject(objectToUpdate: any) {
-    const secondKey: string = Object.keys(objectToUpdate)[1];
     let deleteFunc: () => void;
     let message: string = '';
 
-    if (secondKey === 'checkin') {
+    if ('checkin' in objectToUpdate) {
       message = 'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?';
       deleteFunc = () => this.reservationService.deleteReservation(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
-    }else if (secondKey === 'firstName') {
+    }else if ('firstName' in objectToUpdate) {
       message = 'Gość zostanie usunięty a z nim wszystkie jego rezerwacje (Może to wpłynąć na statystki, narazie nie zalecane!). Czy chcesz kontynuować?';
       deleteFunc = () => this.userService.delete(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
