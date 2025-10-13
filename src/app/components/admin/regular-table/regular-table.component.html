@@ -50,7 +50,7 @@
     <div class="tableFooter">
       <i class="fa-solid fa-plus addIcon" (click)="createFunc()"></i>
       <mat-paginator
-        [length]="pageSizeOptions[pageSizeOptions.length - 1]"
+        [length]="paginatorLength"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="fetchFunc($event)">

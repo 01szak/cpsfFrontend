@@ -16,6 +16,7 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
   protected event?: PageEvent;
   protected page: number = 0;
   protected size: number = 0
+  protected paginatorLength: number = 0;
   protected sub!: Subscription;
   protected additionalFunc?: (t: T) => any;
   protected columns!:  {type: string, field: string }[];
@@ -37,7 +38,7 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
       this.size,
       this.sortInfo,
       this.filterInfo
-    ).subscribe();
+    ).subscribe(p => {this.paginatorLength = p.totalElements});
   }
 
   protected getSortInfo(sort: Sort) {

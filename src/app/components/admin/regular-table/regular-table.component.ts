@@ -53,6 +53,7 @@ export class RegularTableComponent<T extends BackendEntity> {
   @Input() public pageSize: number = 0;
   @Input() public pageSizeOptions: number[] = [];
   @Input() public serviceInstance: any = {};
+  @Input() public paginatorLength: number = 0;
   @Input() public fetchFunc!: ($event: PageEvent) => any;
   @Input() public onClickFunc!: (t:T) => any;
   @Input() public createFunc!: () => any;
@@ -86,7 +87,6 @@ export class RegularTableComponent<T extends BackendEntity> {
        this.isClicked = true;
      }
   }
-
 
   protected sendSortInfo(columnName?: string, directionB?: boolean) {
     if (columnName === undefined || directionB === undefined) {
