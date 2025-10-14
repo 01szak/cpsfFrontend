@@ -66,5 +66,6 @@ export class ReservationPage extends BaseTablePage<Reservation, ReservationServi
     this.formService.openUpdateReservationFormPopup(reservation);
   }
 
+
 }
 

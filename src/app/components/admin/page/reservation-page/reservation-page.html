@@ -11,5 +11,6 @@
   [createFunc]="openCreatePopup.bind(this)"
   [additionalFunc]="additionalFunc"
   (sortInfo)="getSortInfo($event)"
-  (filterInfo)="getFilterInfo($event)" >
+  (filterInfo)="getFilterInfo($event)"
+  (paginatorReady)="getPaginator($event)">
 </app-regular-table>

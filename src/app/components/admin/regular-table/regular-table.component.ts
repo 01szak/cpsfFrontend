@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -45,7 +45,9 @@ import {BackendEntity} from '../../Interface/BackendEntity';
   templateUrl: './regular-table.component.html',
   styleUrl: './regular-table.component.css',
 })
-export class RegularTableComponent<T extends BackendEntity> {
+export class RegularTableComponent<T extends BackendEntity> implements AfterViewInit {
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   @Input() public page$!: Observable<Page<T>>;
   @Input() public tabColumns: column[] = [];
@@ -61,6 +63,7 @@ export class RegularTableComponent<T extends BackendEntity> {
 
   @Output() public sortInfo = new EventEmitter<Sort>();
   @Output() public filterInfo = new EventEmitter<Filter>();
+  @Output() paginatorReady = new EventEmitter<MatPaginator>();
 
   private readonly dialog = inject(MatDialog)
 
@@ -68,6 +71,10 @@ export class RegularTableComponent<T extends BackendEntity> {
   protected isClicked: boolean = false;
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
+
+  ngAfterViewInit(): void {
+    this.paginatorReady.emit(this.paginator);
+  }
 
   protected get columnFields(): string[] {
     return this.tabColumns.map(col => col.field);

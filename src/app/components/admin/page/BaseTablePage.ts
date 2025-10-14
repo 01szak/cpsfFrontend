@@ -1,12 +1,15 @@
-import {PageEvent} from '@angular/material/paginator';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {PopupFormService} from '../../../service/PopupFormService';
 import {Filter, Sort} from '../regular-table/regular-table.component';
 import {Observable, Subscription} from 'rxjs';
 import {Page} from '../../Interface/Page';
 import {BackendEntity} from '../../Interface/BackendEntity';
 import {BackendService} from '../../../service/BackendService';
+import {Directive} from "@angular/core";
 
+@Directive()
 export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>> {
+
 
   protected pagedData!: Observable<Page<T>>;
   protected pageSize: number = 0;
@@ -22,6 +25,7 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
   protected columns!:  {type: string, field: string }[];
   protected displayedColumns!: string[];
   protected formService!: PopupFormService;
+  protected paginator!: MatPaginator;
 
   constructor(protected backendService: S) {
     this.pagedData = this.backendService.pageData$;
@@ -48,7 +52,19 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
 
   protected getFilterInfo(filter: Filter) {
     this.filterInfo = filter;
+    this.page = 0;
+
+    if (this.paginator) {
+      console.log(this.paginator)
+      this.paginator.firstPage();
+    }
+    console.log(this.paginator)
+
     this.fetchData(this.event, this.page, this.size);
+  }
+
+  protected getPaginator(paginator: MatPaginator) {
+    this.paginator = paginator;
   }
 
   protected openCreatePopup() {

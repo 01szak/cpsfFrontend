@@ -53,4 +53,6 @@ export class UserPage extends BaseTablePage<User, UserService> implements OnInit
   protected override openUpdatePopup(user: User) {
     this.formService.openUpdateUserPopup(user);
   }
+
+
 }
