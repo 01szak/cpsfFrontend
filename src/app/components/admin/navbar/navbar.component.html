@@ -1,18 +1,44 @@
-<div class="container">
-  <div>
-    <div class="routers">
-      <div class="functionalButtons">
-<!--        <a class="navbarButton" routerLink="options"><i class="fa-solid fa-gear"></i></a>-->
-        <a class="navbarButton" routerLink="../" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i></a>
-      </div>
-    <div class="routersButtons">
-      <a class="navbarButton" routerLink="calendar"><i class="fa-solid fa-calendar-days"></i></a>
-      <a class="navbarButton" routerLink="reservations"><i class="fa-solid fa-list"></i></a>
-      <a class="navbarButton" routerLink="users"><i class="fa-solid fa-users"></i></a>
-      <a class="navbarButton" routerLink="statistics"><i class="fa-solid fa-chart-pie"></i></a>
-    </div>
-    </div>
+<div class="content">
+  <div  (mouseleave)="shouldClose($event)" class="toggleButton">
+    <a class="navbarButton"><i (mouseenter)="drawer.open()" (click)="keepOpen()" class="fa-solid fa-bars"></i></a>
   </div>
+  <mat-drawer-container [hasBackdrop]="false" class="background container">
+    <mat-drawer #drawer
+                mode="over"
+                position="start"
+                (mouseenter)="onDrawerEnter()"
+                (mouseleave)="onDrawerLeave()"
+                class="background">
+      <div class="routers">
 
+        <div class="routersButtons">
+          <a class="navbarButton" routerLink="calendar"><i class="fa-solid fa-calendar-days"></i></a>
+          <a class="navbarButton" routerLink="reservations"><i class="fa-solid fa-list"></i></a>
+          <a class="navbarButton" routerLink="users"><i class="fa-solid fa-users"></i></a>
+          <a class="navbarButton" routerLink="statistics"><i class="fa-solid fa-chart-pie"></i></a>
+        </div>
+        <div class="functionalButtons">
+          <a class="navbarButton" [matMenuTriggerFor]="menu"  [matMenuTriggerData]="{emp: employee$ | async}"><i class="fa-solid fa-circle-user"></i></a>
+            <mat-menu #menu >
+              <ng-template matMenuContent let-emp="emp" class="menu">
+                <div class="menuItem"><label><i class="fa-solid fa-user"></i> Nazwa użytkownika: </label><p>{{emp.username}}</p></div>
+                <div class="menuItem"><label><i class="fa-solid fa-envelope"></i> Email: </label><p>{{emp.email}}</p></div>
+                <div class="menuItem"><label><i class="fa-solid fa-shield"></i> Uprawnienia: </label><p>{{emp.role}}</p></div>
+                <div class="functionalMenuItems">
+                  <div class="editRoute">
+                    <a  class="editRoute"><i class="fa-solid fa-pen"></i> Edytuj profil </a>
+                  </div>
+                  <div class="editRoute" >
+                    <a routerLink="../" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Wyloguj się</a>
+                  </div>
+                </div>
 
+              </ng-template>
+            </mat-menu>
+          <a class="navbarButton" routerLink="../" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
+
+      </div>
+    </mat-drawer>
+  </mat-drawer-container>
 </div>

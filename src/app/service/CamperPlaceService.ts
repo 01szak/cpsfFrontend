@@ -2,12 +2,11 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {CamperPlace} from '../components/Interface/CamperPlace';
-import {Reservation} from '../components/Interface/Reservation';
 
 @Injectable({providedIn: "root"})
 export class CamperPlaceService {
 
-  api = '/api/camperPlaces'
+  api = '/api/camperPlace'
 
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
   public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();

@@ -13,7 +13,7 @@ export class UserService extends BackendService<User>{
 
   constructor(http: HttpClient) {
     super(
-      '/api/users',
+      '/api/user',
       http,
       new BehaviorSubject<User | null>(null))
   }

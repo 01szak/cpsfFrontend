@@ -10,6 +10,9 @@
   --bg-color-error: #f44336;
   --bg-color-scrollbar: rgb(60, 59, 59);
   --container-blury: rgba(255, 255, 255, 0.8);
+  --user-details-background: rgb(255, 255, 255);
+  --user-details-text: rgba(0, 0, 0, 0);
+  --background: rgb(30, 31, 34);
 
   ::-webkit-scrollbar-thumb {
     background-color: black;
@@ -31,7 +34,9 @@
     enabled-trigger-text-color: var(--bg-color-quaternary),
   ));
 }
-
+  @include mat.menu-overrides((
+    container-color: var(--user-details-background),          // tło menu
+  ));
 .successSnackBar {
   .mdc-snackbar__surface {
     background-color: var(--bg-color-success) !important;
@@ -48,6 +53,9 @@
 
 .primary {
   background-color: var(--bg-color-primary) !important;
+}
+.background {
+  background-color: var(--background) !important;
 }
 .secondary {
   background-color: var(--bg-color-secondary) !important;
@@ -87,7 +95,7 @@
   display: none !important;
 }
 html{
-  background-color: rgba(0, 0, 0, 0.88);
+  background-color: var(--background);
   color: white;
 }
 

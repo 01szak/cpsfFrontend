@@ -47,13 +47,13 @@ export class LoginComponent {
   }
 
   request: AuthenticatorRequest = {
-    email: '',
+    login: '',
     password: ''
   }
 
 
   onSubmitLogin(): void {
-    this.onSubmitLoginEvent.emit({"email": this.request.email, "password": this.request.password});
+    this.onSubmitLoginEvent.emit({"email": this.request.login, "password": this.request.password});
     this.loginService.login(this.request).subscribe({
       next: (req) => {
         this.isLogged = true;

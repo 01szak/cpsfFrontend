@@ -25,7 +25,7 @@ export class ReservationService extends BackendService<Reservation> {
     private camperPlaceService: CamperPlaceService,
   ) {
     super(
-      '/api/reservations',
+      '/api/reservation',
       http,
       new BehaviorSubject<ReservationData | null>(null)
     );
