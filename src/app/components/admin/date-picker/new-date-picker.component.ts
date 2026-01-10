@@ -32,15 +32,12 @@ export class NewDatePickerComponent implements OnInit {
       "Listopad",
       "Grudzień"
     ];
-  years: number[] = [
-    2024,
-    2025,
-  ]
+  years: number[] = []
   currentMonth: string = this.months[new Date().getMonth() + 1];
   currentYear: number = new Date().getFullYear();
 
   ngOnInit() {
-    this.addMissingYears()
+    this.getYears()
   }
 
 
@@ -90,11 +87,12 @@ export class NewDatePickerComponent implements OnInit {
     this.year.emit(this.currentYear);
   }
 
-  addMissingYears() {
-    let currentYear = new Date().getFullYear()
-    let lasYearInTab = this.years[this.years.length - 1];
-    while (currentYear > lasYearInTab) {
-      this.years.push(lasYearInTab++);
+  getYears() {
+    const currentYear = new Date().getFullYear();
+    if (!this.years.includes(currentYear)) {
+      for (let i = 0; i < (currentYear - 2024) + 1 ; i++) {
+        this.years.push(2024 + i);
+      }
     }
   }
 
