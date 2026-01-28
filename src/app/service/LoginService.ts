@@ -19,6 +19,7 @@ export class LoginService {
   }
 
   login(request: AuthenticatorRequest): Observable<any> {
+    console.log(this.api + 'login', request,{headers: this.headers})
     return this.http.post<AuthenticatorRequest>(this.api + 'login', request,{headers: this.headers}).pipe(
       tap((response: any) =>{
         if(response){
