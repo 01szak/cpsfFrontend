@@ -14,6 +14,7 @@ export class BackendService<T extends BackendEntity> {
   protected pageDataBs: BehaviorSubject<Page<T>>;
   private snackBar = inject(MatSnackBar);
 
+  protected api;
   protected formDialog = inject(MatDialog);
   protected event?: PageEvent;
   protected page?: number;
@@ -31,6 +32,7 @@ export class BackendService<T extends BackendEntity> {
       verticalPosition: 'top'
     });
   }
+
   protected errorSnackBar (error: any) {
     this.snackBar.open(error.error || 'Coś poszło nie tak', undefined, {
       panelClass: 'errorSnackBar',
@@ -41,10 +43,11 @@ export class BackendService<T extends BackendEntity> {
   }
 
   constructor(
-    protected api: string,
+    protected apiString: string,
     protected http: HttpClient,
     protected allDataSubject: BehaviorSubject<any | null>
   ) {
+    this.api = apiString;
     this.pageDataBs = new BehaviorSubject<Page<T>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
     this.pageData$ = this.pageDataBs.asObservable();
   }
@@ -65,8 +68,14 @@ export class BackendService<T extends BackendEntity> {
       );
   }
 
-  public update(t: T) {
-    return this.http.patch<{[key: string]: string}>(this.api + '/' + t.id, t)
+  public update(t: T | T[]) {
+    let api = this.api;
+    //
+    // if (!Array.isArray(t)) {
+    //   api += '/' + t.id;
+    // }
+
+    return this.http.patch<{[k159ey: string]: string}>(api, t)
       .pipe(
         tap({
             next: (response) => {
@@ -74,7 +83,6 @@ export class BackendService<T extends BackendEntity> {
               this.formDialog.closeAll();
             },
             error: (error) => {
-              console.log(error)
               this.errorSnackBar(error);
             }
           }

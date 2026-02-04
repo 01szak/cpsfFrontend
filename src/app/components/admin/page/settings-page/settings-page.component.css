@@ -50,6 +50,9 @@ td {
 :host ::ng-deep .mdc-text-field__input {
   color: white !important;
 }
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  max-width: 150px;
+}
 
 mat-form-field {
   vertical-align: center!important;

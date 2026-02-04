@@ -4,12 +4,10 @@ import {BehaviorSubject, map, Observable, tap} from 'rxjs';
 import {CamperPlace} from '../components/Interface/CamperPlace';
 import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 import {CamperPlaceForTable} from '../components/Interface/CamperPlaceForTable';
+import {BackendService} from './BackendService';
 
 @Injectable({providedIn: "root"})
-export class CamperPlaceService {
-
-  api = '/api/camperPlace'
-
+export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
 
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
   private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
@@ -19,14 +17,16 @@ export class CamperPlaceService {
   public camperPlacesForTable$: Observable<CamperPlaceForTable[]> = this.camperPlaceForTableSubject.asObservable();
   public camperPlaceType = this.camperPlaceTypeSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(http: HttpClient) {
+    super('api/camperPlace', http, new BehaviorSubject<CamperPlaceForTable | null>(null));
+  }
 
   getCamperPlaces(): Observable<CamperPlace[]> {
     return this.http.get<CamperPlace[]>(this.api);
   }
 
   getCamperPlacesForTable(): Observable<CamperPlaceForTable[]> {
-    return this.http.get<CamperPlaceForTable[]>(this.api + "/v2").pipe(
+    return this.http.get<CamperPlaceForTable[]>(this.api + '/v2').pipe(
       tap(p => {
         this.camperPlaceForTableSubject.next(p)
       })
@@ -34,7 +34,7 @@ export class CamperPlaceService {
   }
 
   getCamperPlaceTypes(): Observable<CamperPlaceType[]> {
-    return this.http.get<CamperPlaceType[]>(this.api + "/type").pipe(
+    return this.http.get<CamperPlaceType[]>(this.api + '/type').pipe(
       tap(p => {
         this.camperPlaceTypeSubject.next(p)
       })

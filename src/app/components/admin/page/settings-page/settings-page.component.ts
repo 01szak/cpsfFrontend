@@ -33,11 +33,8 @@ export class  SettingsPage implements OnInit {
 
   protected readonly displayedColumns = ["index", "type", "price"];
   protected camperPlaces$!: Observable<CamperPlaceForTable[]>;
-
   protected camperPlaceTypes$!: Observable<CamperPlaceType[]>;
-
   protected formChanged = false;
-
 
   protected reset = () => {
     this.rows.controls.forEach((control, i) => {
@@ -45,7 +42,17 @@ export class  SettingsPage implements OnInit {
     });
     this.formChanged = false}
 
-  protected update = () => {console.log("kakak")};
+  protected update = () => {
+    const changedRows = this.getChangedRows()
+    this.camperPlaceService.update(changedRows).subscribe({
+      next: () => {this.loadBuildForm(); this.formChanged = false},
+      error: () => {this.reset()}
+    });
+  };
+
+  protected get rows() {
+    return this.camperPlaceForm.get('rows') as FormArray;
+  }
 
   private sub!: Subscription;
   private formBuilder = inject(FormBuilder);
@@ -54,23 +61,28 @@ export class  SettingsPage implements OnInit {
   constructor(private camperPlaceService: CamperPlaceService) {
     this.camperPlaceForm.events.subscribe(e => {
       if (e instanceof ValueChangeEvent) {
-
-        const changedRows = this.rows.controls
-          .filter(row => row.dirty)
-          .map(row => row.value);
-        if (changedRows.length > 0) {
+        if (this.getChangedRows().length > 0) {
           this.formChanged = true;
         }
-        console.log(changedRows)
       }
     })
   }
 
-  camperPlaceForm = this.formBuilder.group({
+  protected camperPlaceForm = this.formBuilder.group({
     rows: this.formBuilder.array([])
   });
 
   ngOnInit() {
+    this.loadBuildForm();
+    this.camperPlaceService.getCamperPlaceTypes().subscribe();
+    this.camperPlaceTypes$ = this.camperPlaceService.camperPlaceType;
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe;
+  }
+
+  private loadBuildForm () {
     this.camperPlaces$ =
       this.camperPlaceService.getCamperPlacesForTable().pipe(
         tap(cp => {
@@ -78,11 +90,6 @@ export class  SettingsPage implements OnInit {
           this.buildForm(this.camperPlaceFormLastState);
         })
       );
-
-    // console.log(this.camperPlaces$.pipe(tap))
-
-    this.camperPlaceService.getCamperPlaceTypes().subscribe();
-    this.camperPlaceTypes$ = this.camperPlaceService.camperPlaceType;
   }
 
   private buildForm(cp: CamperPlaceForTable[]) {
@@ -92,6 +99,7 @@ export class  SettingsPage implements OnInit {
     cp.forEach(c => {
       rows.push(
         this.formBuilder.group({
+          id: [c.id],
           index: [c.index],
           type: [c.type],
           price: [c.price],
@@ -100,15 +108,11 @@ export class  SettingsPage implements OnInit {
     });
   }
 
-  get rows() {
-    return this.camperPlaceForm.get('rows') as FormArray;
+  private getChangedRows(): CamperPlaceForTable[] {
+    return this.rows.controls
+      .filter(row => row.dirty)
+      .map(row => row.value);
   }
-
-  ngOnDestroy() {
-    this.sub.unsubscribe;
-  }
-
-
 
   protected readonly console = console;
 }

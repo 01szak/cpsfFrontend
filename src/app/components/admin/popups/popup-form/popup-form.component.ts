@@ -8,7 +8,7 @@ import {map, Observable} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {PopupConfirmationService} from '../../../../service/PopupConfirmationService';
 import {ReservationService} from '../../../../service/ReservationService';
-import {User} from '../../../Interface/User';
+import {Guest} from '../../../Interface/Guest';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -54,8 +54,8 @@ export class PopupFormComponent implements OnInit {
   deleteRes = (r: Reservation) => {
     this.reservationService.deleteReservation(r)
   }
-  deleteUser = (u: User) => this.userService.delete(u)
-  userList: { name: string, user: User }[] = [];
+  deleteUser = (g: Guest) => this.userService.delete(g)
+  userList: { name: string, guest: Guest }[] = [];
   additionalFieldsCheckbox: boolean = false;
   inputValue: string = '';
 
@@ -85,9 +85,9 @@ export class PopupFormComponent implements OnInit {
     })
       .pipe(
         map(e =>
-          e.content.map(u => ({
-            name: u.firstName + ' ' + u.lastName,
-            user: u
+          e.content.map(g => ({
+            name: g.firstName + ' ' + g.lastName,
+            guest: g
           }))
         )
       )
@@ -164,7 +164,7 @@ export interface FormInput {
   select?: boolean,
   selectList?: Observable<any[]>,
   checkbox?: boolean
-  defaultValue?: string | Date | number | User | boolean
+  defaultValue?: string | Date | number | Guest | boolean
   readonly?: boolean,
   additional?: boolean
   replacedByAdditional?: boolean

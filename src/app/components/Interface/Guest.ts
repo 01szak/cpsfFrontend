@@ -1,7 +1,7 @@
 import {BackendEntity} from './BackendEntity';
 
-export interface User extends BackendEntity {
-  __type?: 'User';
+export interface Guest extends BackendEntity {
+  __type?: 'Guest';
   id: number,
   firstName: string,
   lastName: string,

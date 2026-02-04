@@ -14,7 +14,7 @@ export class EmployeeService extends BackendService<Employee> {
     http: HttpClient,
   ) {
     super(
-      '/api/employee',
+      '/api/user',
       http,
       new BehaviorSubject<Employee | null>(null)
     );

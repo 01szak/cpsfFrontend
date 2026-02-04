@@ -4,7 +4,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import {RegularTableComponent} from '../../regular-table/regular-table.component';
 import {PopupFormService} from '../../../../service/PopupFormService';
-import {User} from '../../../Interface/User';
+import {Guest} from '../../../Interface/Guest';
 import {UserService} from '../../../../service/UserService';
 import {BaseTablePage} from '../BaseTablePage';
 
@@ -20,7 +20,7 @@ import {BaseTablePage} from '../BaseTablePage';
   styleUrl: './user-page.css',
   standalone: true
 })
-export class UserPage extends BaseTablePage<User, UserService> implements OnInit, OnDestroy{
+export class UserPage extends BaseTablePage<Guest, UserService> implements OnInit, OnDestroy{
 
   constructor(
     protected userService: UserService,
@@ -50,8 +50,8 @@ export class UserPage extends BaseTablePage<User, UserService> implements OnInit
     this.formService.openCreateUserFormPopup();
   }
 
-  protected override openUpdatePopup(user: User) {
-    this.formService.openUpdateUserPopup(user);
+  protected override openUpdatePopup(guest: Guest) {
+    this.formService.openUpdateUserPopup(guest);
   }
 
 
