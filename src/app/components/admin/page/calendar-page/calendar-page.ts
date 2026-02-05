@@ -117,7 +117,6 @@ export class CalendarPage implements OnInit, OnDestroy{
    if (!camperPlace) {
      return;
    }
-   console.log(camperPlace);
     const target = event.target as HTMLElement;
     const date = new Date(year, month, day);
 

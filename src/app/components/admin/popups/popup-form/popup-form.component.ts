@@ -54,8 +54,8 @@ export class PopupFormComponent implements OnInit {
   deleteRes = (r: Reservation) => {
     this.reservationService.deleteReservation(r)
   }
-  deleteUser = (g: Guest) => this.userService.delete(g)
-  userList: { name: string, guest: Guest }[] = [];
+  deleteGuest = (g: Guest) => this.userService.delete(g)
+  guestList: { name: string, guest: Guest }[] = [];
   additionalFieldsCheckbox: boolean = false;
   inputValue: string = '';
 
@@ -92,7 +92,7 @@ export class PopupFormComponent implements OnInit {
         )
       )
       .subscribe(list => {
-        this.userList = list;
+        this.guestList = list;
         if (list.length > 0) {
           setTimeout(() => this.select?.open());
         }
@@ -102,7 +102,7 @@ export class PopupFormComponent implements OnInit {
 
   onOptionSelected(event: MatSelectChange, formField: any) {
       this.inputValue = event.value.name;
-      this.formValues[formField] = event.value.user
+      this.formValues[formField] = event.value.guest
   }
 
   close() {

@@ -16,6 +16,7 @@
     readonly popupForm: MatDialog = inject(MatDialog);
     guests$: Observable<Guest[]>;
     camperPlaces$: Observable<string[]>;
+
     constructor(
       private popupConfirmationService: PopupConfirmationService,
       private reservationService: ReservationService,
@@ -27,6 +28,7 @@
 
       this.camperPlaces$ = this.camperPlaceService.getCamperPlaces().pipe(map(camperPlaces => camperPlaces.map(cp => cp.index)));
     }
+
     openCreateReservationFormPopup(camperPlace?: CamperPlace, year?: number, month?: number, day?: number) {
       const checkinDefaultDate = (year === undefined || month === undefined || day === undefined) ? undefined : new Date(year, month, day);
       const formData: FormData = {
@@ -35,7 +37,7 @@
           { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: checkinDefaultDate, readonly: checkinDefaultDate instanceof Date, additional: false},
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', additional: false},
           { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: camperPlace?.index || undefined, readonly: (camperPlace?.index.length || 0) > 0, additional: false},
-          { name: 'Gość', field: 'user', type: 'text', select: true, selectList: this.guests$, additional: false, replacedByAdditional: true, autocomplete: true},
+          { name: 'Gość', field: 'guest', type: 'text', select: true, selectList: this.guests$, additional: false, replacedByAdditional: true, autocomplete: true},
           { name: 'Imię', field: 'firstName', type: 'text', additional: true },
           { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true },
           { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true },
@@ -51,7 +53,7 @@
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
           const guestToCreate: Guest = {
-            id: 0,
+            id: '',
             firstName: result['firstName']?.toString() ?? '',
             lastName: result['lastName']?.toString() ?? '',
             carRegistration: result['carRegistration']?.toString() ?? '',
