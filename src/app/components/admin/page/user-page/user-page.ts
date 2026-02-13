@@ -40,7 +40,6 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
 
   ngOnInit() {
     super.fetchData(this.event, this.page, this. size);
-    this.pagedData.subscribe(d => {console.log(d)})
   }
 
   ngOnDestroy() {

@@ -55,10 +55,8 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
     this.page = 0;
 
     if (this.paginator) {
-      console.log(this.paginator)
       this.paginator.firstPage();
     }
-    console.log(this.paginator)
 
     this.fetchData(this.event, this.page, this.size);
   }

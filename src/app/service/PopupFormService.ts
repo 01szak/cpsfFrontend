@@ -116,7 +116,6 @@
         panelClass: 'popupForm'
       })
       dialogRef.afterOpened().subscribe(() => {
-        console.log(reservationToUpdate)
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
           reservationToUpdate.checkin = result['checkin']?.toString() ?? reservationToUpdate.checkin;

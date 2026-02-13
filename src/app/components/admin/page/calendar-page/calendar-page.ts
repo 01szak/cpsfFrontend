@@ -59,10 +59,6 @@ export class CalendarPage implements OnInit, OnDestroy{
       this.paidReservationsWithSets = data.paid;
       this.userPerReservation = data.users;
     });
-    console.log(this.reservationMetadataWithSets)
-    console.log(this.paidReservationsWithSets)
-    console.log(this.userPerReservation)
-    console.log(this.camperPlaces$)
   }
 
   ngOnDestroy(): void {
@@ -147,7 +143,6 @@ export class CalendarPage implements OnInit, OnDestroy{
       });
     }
     if (reservationToUpdate) {
-      console.log(reservationToUpdate)
       this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
     } else {
       this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
