@@ -86,7 +86,7 @@ export class PopupFormComponent implements OnInit {
       .pipe(
         map(e =>
           e.content.map(g => ({
-            name: g.firstName + ' ' + g.lastName,
+            name: g.firstname + ' ' + g.lastname,
             guest: g
           }))
         )
@@ -141,7 +141,7 @@ export class PopupFormComponent implements OnInit {
       message = 'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?';
       deleteFunc = () => this.reservationService.deleteReservation(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
-    }else if ('firstName' in objectToUpdate) {
+    }else if ('firstname' in objectToUpdate) {
       message = 'Gość zostanie usunięty a z nim wszystkie jego rezerwacje (Może to wpłynąć na statystki, narazie nie zalecane!). Czy chcesz kontynuować?';
       deleteFunc = () => this.userService.delete(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);

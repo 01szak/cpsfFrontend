@@ -26,17 +26,17 @@
                 <div class="menuItem"><label><i class="fa-solid fa-shield"></i> Uprawnienia: </label><p>{{emp.role}}</p></div>
                 <div class="functionalMenuItems">
                   <div class="editRoute">
-                    <a  class="editRoute"><i class="fa-solid fa-pen"></i> Edytuj profil </a>
+<!--                    <a  class="editRoute"><i class="fa-solid fa-pen"></i> Edytuj profil </a>-->
                   </div>
                   <div class="editRoute" >
-                    <a routerLink="../" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Wyloguj się</a>
+                    <p class="menuItem" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Wyloguj się</p>
                   </div>
                 </div>
 
               </ng-template>
             </mat-menu>
           <a class="navbarButton" routerLink="settings"><i class="fa-solid fa-gear"></i></a>
-          <a class="navbarButton" routerLink="../" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i></a>
+          <a class="navbarButton" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i></a>
         </div>
 
       </div>

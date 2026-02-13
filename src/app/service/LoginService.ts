@@ -19,7 +19,6 @@ export class LoginService {
   }
 
   login(request: AuthenticatorRequest): Observable<any> {
-    console.log(this.api + 'login', request,{headers: this.headers})
     return this.http.post<AuthenticatorRequest>(this.api + 'login', request,{headers: this.headers}).pipe(
       tap((response: any) =>{
         if(response){
@@ -31,28 +30,26 @@ export class LoginService {
   }
 
   public hasRole(role: Role): boolean {
-    const r: Role | null = this.getRole();
-    if (this.getRole() !== null) {
-      return r === role;
-    }
-    return false
+    return this.getRole() === role && role !== null;
   }
 
   private getTokenPayload() {
-    if (this.token || this.token === '') {
+    if (!this.token) return null;
+    try {
+      const payload = this.token.split('.')[1]
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+      return JSON.parse(atob(payload));
+    } catch {
       return null;
     }
-
-    const payload = this.token.split('.')[1];
-    return JSON.parse(atob(payload));
   }
 
-  private getRole() {
+  private getRole():Role {
     const payload = this.getTokenPayload();
     return payload?.scope || null
   }
 }
-
 
 export interface AuthenticatorRequest {
   login: string;

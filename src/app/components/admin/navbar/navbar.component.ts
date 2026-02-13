@@ -1,10 +1,9 @@
-import {Component, ViewChild} from '@angular/core';
-import {RouterLink} from '@angular/router';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from '@angular/material/sidenav';
 import {EmployeeService} from '../../../service/EmployeeService';
 import {Observable} from 'rxjs';
 import {Employee} from '../../Interface/Employee';
-import {MatTooltip} from '@angular/material/tooltip';
 import {AsyncPipe} from '@angular/common';
 import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
 
@@ -15,7 +14,6 @@ import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
     RouterLink,
     MatDrawerContainer,
     MatDrawer,
-    MatTooltip,
     AsyncPipe,
     MatMenuTrigger,
     MatMenu,
@@ -25,15 +23,15 @@ import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
   styleUrl: './navbar.component.css',
   standalone: true
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
 
-  @ViewChild('drawer') drawer = new MatDrawer;
+  @ViewChild('drawer') drawer!: MatDrawer;
 
   protected clicked: boolean = false;
   protected drawerEntered: boolean = false;
   protected employee$: Observable<Employee>;
 
-  constructor(private service: EmployeeService) {
+  constructor(private service: EmployeeService, private router: Router) {
     this.employee$ = service.employee$;
   }
 
@@ -43,6 +41,8 @@ export class NavbarComponent {
 
   protected logout():void{
     sessionStorage.removeItem('jwtToken');
+    this.router.navigate(['/']);
+
   }
 
   protected keepOpen() {

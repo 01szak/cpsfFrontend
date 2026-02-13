@@ -38,8 +38,8 @@
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', additional: false},
           { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: camperPlace?.index || undefined, readonly: (camperPlace?.index.length || 0) > 0, additional: false},
           { name: 'Gość', field: 'guest', type: 'text', select: true, selectList: this.guests$, additional: false, replacedByAdditional: true, autocomplete: true},
-          { name: 'Imię', field: 'firstName', type: 'text', additional: true },
-          { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true },
+          { name: 'Imię', field: 'firstname', type: 'text', additional: true },
+          { name: 'Nazwisko', field: 'lastname', type: 'text', additional: true },
           { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true },
           { name: 'Email', field: 'email', type: 'email', additional: true },
           { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true },
@@ -54,8 +54,8 @@
           const result = dialogRef.componentInstance.formValues;
           const guestToCreate: Guest = {
             id: '',
-            firstName: result['firstName']?.toString() ?? '',
-            lastName: result['lastName']?.toString() ?? '',
+            firstname: result['firstname']?.toString() ?? '',
+            lastname: result['lastname']?.toString() ?? '',
             carRegistration: result['carRegistration']?.toString() ?? '',
             email: result['email']?.toString() ?? '',
             phoneNumber: result['phoneNumber']?.toString() ?? '',
@@ -102,9 +102,9 @@
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
           { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlaceIndex},
           { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
-          { name: 'Gość', field: 'guest', type: 'select', defaultValue: reservationToUpdate.guest ? (reservationToUpdate.guest.firstName + " " + reservationToUpdate.guest.lastName) : '',  replacedByAdditional: true, readonly: true},
-          { name: 'Imię', field: 'firstName', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.firstName },
-          { name: 'Nazwisko', field: 'lastName', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.lastName },
+          { name: 'Gość', field: 'guest', type: 'select', defaultValue: reservationToUpdate.guest ? (reservationToUpdate.guest.firstname + " " + reservationToUpdate.guest.lastname) : '',  replacedByAdditional: true, readonly: true},
+          { name: 'Imię', field: 'firstname', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.firstname },
+          { name: 'Nazwisko', field: 'lastname', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.lastname },
           { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.carRegistration },
           { name: 'Email', field: 'email', type: 'email', additional: true, defaultValue: reservationToUpdate.guest?.email },
           { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.phoneNumber },
@@ -123,8 +123,8 @@
           reservationToUpdate.checkout = result['checkout']?.toString() ?? reservationToUpdate.checkout;
           reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
           reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
-          reservationToUpdate.guest!.firstName = result['firstName']?.toString() ?? reservationToUpdate.guest?.firstName;
-          reservationToUpdate.guest!.lastName = result['lastName']?.toString() ?? reservationToUpdate.guest?.lastName;
+          reservationToUpdate.guest!.firstname = result['firstname']?.toString() ?? reservationToUpdate.guest?.firstname;
+          reservationToUpdate.guest!.lastname = result['lastname']?.toString() ?? reservationToUpdate.guest?.lastname;
           reservationToUpdate.guest!.carRegistration = result['carRegistration']?.toString() ?? reservationToUpdate.guest?.carRegistration;
           reservationToUpdate.guest!.email = result['email']?.toString() ?? reservationToUpdate.guest?.email;
           reservationToUpdate.guest!.phoneNumber = result['phoneNumber']?.toString() ?? reservationToUpdate.guest?.phoneNumber;
@@ -141,8 +141,8 @@
       const formData: FormData = {
         header: 'Nowy gość',
         formInputs: [
-          { name: 'Imie', field: 'firstName', type: 'text'},
-          { name: 'Nazwisko', field: 'lastName', type: 'text'},
+          { name: 'Imie', field: 'firstname', type: 'text'},
+          { name: 'Nazwisko', field: 'lastname', type: 'text'},
           { name: 'Email', field: 'email', type: 'text'},
           { name: 'Numer telefonu', field: 'phoneNumber', type: 'text'},
           { name: 'Rejestracja', field: 'carRegistration', type: 'text'},
@@ -157,8 +157,8 @@
           const result = dialogRef.componentInstance.formValues;
           const userToCreate: Guest = {
             id: 0,
-            firstName: result['firstName']?.toString() ?? '',
-            lastName: result['lastName']?.toString() ?? '',
+            firstname: result['firstname']?.toString() ?? '',
+            lastname: result['lastname']?.toString() ?? '',
             carRegistration: result['carRegistration']?.toString() ?? '',
             email: result['email']?.toString() ?? '',
             phoneNumber: result['phoneNumber']?.toString() ?? '',
@@ -179,8 +179,8 @@
       }
       let userToUpdate: Guest = {
         id: guest.id,
-        firstName: guest.firstName,
-        lastName: guest.lastName,
+        firstname: guest.firstname,
+        lastname: guest.lastname,
         email: guest.email,
         phoneNumber: guest.phoneNumber,
         carRegistration: guest.carRegistration
@@ -190,8 +190,8 @@
         update: true,
         objectToUpdate: userToUpdate,
         formInputs: [
-          { name: 'Imie', field: 'firstName', type: 'text', defaultValue: guest.firstName},
-          { name: 'Nazwisko', field: 'lastName', type: 'text', defaultValue: guest.lastName},
+          { name: 'Imie', field: 'firstname', type: 'text', defaultValue: guest.firstname},
+          { name: 'Nazwisko', field: 'lastname', type: 'text', defaultValue: guest.lastname},
           { name: 'Email', field: 'email', type: 'text',defaultValue: guest.email},
           { name: 'Numer telefonu', field: 'phoneNumber', type: 'text', defaultValue: guest.phoneNumber},
           { name: 'Rejestracja', field: 'carRegistration', type: 'text', defaultValue: guest.carRegistration},
@@ -205,8 +205,8 @@
 
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
-          userToUpdate.firstName = result['firstName']?.toString() ?? userToUpdate.firstName;
-          userToUpdate.lastName = result['lastName']?.toString() ?? userToUpdate.lastName;
+          userToUpdate.firstname = result['firstname']?.toString() ?? userToUpdate.firstname;
+          userToUpdate.lastname = result['lastname']?.toString() ?? userToUpdate.lastname;
           userToUpdate.carRegistration = result['carRegistration']?.toString() ?? userToUpdate.carRegistration;
           userToUpdate.email = result['email']?.toString() ?? userToUpdate.email;
           userToUpdate.phoneNumber = result['phoneNumber']?.toString() ?? userToUpdate.phoneNumber;

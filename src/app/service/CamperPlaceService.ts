@@ -26,7 +26,7 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
   }
 
   getCamperPlacesForTable(): Observable<CamperPlaceForTable[]> {
-    return this.http.get<CamperPlaceForTable[]>(this.api + '/v2').pipe(
+    return this.http.get<CamperPlaceForTable[]>(this.api).pipe(
       tap(p => {
         this.camperPlaceForTableSubject.next(p)
       })

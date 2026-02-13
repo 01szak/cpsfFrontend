@@ -29,8 +29,8 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
     super(userService);
     this.formService = formService;
     this.columns = [
-      {type: 'text',field: 'firstName'},
-      {type: 'text',field: 'lastName'},
+      {type: 'text',field: 'firstname'},
+      {type: 'text',field: 'lastname'},
       {type: 'text',field: 'email'},
       {type: 'text',field: 'phoneNumber'},
       {type: 'text',field: 'carRegistration'},
@@ -40,6 +40,7 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
 
   ngOnInit() {
     super.fetchData(this.event, this.page, this. size);
+    this.pagedData.subscribe(d => {console.log(d)})
   }
 
   ngOnDestroy() {

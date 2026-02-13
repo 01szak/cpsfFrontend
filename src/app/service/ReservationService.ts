@@ -61,7 +61,7 @@ export class ReservationService extends BackendService<Reservation> {
       map(p => {
         const reservations = p.content
         reservations.forEach(r => {
-          r.stringUser = r.guest?.firstName + " " + r.guest?.lastName || '';
+          r.stringUser = r.guest ? (r.guest.firstname + " " + r.guest.lastname) : '';
         })
         return p;
       }),

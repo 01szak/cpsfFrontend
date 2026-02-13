@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, OnInit, inject, OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {CamperPlaceForTable} from '../../../Interface/CamperPlaceForTable';
@@ -29,7 +29,7 @@ import {FormButtonsComponent} from '../../form-buttons/form-buttons.component';
   styleUrl: './settings-page.component.css',
   standalone: true,
 })
-export class  SettingsPage implements OnInit {
+export class  SettingsPage implements OnInit, OnDestroy {
 
   protected readonly displayedColumns = ["index", "type", "price"];
   protected camperPlaces$!: Observable<CamperPlaceForTable[]>;
@@ -44,28 +44,32 @@ export class  SettingsPage implements OnInit {
 
   protected update = () => {
     const changedRows = this.getChangedRows()
-    this.camperPlaceService.update(changedRows).subscribe({
-      next: () => {this.loadBuildForm(); this.formChanged = false},
-      error: () => {this.reset()}
-    });
+    this.sub.add(
+      this.camperPlaceService.update(changedRows).subscribe({
+        next: () => {this.loadBuildForm(); this.formChanged = false},
+        error: () => {this.reset()}
+      })
+    );
   };
 
   protected get rows() {
     return this.camperPlaceForm.get('rows') as FormArray;
   }
 
-  private sub!: Subscription;
+  private sub = new Subscription();
   private formBuilder = inject(FormBuilder);
   private camperPlaceFormLastState:CamperPlaceForTable[] = [];
 
   constructor(private camperPlaceService: CamperPlaceService) {
-    this.camperPlaceForm.events.subscribe(e => {
-      if (e instanceof ValueChangeEvent) {
-        if (this.getChangedRows().length > 0) {
-          this.formChanged = true;
+    this.sub.add(
+      this.camperPlaceForm.events.subscribe(e => {
+        if (e instanceof ValueChangeEvent) {
+          if (this.getChangedRows().length > 0) {
+            this.formChanged = true;
+          }
         }
-      }
-    })
+      })
+    );
   }
 
   protected camperPlaceForm = this.formBuilder.group({
@@ -74,7 +78,7 @@ export class  SettingsPage implements OnInit {
 
   ngOnInit() {
     this.loadBuildForm();
-    this.camperPlaceService.getCamperPlaceTypes().subscribe();
+    this.sub.add(this.camperPlaceService.getCamperPlaceTypes().subscribe());
     this.camperPlaceTypes$ = this.camperPlaceService.camperPlaceType;
   }
 
