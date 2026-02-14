@@ -1,0 +1,67 @@
+.content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+tr {
+  color: white;
+}
+
+table{
+  table-layout: fixed;
+  background-color: inherit;
+  border: solid 1px white;
+  border-radius: 10px;
+}
+
+.panel {
+  width: 100%;
+  padding: 50px 0 50px 50px;
+  border-top: dotted 1px;
+  border-bottom: dotted 1px;
+}
+
+h1 {
+  margin-left: 50px;
+}
+.mat-mdc-table {
+  min-width: 500px;
+}
+
+td {
+  place-items: center!important;
+  padding-top: 15px;
+}
+
+:host ::ng-deep .mdc-text-field__input {
+  color: white !important;
+}
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  max-width: 80px;
+}
+:host ::ng-deep .select .mat-mdc-text-field-wrapper {
+  max-width: 150px;
+}
+
+mat-form-field {
+  vertical-align: center!important;
+  align-items: center!important;
+}
+
+.mat-mdc-select {
+  color: white;
+}
+
+.buttons {
+  width: 100% ;
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  justify-content: end;
+}
+
+

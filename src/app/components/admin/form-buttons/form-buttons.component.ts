@@ -1,13 +1,16 @@
-import {Component, Input} from '@angular/core';
-import {MatButton} from "@angular/material/button";
+import { Component, Input } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-form-buttons',
+  standalone: true,
   imports: [
-    MatButton
+    CommonModule,
+    MatButtonModule
   ],
   templateUrl: './form-buttons.component.html',
-  styleUrl: './form-buttons.component.css'
+  styleUrls: ['./form-buttons.component.css']
 })
 export class FormButtonsComponent {
   @Input() firstButtonText: string = 'Cofnij';

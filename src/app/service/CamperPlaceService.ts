@@ -1,21 +1,44 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, map, Observable, tap} from 'rxjs';
 import {CamperPlace} from '../components/Interface/CamperPlace';
-import {Reservation} from '../components/Interface/Reservation';
+import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
+import {CamperPlaceForTable} from '../components/Interface/CamperPlaceForTable';
+import {BackendService} from './BackendService';
 
 @Injectable({providedIn: "root"})
-export class CamperPlaceService {
-
-  api = '/api/camperPlaces'
+export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
 
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
-  public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
+  private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
+  private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
 
-  constructor(private http: HttpClient) {}
+  public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
+  public camperPlacesForTable$: Observable<CamperPlaceForTable[]> = this.camperPlaceForTableSubject.asObservable();
+  public camperPlaceType = this.camperPlaceTypeSubject.asObservable();
+
+  constructor(http: HttpClient) {
+    super('api/camperPlace', http, new BehaviorSubject<CamperPlaceForTable | null>(null));
+  }
 
   getCamperPlaces(): Observable<CamperPlace[]> {
     return this.http.get<CamperPlace[]>(this.api);
+  }
+
+  getCamperPlacesForTable(): Observable<CamperPlaceForTable[]> {
+    return this.http.get<CamperPlaceForTable[]>(this.api).pipe(
+      tap(p => {
+        this.camperPlaceForTableSubject.next(p)
+      })
+    );
+  }
+
+  getCamperPlaceTypes(): Observable<CamperPlaceType[]> {
+    return this.http.get<CamperPlaceType[]>(this.api + '/type').pipe(
+      tap(p => {
+        this.camperPlaceTypeSubject.next(p)
+      })
+    );
   }
 
   getCamperPlacesAsync() {

@@ -7,6 +7,7 @@ import {UserPage} from './components/admin/page/user-page/user-page';
 import {ReservationPage} from './components/admin/page/reservation-page/reservation-page';
 import {AdminPageComponent} from './components/admin/page/main-page/admin-page.component';
 import {CalendarPage} from './components/admin/page/calendar-page/calendar-page';
+import {SettingsPage} from './components/admin/page/settings-page/settings-page.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
       {
         path: 'users',
         component: UserPage
+      },
+      {
+        path: 'settings',
+        component: SettingsPage
       },
     ]
   },

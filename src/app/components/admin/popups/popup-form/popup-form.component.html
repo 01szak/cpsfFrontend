@@ -35,9 +35,9 @@
                                   #select
                                   (selectionChange)="onOptionSelected($event, formInput.field)">
                                   <mat-select-trigger></mat-select-trigger>
-                                  @for (user of userList; track user) {
-                                    <mat-option [value]="user">
-                                      {{user.name}}
+                                  @for (guest of guestList; track guest) {
+                                    <mat-option [value]="guest">
+                                      {{guest.name}}
                                     </mat-option>
                                   }
                                 </mat-select>

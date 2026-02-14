@@ -59,7 +59,6 @@ export class CalendarPage implements OnInit, OnDestroy{
       this.paidReservationsWithSets = data.paid;
       this.userPerReservation = data.users;
     });
-
   }
 
   ngOnDestroy(): void {

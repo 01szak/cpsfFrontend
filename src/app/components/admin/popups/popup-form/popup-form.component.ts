@@ -8,7 +8,7 @@ import {map, Observable} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {PopupConfirmationService} from '../../../../service/PopupConfirmationService';
 import {ReservationService} from '../../../../service/ReservationService';
-import {User} from '../../../Interface/User';
+import {Guest} from '../../../Interface/Guest';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -54,8 +54,7 @@ export class PopupFormComponent implements OnInit {
   deleteRes = (r: Reservation) => {
     this.reservationService.deleteReservation(r)
   }
-  deleteUser = (u: User) => this.userService.delete(u)
-  userList: { name: string, user: User }[] = [];
+  guestList: { name: string, guest: Guest }[] = [];
   additionalFieldsCheckbox: boolean = false;
   inputValue: string = '';
 
@@ -85,14 +84,14 @@ export class PopupFormComponent implements OnInit {
     })
       .pipe(
         map(e =>
-          e.content.map(u => ({
-            name: u.firstName + ' ' + u.lastName,
-            user: u
+          e.content.map(g => ({
+            name: g.firstname + ' ' + g.lastname,
+            guest: g
           }))
         )
       )
       .subscribe(list => {
-        this.userList = list;
+        this.guestList = list;
         if (list.length > 0) {
           setTimeout(() => this.select?.open());
         }
@@ -102,7 +101,7 @@ export class PopupFormComponent implements OnInit {
 
   onOptionSelected(event: MatSelectChange, formField: any) {
       this.inputValue = event.value.name;
-      this.formValues[formField] = event.value.user
+      this.formValues[formField] = event.value.guest
   }
 
   close() {
@@ -141,7 +140,7 @@ export class PopupFormComponent implements OnInit {
       message = 'Rezerwacja zostanie usunięta. Czy chcesz kontynuować?';
       deleteFunc = () => this.reservationService.deleteReservation(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
-    }else if ('firstName' in objectToUpdate) {
+    }else if ('firstname' in objectToUpdate) {
       message = 'Gość zostanie usunięty a z nim wszystkie jego rezerwacje (Może to wpłynąć na statystki, narazie nie zalecane!). Czy chcesz kontynuować?';
       deleteFunc = () => this.userService.delete(objectToUpdate).subscribe();
       this.popupConfirmationService.openConfirmationPopup(message, deleteFunc);
@@ -164,7 +163,7 @@ export interface FormInput {
   select?: boolean,
   selectList?: Observable<any[]>,
   checkbox?: boolean
-  defaultValue?: string | Date | number | User | boolean
+  defaultValue?: string | Date | number | Guest | boolean
   readonly?: boolean,
   additional?: boolean
   replacedByAdditional?: boolean

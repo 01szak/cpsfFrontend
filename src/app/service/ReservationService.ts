@@ -25,7 +25,7 @@ export class ReservationService extends BackendService<Reservation> {
     private camperPlaceService: CamperPlaceService,
   ) {
     super(
-      '/api/reservations',
+      '/api/reservation',
       http,
       new BehaviorSubject<ReservationData | null>(null)
     );
@@ -61,7 +61,7 @@ export class ReservationService extends BackendService<Reservation> {
       map(p => {
         const reservations = p.content
         reservations.forEach(r => {
-          r.stringUser = r.user?.firstName + " " + r.user?.lastName || '';
+          r.stringUser = r.guest ? (r.guest.firstname + " " + r.guest.lastname) : '';
         })
         return p;
       }),

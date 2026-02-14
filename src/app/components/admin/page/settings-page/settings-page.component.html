@@ -1,0 +1,64 @@
+<h1>Parcele</h1>
+
+<div class="panel">
+  @if (camperPlaces$ | async) {
+
+    <form [formGroup]="camperPlaceForm">
+
+      <table mat-table [dataSource]="rows.controls" formArrayName="rows">
+
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef> Indeks </th>
+          <td mat-cell *matCellDef="let row; let i = index"
+              [formGroupName]="i">
+            <mat-form-field appearance="outline" class="field">
+              <input matInput formControlName="index">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef> Rodzaj </th>
+          <td mat-cell *matCellDef="let row; let i = index"
+              [formGroupName]="i">
+            <mat-form-field appearance="outline" class="select field">
+              <mat-select formControlName="type">
+                @for (cpType of camperPlaceTypes$ | async; track cpType.name) {
+                  <mat-option value="{{cpType.name}}">{{cpType.name}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef> Cena </th>
+          <td mat-cell *matCellDef="let row; let i = index"
+              [formGroupName]="i">
+            <mat-form-field appearance="outline" class="field">
+              <input matInput type="number" formControlName="price">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      </table>
+
+    </form>
+  }
+</div>
+
+
+@if(formChanged) {
+  <div class="buttons">
+    <app-form-buttons
+      [firstButtonText]="'Reset'"
+      [secondButtonText]="'Zapisz'"
+      [firstAction]="reset"
+      [secondAction]="update">
+    </app-form-buttons>
+
+  </div>
+}
