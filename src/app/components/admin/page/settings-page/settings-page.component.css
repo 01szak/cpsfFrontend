@@ -30,27 +30,19 @@ h1 {
 .mat-mdc-table {
   min-width: 500px;
 }
-/* 1️⃣ Centrowanie */
-.formContainerWithInput {
-  display: flex;
-  justify-content: center;  /* poziome centrowanie */
-  margin-top: 20px;         /* opcjonalne */
-}
-
-/* 2️⃣ Maksymalna szerokość */
-.inputField {
-  max-width: 1px;
-  width: 100%; /* wypełnia kontener do 100px */
-}
 
 td {
-  place-ite: center!important;
+  place-items: center!important;
+  padding-top: 15px;
 }
 
 :host ::ng-deep .mdc-text-field__input {
   color: white !important;
 }
 :host ::ng-deep .mat-mdc-text-field-wrapper {
+  max-width: 80px;
+}
+:host ::ng-deep .select .mat-mdc-text-field-wrapper {
   max-width: 150px;
 }
 

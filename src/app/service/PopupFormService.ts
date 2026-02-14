@@ -52,14 +52,7 @@
       dialogRef.afterOpened().subscribe(() => {
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
-          const guestToCreate: Guest = {
-            id: '',
-            firstname: result['firstname']?.toString() ?? '',
-            lastname: result['lastname']?.toString() ?? '',
-            carRegistration: result['carRegistration']?.toString() ?? '',
-            email: result['email']?.toString() ?? '',
-            phoneNumber: result['phoneNumber']?.toString() ?? '',
-          }
+          const guestToCreate = this.getDefaultGuest(result);
           const reservationToCreate: Reservation = {
             paid: false,
             camperPlaceIndex: result['camperPlaceIndex'].toString() ?? '',
@@ -154,18 +147,11 @@
       dialogRef.afterOpened().subscribe(() => {
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
-          const userToCreate: Guest = {
-            id: 0,
-            firstname: result['firstname']?.toString() ?? '',
-            lastname: result['lastname']?.toString() ?? '',
-            carRegistration: result['carRegistration']?.toString() ?? '',
-            email: result['email']?.toString() ?? '',
-            phoneNumber: result['phoneNumber']?.toString() ?? '',
-          }
+          const guestToCreate: Guest = this.getDefaultGuest(result);
 
           this.popupConfirmationService.openConfirmationPopup(
             "Gość zostanie dodany. Czy chcesz kontynuować?",
-            () => this.userService.create(userToCreate).subscribe()
+            () => this.userService.create(guestToCreate).subscribe()
           );
         }
       })
@@ -218,4 +204,16 @@
        }
       );
     }
+
+    private getDefaultGuest(result: Record<string, any>): Guest {
+      return {
+        id: '',
+        firstname: result['firstname']?.toString() ?? '',
+        lastname: result['lastname']?.toString() ?? '',
+        carRegistration: result['carRegistration']?.toString() ?? '',
+        email: result['email']?.toString() ?? '',
+        phoneNumber: result['phoneNumber']?.toString() ?? '',
+      }
+    }
+
   }

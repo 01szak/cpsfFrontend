@@ -54,7 +54,6 @@ export class PopupFormComponent implements OnInit {
   deleteRes = (r: Reservation) => {
     this.reservationService.deleteReservation(r)
   }
-  deleteGuest = (g: Guest) => this.userService.delete(g)
   guestList: { name: string, guest: Guest }[] = [];
   additionalFieldsCheckbox: boolean = false;
   inputValue: string = '';
