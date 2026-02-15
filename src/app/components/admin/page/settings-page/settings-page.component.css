@@ -13,7 +13,6 @@ tr {
 table{
   table-layout: fixed;
   background-color: inherit;
-  border: solid 1px white;
   border-radius: 10px;
 }
 
@@ -47,8 +46,8 @@ td {
 }
 
 mat-form-field {
-  vertical-align: center!important;
-  align-items: center!important;
+  vertical-align: middle !important;
+  align-items: center !important;
 }
 
 .mat-mdc-select {
@@ -64,4 +63,20 @@ mat-form-field {
   justify-content: end;
 }
 
+.tableContainer {
+  max-height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 
+.header {
+  background-color: var(--background);
+}
+
+.cpForm {
+  width: inherit;
+  border: 1px solid white;
+  max-width: 500px;
+  border-radius: 10px;
+  padding: 5px;
+}
