@@ -1,16 +1,5 @@
 <div class="content">
-  <div  (mouseleave)="shouldClose($event)" class="toggleButton">
-    <a class="navbarButton"><i (mouseenter)="drawer.open()" (click)="keepOpen()" class="fa-solid fa-ellipsis"></i></a>
-  </div>
-  <mat-drawer-container [hasBackdrop]="false" class="background container">
-    <mat-drawer #drawer
-                mode="over"
-                position="start"
-                (mouseenter)="onDrawerEnter()"
-                (mouseleave)="onDrawerLeave()"
-                class="background">
       <div class="routers">
-
         <div class="routersButtons">
           <a class="navbarButton" routerLink="calendar"><i class="fa-solid fa-calendar-days"></i></a>
           <a class="navbarButton" routerLink="reservations"><i class="fa-solid fa-list"></i></a>
@@ -37,8 +26,5 @@
           <a class="navbarButton" routerLink="settings"><i class="fa-solid fa-gear"></i></a>
           <a class="navbarButton" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i></a>
         </div>
-
       </div>
-    </mat-drawer>
-  </mat-drawer-container>
 </div>

@@ -1,4 +1,5 @@
 .content {
+  width: 100%;
   display: flex;
   justify-content: space-evenly;
   height: 100%;
@@ -24,18 +25,17 @@ mat-drawer{
 }
 
 .routers {
-  display: flex;
-  flex-wrap: wrap;
-  background-color: inherit;
-  height: 100%;
-  align-content: center;
-  justify-content: space-between;
+  width: 100%;
+  display: grid;
+  align-items: center;
+  grid-template-columns: auto auto;
 }
 .functionalButtons {
-  justify-self: end !important;
+  justify-content: end !important;
+  justify-self: end;
 }
 .routersButtons {
-  justify-self: start !important;
+  justify-self: end;
 }
 .navbarButton {
   margin: 15px;
