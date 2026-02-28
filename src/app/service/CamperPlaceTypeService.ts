@@ -10,7 +10,7 @@ import {CamperPlace} from '../components/Interface/CamperPlace';
 export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {
 
   private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
-  public camperPlaceType = this.camperPlaceTypeSubject.asObservable();
+  public camperPlaceType$ = this.camperPlaceTypeSubject.asObservable();
 
   constructor(http: HttpClient) {
     super('api/camperPlaceType', http, new BehaviorSubject<CamperPlaceType | null>(null));

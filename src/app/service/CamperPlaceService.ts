@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {CamperPlace} from '../components/Interface/CamperPlace';
-import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 import {CamperPlaceForTable} from '../components/Interface/CamperPlaceForTable';
 import {BackendService} from './BackendService';
 

@@ -1,0 +1,57 @@
+
+tr {
+  color: white;
+}
+
+table {
+  table-layout: fixed;
+  background-color: inherit;
+  border-radius: 10px;
+}
+
+h1 {
+  margin-left: 50px;
+}
+
+td {
+  place-items: center!important;
+  padding-top: 15px;
+}
+
+:host ::ng-deep .mdc-text-field__input {
+  color: white !important;
+}
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  max-width: 80px;
+}
+:host ::ng-deep .select .mat-mdc-text-field-wrapper {
+  max-width: 150px;
+}
+
+mat-form-field {
+  vertical-align: middle !important;
+  align-items: center !important;
+}
+
+.mat-mdc-select {
+  color: white;
+}
+
+.buttons {
+  width: 100%;
+}
+
+.tableContainer {
+  height: 100%;
+  width: 100%;
+
+}
+
+.header {
+  /*background-color: var(--background);*/
+}
+
+.cpForm {
+  width: 100%;
+  border-radius: 10px;
+}
