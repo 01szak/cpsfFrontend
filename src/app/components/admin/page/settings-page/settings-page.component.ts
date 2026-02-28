@@ -1,6 +1,7 @@
-import {Component, OnInit, inject, OnDestroy} from '@angular/core';
+import {Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
+import {CamperPlaceTypeService} from '../../../../service/CamperPlaceTypeService';
 import {CamperPlaceForTable} from '../../../Interface/CamperPlaceForTable';
 import {CamperPlaceType} from '../../../Interface/CamperPlaceType';
 import {Observable, Subscription, tap, pipe} from 'rxjs';
@@ -60,7 +61,7 @@ export class  SettingsPage implements OnInit, OnDestroy {
   private formBuilder = inject(FormBuilder);
   private camperPlaceFormLastState:CamperPlaceForTable[] = [];
 
-  constructor(private camperPlaceService: CamperPlaceService) {
+  constructor(private camperPlaceService: CamperPlaceService, private camperPlaceTypeService: CamperPlaceTypeService) {
     this.sub.add(
       this.camperPlaceForm.events.subscribe(e => {
         if (e instanceof ValueChangeEvent) {
@@ -78,7 +79,7 @@ export class  SettingsPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadBuildForm();
-    this.sub.add(this.camperPlaceService.getCamperPlaceTypes().subscribe());
+    this.sub.add(this.camperPlaceTypeService.getCamperPlaceTypes().subscribe());
     this.camperPlaceTypes$ = this.camperPlaceService.camperPlaceType;
   }
 

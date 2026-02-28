@@ -1,3 +1,5 @@
 export interface CamperPlaceType {
-    name: string
+  id: number,
+  typeName: string,
+  price: number
 }

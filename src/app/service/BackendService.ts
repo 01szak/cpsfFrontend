@@ -69,13 +69,11 @@ export class BackendService<T extends BackendEntity> {
   }
 
   public update(t: T | T[]) {
-    let api = this.api;
     //
     // if (!Array.isArray(t)) {
     //   api += '/' + t.id;
     // }
-
-    return this.http.patch<{[k159ey: string]: string}>(api, t)
+    return this.http.patch<{[k159ey: string]: string}>(this.api, t)
       .pipe(
         tap({
             next: (response) => {

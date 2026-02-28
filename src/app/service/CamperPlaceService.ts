@@ -11,11 +11,9 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
 
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
   private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
-  private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
 
   public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
   public camperPlacesForTable$: Observable<CamperPlaceForTable[]> = this.camperPlaceForTableSubject.asObservable();
-  public camperPlaceType = this.camperPlaceTypeSubject.asObservable();
 
   constructor(http: HttpClient) {
     super('api/camperPlace', http, new BehaviorSubject<CamperPlaceForTable | null>(null));
@@ -29,14 +27,6 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
     return this.http.get<CamperPlaceForTable[]>(this.api).pipe(
       tap(p => {
         this.camperPlaceForTableSubject.next(p)
-      })
-    );
-  }
-
-  getCamperPlaceTypes(): Observable<CamperPlaceType[]> {
-    return this.http.get<CamperPlaceType[]>(this.api + '/type').pipe(
-      tap(p => {
-        this.camperPlaceTypeSubject.next(p)
       })
     );
   }
