@@ -13,6 +13,7 @@ import {MatSelectModule} from '@angular/material/select';
 import { ReactiveFormsModule} from '@angular/forms';
 import {CamperPlaceFormComponent} from './camper-place-form/camper-place-form.component';
 import {MatCard} from '@angular/material/card';
+import {CamperPlaceTypeFormComponent} from './camper-place-type-form/camper-place-type-form.component';
 
 @Component({
   selector: 'settings-page',
@@ -25,7 +26,8 @@ import {MatCard} from '@angular/material/card';
     MatSelectModule,
     MatFormFieldModule,
     CamperPlaceFormComponent,
-    MatCard
+    MatCard,
+    CamperPlaceTypeFormComponent
   ],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.css',
@@ -37,7 +39,6 @@ export class SettingsPage implements OnInit, OnDestroy {
   protected camperPlaceTypes$!: Observable<CamperPlaceType[]>;
 
   private sub = new Subscription();
-
 
   constructor(
     private camperPlaceService: CamperPlaceService,

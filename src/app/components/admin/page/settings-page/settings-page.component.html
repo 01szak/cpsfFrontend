@@ -1,5 +1,4 @@
 <main>
-
   <h1>Parcele</h1>
   <mat-card class="primary">
       <app-camper-place-form
@@ -8,7 +7,8 @@
       />
   </mat-card>
 
-
-
-
+  <mat-card class="primary">
+    <app-camper-place-type-form
+      [camperPlaceTypes]="camperPlaceTypes$ | async"/>
+  </mat-card>
 </main>

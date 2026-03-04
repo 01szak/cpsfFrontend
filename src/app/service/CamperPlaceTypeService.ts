@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {BackendService} from './BackendService';
-import {CamperPlaceForTable} from '../components/Interface/CamperPlaceForTable';
 import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
-import {CamperPlace} from '../components/Interface/CamperPlace';
 
 @Injectable({providedIn: "root"})
 export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {

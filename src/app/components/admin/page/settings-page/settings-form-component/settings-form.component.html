@@ -1,0 +1,54 @@
+<main>
+  @if (data) {
+    <form [formGroup]="form">
+      <div class="tableContainer">
+        @if (rows.controls) {
+          <table mat-table [dataSource]="rows.controls" formArrayName="rows">
+            @for (f of formDeclaration; track f.columnDef) {
+              @switch (f.rowType){
+                @case ('select') {
+                  <ng-container [matColumnDef]="f.columnDef">
+                    <th mat-header-cell *matHeaderCellDef> {{f.headerName}} </th>
+                    <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                      <mat-form-field appearance="outline" class="select field">
+                        <mat-select [formControlName]="f.columnDef" [compareWith]="f.compareFunc ?? defaultCompare">
+                          @for (sd of f.selectData; track sd) {
+                            <mat-option [value]="sd">{{sd}}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    </td>
+                  </ng-container>
+                }
+                @default {
+                  <ng-container [matColumnDef]="f.columnDef">
+                    <th mat-header-cell *matHeaderCellDef> {{f.headerName}} </th>
+                    <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                      <mat-form-field appearance="outline" class="field">
+                        <input matInput [type]="f.valueType" [formControlName]="f.columnDef">
+                      </mat-form-field>
+                    </td>
+                  </ng-container>
+                }
+              }
+            }
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="primary"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        }
+
+      </div>
+    </form>
+  }
+
+  @if(formChanged) {
+    <footer class="buttons">
+      <app-form-buttons
+        [firstButtonText]="'Reset'"
+        [secondButtonText]="'Zapisz'"
+        [firstAction]="reset"
+        [secondAction]="update">
+      </app-form-buttons>
+    </footer>
+  }
+</main>

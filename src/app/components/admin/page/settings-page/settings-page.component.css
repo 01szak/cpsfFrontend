@@ -1,8 +1,11 @@
 main {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   padding: 50px 0 50px 50px;
   border-top: dotted 1px;
   border-bottom: dotted 1px;
+  gap: 50px;
 }
 
 mat-card {
@@ -10,6 +13,4 @@ mat-card {
   height: 100%;
   max-width: 600px;
   max-height: 500px;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }

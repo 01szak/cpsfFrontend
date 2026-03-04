@@ -1,5 +1,5 @@
+<main>
   @if (camperPlaces) {
-
     <form [formGroup]="camperPlaceForm" class="cpForm">
       <div class="tableContainer">
         <table mat-table [dataSource]="rows.controls" formArrayName="rows">
@@ -44,14 +44,15 @@
         </table>
       </div>
     </form>
-    @if(formChanged) {
-      <footer class="buttons">
-        <app-form-buttons
-          [firstButtonText]="'Reset'"
-          [secondButtonText]="'Zapisz'"
-          [firstAction]="reset"
-          [secondAction]="update">
-        </app-form-buttons>
-      </footer>
-    }
   }
+  @if(formChanged) {
+    <footer class="buttons">
+      <app-form-buttons
+        [firstButtonText]="'Reset'"
+        [secondButtonText]="'Zapisz'"
+        [firstAction]="reset"
+        [secondAction]="update">
+      </app-form-buttons>
+    </footer>
+  }
+</main>

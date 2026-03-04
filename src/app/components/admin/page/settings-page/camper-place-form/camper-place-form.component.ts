@@ -36,16 +36,16 @@ import {FormButtonsComponent} from '../../../form-buttons/form-buttons.component
     MatRow,
     MatRowDef,
     FormButtonsComponent,
-    MatFooterRow
   ],
   templateUrl: './camper-place-form.component.html',
   styleUrl: './camper-place-form.component.css'
 })
-export class CamperPlaceFormComponent implements OnInit, OnDestroy{
+export class CamperPlaceFormComponent implements OnInit, OnDestroy {
 
   @Input() set camperPlaces(value: CamperPlaceForTable[] | null) {
     this._camperPlaces = value;
     if (this._camperPlaces) {
+      this.camperPlaceFormLastState = this._camperPlaces;
       this.buildForm();
     }
   }
@@ -65,30 +65,22 @@ export class CamperPlaceFormComponent implements OnInit, OnDestroy{
     return this._camperPlaceTypes;
   }
 
-  private _camperPlaces: CamperPlaceForTable[] | null = null;
-  private _camperPlaceTypes: CamperPlaceType[] | null = null;
   private sub = new Subscription();
   private formBuilder = inject(FormBuilder);
+  private _camperPlaces: CamperPlaceForTable[] | null = null;
+  private _camperPlaceTypes: CamperPlaceType[] | null = null;
+  private camperPlaceFormLastState:CamperPlaceForTable[] = [];
 
-  protected formChanged = false;
   protected readonly displayedColumns = ["index", "type", "price"];
   protected camperPlaceForm = this.formBuilder.group({
     rows: this.formBuilder.array([])
   });
 
-  private camperPlaceFormLastState:CamperPlaceForTable[] = [];
-
-  constructor(private camperPlaceService: CamperPlaceService) {
-    this.sub.add(
-      this.camperPlaceForm.events.subscribe(e => {
-        if (e instanceof ValueChangeEvent) {
-          if (this.getChangedRows().length > 0) {
-            this.formChanged = true;
-          }
-        }
-      })
-    );
+  get formChanged() {
+    return this.getChangedRows().length > 0;
   }
+
+  constructor(private camperPlaceService: CamperPlaceService) {}
 
   ngOnInit() {
     this.buildForm();
@@ -100,15 +92,22 @@ export class CamperPlaceFormComponent implements OnInit, OnDestroy{
 
   protected reset = () => {
     this.rows.controls.forEach((control, i) => {
-      control.reset({ ...this.camperPlaceFormLastState[i] });
+      control.reset({ ...this.camperPlaceFormLastState[i]});
     });
-    this.formChanged = false}
+  }
 
   protected update = () => {
-    const changedRows = this.getChangedRows()
+    const changedRows = this.getChangedRows();
     this.sub.add(
       this.camperPlaceService.update(changedRows).subscribe({
-        error: () => {this.reset()}
+        next: () => {
+          this.camperPlaceFormLastState = this.rows.value;
+          this.buildForm();
+
+          this.rows.controls.forEach(c => c.markAsPristine());
+          this.camperPlaceForm.markAsPristine();
+        },
+        error: () => {this.reset();}
       })
     );
   };
@@ -121,25 +120,27 @@ export class CamperPlaceFormComponent implements OnInit, OnDestroy{
 
   private buildForm() {
     const rows = this.camperPlaceForm.get('rows') as FormArray;
-    rows.clear();
 
-    if (this.camperPlaces) {
-      this.camperPlaces.forEach(c => {
-        rows.push(
+    if (this.rows.length <= 0) {
+      this.camperPlaceFormLastState.forEach(() => {
+        this.rows.push(
           this.formBuilder.group({
-            id: [c.id],
-            index: [c.index],
-            type: [c.type],
-            price: [c.price],
+            id: [],
+            index: [],
+            type: [],
+            price: [],
           })
         );
       });
     }
+    rows.patchValue(this.camperPlaceFormLastState);
+    console.log(rows.controls)
   }
 
   private getChangedRows(): CamperPlaceForTable[] {
     return this.rows.controls
-      .filter(row => row.dirty)
-      .map(row => row.value);
+      .filter(control => control.dirty)
+      .map(control => control.value);
   }
+
 }
