@@ -1,37 +1,30 @@
-import {Component, Input} from '@angular/core';
-import {CamperPlaceType} from '../../../../Interface/CamperPlaceType';
-import {
-  FormFieldDeclaration,
-  SettingsFormComponent
-} from '../settings-form-component/settings-form.component';
-import {CamperPlaceTypeService} from '../../../../../service/CamperPlaceTypeService';
+import { Component, Input } from '@angular/core';
+import { CamperPlaceType } from '../../../../Interface/CamperPlaceType';
+import { FormFieldDeclaration, SettingsFormComponent } from '../settings-form-component/settings-form.component';
+import { CamperPlaceTypeService } from '../../../../../service/CamperPlaceTypeService';
 
 @Component({
   selector: 'app-camper-place-type-form',
-  imports: [
-    SettingsFormComponent
-  ],
-  templateUrl: './camper-place-type-form.component.html',
-  styleUrl: './camper-place-type-form.component.css'
+  standalone: true,
+  imports: [SettingsFormComponent],
+  template: `
+    <app-settings-form-component
+      [displayedColumns]="dispColumns"
+      [formDeclaration]="formFieldsDeclaration"
+      [data]="camperPlaceTypes"
+      [service]="camperPlaceTypeService"
+    />
+  `,
+  styles: [``]
 })
-export class CamperPlaceTypeFormComponent
-  extends SettingsFormComponent<CamperPlaceType, CamperPlaceTypeService> {
+export class CamperPlaceTypeFormComponent {
+  @Input() camperPlaceTypes: CamperPlaceType[] | null = [];
 
   protected formFieldsDeclaration: FormFieldDeclaration[] = [
-    {columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
-    {columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
-  ]
-  protected dispColumns =  this.formFieldsDeclaration.map(f => f.columnDef);
+    { columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
+    { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
+  ];
+  protected dispColumns = this.formFieldsDeclaration.map((f) => f.columnDef);
 
-  constructor(protected camperPlaceTypeService: CamperPlaceTypeService) {
-    super();
-    super.service = camperPlaceTypeService;
-  }
-
-  @Input() set camperPlaceTypes(value: CamperPlaceType[] | null) {
-    if (value) {
-      super.data = value;
-    }
-  }
-
+  constructor(protected camperPlaceTypeService: CamperPlaceTypeService) {}
 }

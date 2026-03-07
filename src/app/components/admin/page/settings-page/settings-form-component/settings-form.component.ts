@@ -1,153 +1,153 @@
-import {Component, Inject, inject, Input, OnInit, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {BackendService} from '../../../../../service/BackendService';
-import {BackendEntity} from '../../../../Interface/BackendEntity';
-import {Subscription} from 'rxjs';
-import {FormButtonsComponent} from '../../../form-buttons/form-buttons.component';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow, MatRowDef, MatTable
-} from '@angular/material/table';
-import {MatFormField, MatInput} from '@angular/material/input';
-import {MatOption} from '@angular/material/core';
-import {MatSelect} from '@angular/material/select';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { BackendService } from '../../../../../service/BackendService';
+import { BackendEntity } from '../../../../Interface/BackendEntity';
+import { Subscription } from 'rxjs';
+import { FormButtonsComponent } from '../../../form-buttons/form-buttons.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { CommonModule } from '@angular/common';
+
+export type FormFieldDeclaration =
+  | {
+      columnDef: string;
+      headerName: string;
+      rowType: 'select';
+      selectData: any[] | null;
+      displayKey?: string;
+      compareFunc?: (a: any, b: any) => boolean;
+    }
+  | {
+      columnDef: string;
+      headerName: string;
+      rowType: 'input';
+      valueType: 'number' | 'text';
+    };
 
 @Component({
   selector: 'app-settings-form-component',
+  standalone: true,
   imports: [
-    FormButtonsComponent,
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
-    MatFormField,
-    MatHeaderCell,
-    MatHeaderRow,
-    MatHeaderRowDef,
-    MatInput,
-    MatOption,
-    MatRow,
-    MatRowDef,
-    MatSelect,
-    MatTable,
+    CommonModule,
     ReactiveFormsModule,
-    MatHeaderCellDef
+    MatTableModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    FormButtonsComponent
   ],
   templateUrl: './settings-form.component.html',
   styleUrl: './settings-form.component.css'
 })
-export class SettingsFormComponent<T extends BackendEntity, S extends BackendService<T>> {
-
-  @Input() displayedColumns!: string[];
-  @Input() formDeclaration!: FormFieldDeclaration[];
-
-  private formBuilder = inject(FormBuilder);
-  private sub = new Subscription();
-  private dataFromLastState: any[] = [];
-  private _data: any[] | null = [];
-  protected form = this.formBuilder.group({
-    rows: this.formBuilder.array([])
-  });
-
-  private _service!: BackendService<T>;
-
-  set service(service: BackendService<T>) {
-    this._service = service;
+export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy {
+  @Input() displayedColumns: string[] = [];
+  
+  private _formDeclaration: FormFieldDeclaration[] = [];
+  @Input() set formDeclaration(f: FormFieldDeclaration[]) {
+    this._formDeclaration = f;
+    if (this._data && this._data.length > 0) {
+      this.rebuildForm(this._data);
+    }
+  }
+  get formDeclaration() {
+    return this._formDeclaration;
   }
 
-  get formChanged() {
-    return this.getChangedRows().length > 0;
+  @Input() service!: BackendService<T>;
+
+  private _data: T[] | null = [];
+  private dataFromLastState: T[] = [];
+  private sub = new Subscription();
+  private fb = inject(FormBuilder);
+
+  @Input() set data(d: T[] | null) {
+    this._data = d;
+    if (d && d.length > 0) {
+      this.dataFromLastState = JSON.parse(JSON.stringify(d));
+      this.rebuildForm(d);
+    } else {
+      this.dataFromLastState = [];
+      this.rows.clear();
+    }
   }
 
   get data() {
     return this._data;
   }
 
-  set data(d: any[] | null) {
-    this._data = d;
+  protected form = this.fb.group({
+    rows: this.fb.array([])
+  });
 
-    if (!d) return;
+  get formChanged() {
+    return this.getChangedRows().length > 0;
+  }
 
-    this.dataFromLastState = d;
+  get rows() {
+    return this.form.get('rows') as FormArray;
+  }
 
-    this.rows.clear();
-
-    d.forEach(row => {
-      this.rows.push(this.createGroup(row));
-    });
-    this.rows.patchValue(d);
-    console.log(this.rows.controls)
-
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   protected reset = () => {
     this.rows.controls.forEach((control, i) => {
-      control.reset({ ...this.dataFromLastState[i]});
+      control.reset({ ...this.dataFromLastState[i] });
     });
-  }
+    this.form.markAsPristine();
+  };
 
   protected update = () => {
     const changedRows = this.getChangedRows();
-
-    this.sub.add(
-      this._service.update(changedRows).subscribe({
-        next: () => {
-          this.dataFromLastState = this.rows.value;
-
-          this.rows.controls.forEach(c => c.markAsPristine());
-          this.form.markAsPristine();
-        },
-        error: () => { this.reset(); }
-      })
-    );
+    if (this.service && changedRows.length > 0) {
+      this.sub.add(
+        this.service.update(changedRows).subscribe({
+          next: () => {
+            this.dataFromLastState = JSON.parse(JSON.stringify(this.rows.value));
+            this.rows.controls.forEach((c) => c.markAsPristine());
+            this.form.markAsPristine();
+          },
+          error: () => {
+            this.reset();
+          }
+        })
+      );
+    }
   };
-  protected get rows() {
-    return this.form.get('rows') as FormArray;
-  }
 
-  private createGroup(data: any): FormGroup {
-    const group: any = {};
-    Object.keys(data).forEach(key => {
-      if (key === 'id') return;
-      const value = data[key];
-      group[key] =
-        typeof value === 'object' && value !== null && !Array.isArray(value)
-          ? this.createGroup(value)
-          : new FormControl(value);
+  protected defaultCompare = (a: any, b: any) => (a && b ? a.id === b.id : a === b);
+
+  private rebuildForm(data: T[]) {
+    this.rows.clear();
+    data.forEach((item) => {
+      this.rows.push(this.createGroup(item));
     });
-    return this.formBuilder.group(group);
   }
 
-  private getChangedRows() {
+  private createGroup(item: any): FormGroup {
+    const group: any = {};
+    Object.keys(item).forEach((key) => {
+      const value = item[key];
+      const isSelect = this.formDeclaration.find((f) => f.columnDef === key && f.rowType === 'select');
+
+      if (!isSelect && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        group[key] = this.createGroup(value);
+      } else {
+        group[key] = new FormControl(value);
+      }
+    });
+    return this.fb.group(group);
+  }
+
+  private getChangedRows(): T[] {
     return this.rows.controls
-      .filter(control => control.dirty)
-      .map(control => control.value);
-  }
-
- protected defaultCompare = (a: any, b: any) => a === b;
-
-  log(val: any) {
-    console.log(val);
-    return ''; // nic nie renderuje w HTML
+      .filter((control) => control.dirty)
+      .map((control) => control.value);
   }
 }
-
-export type FormFieldDeclaration =
-|{
-    columnDef: string;
-    headerName: string;
-    rowType: 'select';
-    selectData: any[];
-    compareFunc?: (a:any, b:any) => boolean;
-}
-|{
-  columnDef: string;
-  headerName: string;
-  rowType: 'input';
-  valueType: 'number' | 'text';
-};
 
