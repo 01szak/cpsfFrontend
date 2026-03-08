@@ -19,6 +19,7 @@ table {
 td, th {
   padding: 1rem 1.5rem !important;
   text-align: left;
+  place-items: center;
   color: var(--text-primary);
 }
 

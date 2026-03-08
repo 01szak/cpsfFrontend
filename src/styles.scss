@@ -2,20 +2,26 @@
 
 /* --- Variables --- */
 :root {
-  /* Colors - Backgrounds */
+  /* Common Tokens */
+  --radius-md: 20px;
+  --radius-full: 9999px;
+  --radius-sm: 8px;
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Dark Theme (Default) */
   --bg-main: #000000;
   --bg-card: #0d0d0d;
   --bg-inner: #050505;
   --bg-overlay: #1a1a1a;
-
-  /* Colors - Brand & Accents */
   --primary: #8b5cf6;
   --text-primary: #ffffff;
   --text-secondary: #a3a3a3;
   --border-color: #262626;
+  --glass: rgba(0, 0, 0, 0.4);
 
-  /* Layout */
-  --radius-md: 20px;
+  /* Calendar theme */
+  --calendar-border: 1px solid rgba(255, 255, 255, 0.1);
+  --calendar-weekend: rgba(255, 255, 255, 0.03);
 
   /* Status Colors */
   --status-success: #059669;
@@ -30,6 +36,34 @@
   --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
   --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
+}
+
+/* Light Theme Overrides */
+.light-theme {
+  --bg-main: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-inner: #f9fafb;
+  --bg-overlay: #ffffff;
+  --primary: #7c3aed;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --border-color: #e5e7eb;
+  --glass: rgba(255, 255, 255, 0.6);
+
+  /* Calendar theme */
+  --calendar-border: 1px solid rgba(94, 94, 94, 0.1);
+  --calendar-weekend: rgba(0, 0, 0, 0.03);
+
+  /* Material Tokens for Light Theme */
+  --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, 0.12);
+  --mdc-outlined-text-field-input-text-color: #111827;
+  --mat-select-trigger-text-color: #111827;
+  --mat-sys-on-surface-variant: rgba(0, 0, 0, 0.6);
+
+  /* Scrollbar for Light Theme */
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+  }
 }
 
 /* --- Base Styles --- */
@@ -66,7 +100,7 @@ input, .mat-mdc-input-element {
 }
 
 .mat-mdc-select-value-text {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
   text-align: center !important;
   width: 100% !important;
 }
@@ -84,6 +118,7 @@ mat-card,
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
 }
 
 /* --- Tables & Containers --- */
@@ -97,7 +132,7 @@ mat-card,
 
 .mat-mdc-paginator-container {
   background-color: var(--bg-inner) !important;
-  color: #fff !important;
+  color: var(--text-primary) !important;
 }
 
 /* --- Form Fields Overrides --- */
@@ -107,11 +142,11 @@ mat-card,
 
 .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input,
 .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
-  color: #fff !important;
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-checkbox .mat-internal-form-field {
-  color: white !important;
+  color: var(--text-primary) !important;
 }
 
 /* --- Snackbar Custom Styles --- */
@@ -157,7 +192,7 @@ mat-card,
 }
 
 .mat-mdc-option {
-  color: #fff !important;
+  color: var(--text-primary) !important;
 
   &:hover:not(.mdc-list-item--disabled) {
     background-color: rgba(255, 255, 255, 0.05) !important;

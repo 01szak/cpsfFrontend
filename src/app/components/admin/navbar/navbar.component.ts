@@ -30,6 +30,19 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.service.getEmployee().subscribe();
+    this.applyPersistedTheme();
+  }
+
+  private applyPersistedTheme(): void {
+    const theme = sessionStorage.getItem('theme');
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    }
+  }
+
+  protected toggleTheme(): void {
+    const isLight = document.body.classList.toggle('light-theme');
+    sessionStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
 
   protected logout():void{

@@ -29,7 +29,7 @@ th {
   background: var(--bg-card) !important;
   text-align: center !important;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   padding: 1rem !important;
   border-bottom: 2px solid var(--border-color) !important;
 }

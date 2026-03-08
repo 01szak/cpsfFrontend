@@ -8,6 +8,7 @@ import {MatCard, MatCardContent} from '@angular/material/card';
 import {AuthenticatorRequest, LoginService} from '../../service/LoginService';
 import {CommonModule} from '@angular/common';
 import {Router, RouterLink, RouterModule} from '@angular/router';
+import {FormButtonsComponent} from '../admin/form-buttons/form-buttons.component';
 
 @Component({
   selector: 'app-login',
@@ -17,13 +18,11 @@ import {Router, RouterLink, RouterModule} from '@angular/router';
     MatInput,
     MatHint,
     MatLabel,
-    MatButton,
-    RouterLink,
     MatCard,
     MatCardContent,
     CommonModule,
-    MatAnchor,
-    RouterModule
+    RouterModule,
+    FormButtonsComponent
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -43,7 +42,6 @@ export class LoginComponent {
 
   onLoginTab(): void {
     this.active = 'login';
-
   }
 
   request: AuthenticatorRequest = {
@@ -52,7 +50,7 @@ export class LoginComponent {
   }
 
 
-  onSubmitLogin(): void {
+  login = () => {
     this.onSubmitLoginEvent.emit({"login": this.request.login, "password": this.request.password});
     this.loginService.login(this.request).subscribe({
       next: (req) => {
@@ -65,7 +63,6 @@ export class LoginComponent {
       }
     });
   }
-
 
   onRegisterTab(): void {
     this.active = 'register';
