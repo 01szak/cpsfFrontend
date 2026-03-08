@@ -1,28 +1,38 @@
 @use '@angular/material' as mat;
 
+/* --- Variables --- */
 :root {
+  /* Colors - Backgrounds */
   --bg-main: #000000;
   --bg-card: #0d0d0d;
-  --bg-inner: #050505; 
+  --bg-inner: #050505;
   --bg-overlay: #1a1a1a;
+
+  /* Colors - Brand & Accents */
   --primary: #8b5cf6;
   --text-primary: #ffffff;
   --text-secondary: #a3a3a3;
-  --border-color: #262626; 
+  --border-color: #262626;
+
+  /* Layout */
   --radius-md: 20px;
 
+  /* Status Colors */
   --status-success: #059669;
   --status-error: #dc2626;
+  --status-warning: #f59e0b;
 
-  /* MATERIAL 19 DESIGN TOKENS */
+  /* Angular Material 19 Design Tokens */
   --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.3);
   --mdc-outlined-text-field-focus-outline-color: var(--primary);
   --mdc-outlined-text-field-outline-width: 1px;
   --mdc-outlined-text-field-input-text-color: #ffffff;
-  
+  --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
+  --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
 }
 
+/* --- Base Styles --- */
 html, body {
   height: 100%;
   margin: 0;
@@ -32,83 +42,124 @@ html, body {
   overflow: hidden;
 }
 
-/* Centrowanie tekstu */
-input, .mat-mdc-input-element { text-align: center !important; }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+/* --- Global Input & Select Alignment --- */
+input, .mat-mdc-input-element {
+  text-align: center !important;
+}
+
 .mat-mdc-select-value {
   width: 100% !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
 }
-.mat-mdc-select-value-text { color: #ffffff !important; text-align: center !important; width: 100% !important; }
-.mat-mdc-select-trigger { display: flex !important; justify-content: center !important; width: 100% !important; }
 
-/* Stylizacja kart i dialogów */
-.primary, mat-card, .mat-mdc-dialog-container .mdc-dialog__surface {
+.mat-mdc-select-value-text {
+  color: #ffffff !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.mat-mdc-select-trigger {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* --- Cards & Dialogs --- */
+.primary,
+mat-card,
+.mat-mdc-dialog-container .mdc-dialog__surface {
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md) !important;
 }
 
-/* Stylizacja kontenerów tabel */
-.table-scroll, .tableContainer, .tableDiv {
+/* --- Tables & Containers --- */
+.table-scroll,
+.mat-mdc-table,
+.tableContainer .tableDiv {
   border: 1px solid var(--border-color) !important;
   background-color: var(--bg-inner) !important;
   border-radius: 12px !important;
 }
 
-/* --- OSTATECZNA NAPRAWA SNACKBARÓW (ELIMINACJA "PÓŁ I PÓŁ") --- */
-
-/* 1. Sukces */
-.successSnackBar .mdc-snackbar__surface {
-  background-color: var(--status-success) !important;
+.mat-mdc-paginator-container {
+  background-color: var(--bg-inner) !important;
+  color: #fff !important;
 }
 
-/* 2. Błąd */
-.errorSnackBar .mdc-snackbar__surface {
-  background-color: var(--status-error) !important;
+/* --- Form Fields Overrides --- */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: inherit !important;
 }
 
-/* 3. Ostrzeżenie */
-.warnSnackBar .mdc-snackbar__surface {
-  background-color: #f59e0b !important;
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input,
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+  color: #fff !important;
 }
 
-/* KLUCZ: Wymuszenie przezroczystości na wszystkich elementach wewnętrznych */
-.successSnackBar .mdc-snackbar__label,
-.successSnackBar .mdc-snackbar__actions,
-.successSnackBar .mat-mdc-snack-bar-label,
-.successSnackBar app-snack-bar,
-.errorSnackBar .mdc-snackbar__label,
-.errorSnackBar .mdc-snackbar__actions,
-.errorSnackBar .mat-mdc-snack-bar-label,
-.errorSnackBar app-snack-bar,
-.warnSnackBar .mdc-snackbar__label,
-.warnSnackBar .mdc-snackbar__actions,
-.warnSnackBar .mat-mdc-snack-bar-label,
-.warnSnackBar app-snack-bar {
-  background-color: transparent !important;
-  background: transparent !important;
-  color: inherit !important;
+.mat-mdc-checkbox .mat-internal-form-field {
+  color: white !important;
 }
 
-/* Wymuszenie pełnej szerokości etykiety, aby nie było luki "actions" */
+/* --- Snackbar Custom Styles --- */
+
+/* Snackbar Surface Backgrounds */
+.successSnackBar .mdc-snackbar__surface { background-color: var(--status-success) !important; }
+.errorSnackBar .mdc-snackbar__surface   { background-color: var(--status-error) !important; }
+.warnSnackBar .mdc-snackbar__surface    { background-color: var(--status-warning) !important; }
+
+/*
+   Ensure transparency for internal elements to avoid "split" background issues
+   (where half the snackbar is colored and half is black/different)
+*/
+.successSnackBar,
+.errorSnackBar,
+.warnSnackBar {
+  .mdc-snackbar__label,
+  .mdc-snackbar__actions,
+  .mat-mdc-snack-bar-label,
+  app-snack-bar {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+}
+
+/* Full width label to avoid action gaps */
 .mat-mdc-snack-bar-container .mdc-snackbar__label {
   flex-grow: 1 !important;
-  padding-right: 16px !important; /* Domyślny padding */
+  padding-right: 16px !important;
 }
 
-/* Ukrycie kontenera akcji jeśli jest pusty (często powoduje czarne luki) */
+/* Hide empty actions to prevent black gaps */
 .mat-mdc-snack-bar-container .mdc-snackbar__actions {
   display: none !important;
 }
 
-/* --- KONIEC NAPRAWY SNACKBARÓW --- */
+/* --- Overlays & Options (Selects & Menus) --- */
+.cdk-overlay-pane {
+  background-color: var(--bg-overlay) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+}
 
-/* Widoczność opcji w selectach */
-.cdk-overlay-pane { background-color: var(--bg-overlay) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; }
-.mat-mdc-option { color: #ffffff !important; }
-.mat-mdc-option:hover:not(.mdc-list-item--disabled) { background-color: rgba(255, 255, 255, 0.05) !important; }
+.mat-mdc-option {
+  color: #fff !important;
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+  &:hover:not(.mdc-list-item--disabled) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}

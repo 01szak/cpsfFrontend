@@ -1,6 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {MatDrawer, MatDrawerContainer, MatDrawerContent} from '@angular/material/sidenav';
 import {EmployeeService} from '../../../service/EmployeeService';
 import {Observable} from 'rxjs';
 import {Employee} from '../../Interface/Employee';
@@ -12,8 +11,6 @@ import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
   selector: 'app-navbar',
   imports: [
     RouterLink,
-    MatDrawerContainer,
-    MatDrawer,
     AsyncPipe,
     MatMenuTrigger,
     MatMenu,

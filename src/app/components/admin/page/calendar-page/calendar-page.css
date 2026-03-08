@@ -44,7 +44,7 @@ td {
 .cell {
   width: 50%;
   height: 100%;
-  min-height: 30px; // Zapewnia klikalność nawet przy pustych danych
+  min-height: 30px;
 }
 
 .days {
@@ -94,7 +94,7 @@ p {
 
 /* Kolory rezerwacji - Dark Theme */
 .reserved {
-  background-color: rgba(218, 215, 37, 0.4) !important; // Green
+  background-color: rgba(218, 194, 37, 0.78) !important; // Green
 }
 
 .weekend {
@@ -102,7 +102,7 @@ p {
 }
 
 .paid.reserved {
-background-color: rgba(139, 92, 246, 0.4) !important; // Violet
+background-color: rgba(92, 164, 246, 0.4) !important; // Violet
 }
 
 /* Fix dla klikalności i krawędzi */
