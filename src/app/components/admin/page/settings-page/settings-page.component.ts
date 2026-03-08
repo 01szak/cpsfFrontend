@@ -11,9 +11,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import { ReactiveFormsModule} from '@angular/forms';
-import {CamperPlaceFormComponent} from './camper-place-form/camper-place-form.component';
+import {CamperPlaceFormComponent} from './settings-form-component/form-component/camper-place-form.component';
 import {MatCard} from '@angular/material/card';
-import {CamperPlaceTypeFormComponent} from './camper-place-type-form/camper-place-type-form.component';
+import {CamperPlaceTypeFormComponent} from './settings-form-component/form-component/camper-place-type-form.component';
 
 @Component({
   selector: 'settings-page',

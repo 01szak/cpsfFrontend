@@ -2,15 +2,21 @@ main {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 50px 0 50px 50px;
-  border-top: dotted 1px;
-  border-bottom: dotted 1px;
-  gap: 50px;
+  padding: 0 2rem;
+  gap: 3rem;
+  background: transparent;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
 mat-card {
-  width: 100%;
-  height: 100%;
-  max-width: 600px;
-  max-height: 500px;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+  max-width: 800px;
 }

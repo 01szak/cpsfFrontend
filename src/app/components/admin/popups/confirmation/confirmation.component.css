@@ -1,6 +1,6 @@
 mat-card {
-  color: #000;
   padding: 10px;
+  color: var(--text-primary);
 }
 .buttons {
   width: 100%;

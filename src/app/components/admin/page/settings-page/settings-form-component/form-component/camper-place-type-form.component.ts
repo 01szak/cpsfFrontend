@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { CamperPlaceType } from '../../../../Interface/CamperPlaceType';
-import { FormFieldDeclaration, SettingsFormComponent } from '../settings-form-component/settings-form.component';
-import { CamperPlaceTypeService } from '../../../../../service/CamperPlaceTypeService';
+import { CamperPlaceType } from '../../../../../Interface/CamperPlaceType';
+import { FormFieldDeclaration, SettingsFormComponent } from '../settings-form.component';
+import { CamperPlaceTypeService } from '../../../../../../service/CamperPlaceTypeService';
 
 @Component({
   selector: 'app-camper-place-type-form',

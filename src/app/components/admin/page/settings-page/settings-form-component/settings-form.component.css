@@ -1,126 +1,72 @@
 main {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.5rem;
   width: 100%;
-  color: white !important; /* Globalny wymóg białego fontu */
 }
 
-/* Wymuszenie koloru dla tabeli i jej elementów */
-table, tr, th, td, .mat-mdc-header-cell, .mat-mdc-cell {
-  color: white !important;
-  opacity: 1 !important;
+.tableContainer {
+  width: 100%;
+  height: 320px;
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-inner);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
 }
 
 table {
   width: 100%;
-  background-color: inherit;
-  border-radius: 10px;
-}
-
-h1 {
-  margin-left: 50px;
-  color: white;
-}
-
-td {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  text-align: center;
+  border-collapse: collapse;
 }
 
 th {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-card) !important;
   text-align: center !important;
-  font-weight: bold;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 1rem !important;
+  border-bottom: 2px solid var(--border-color) !important;
 }
 
-/* --- KONTROLKI FORMULARZA --- */
+td {
+  padding: 0.5rem !important;
+  text-align: center;
+}
+
 .field {
-  max-width: 80px;
+  max-width: 120px;
   margin: 0 auto;
 }
 
 .select {
   min-width: 140px;
-  max-width: 180px;
 }
 
-/* GŁĘBOKIE WYMUSZENIE KOLORÓW DLA MATERIAL DESIGN */
 :host ::ng-deep {
-  /* Kolor tekstu w inputach */
-  .mdc-text-field__input, 
-  .mat-mdc-input-element {
-    color: white !important;
-    caret-color: white !important;
-    text-align: center;
-    -webkit-text-fill-color: white !important; /* Dla Chrome/Safari */
-  }
-
-  /* Kolor tekstu w selectach */
-  .mat-mdc-select-value,
-  .mat-mdc-select-value-text,
-  .mat-mdc-select-trigger {
-    color: white !important;
-    opacity: 1 !important;
-  }
-
-  /* Kolor strzałki i etykiet */
-  .mat-mdc-select-arrow svg {
-    fill: white !important;
-  }
-
-  .mat-mdc-form-field-label, 
-  .mat-mdc-floating-label {
-    color: white !important;
-  }
-
-  /* Wyłączenie efektu wyszarzenia dla nieaktywnych pól (jeśli występują) */
-  .mat-mdc-form-field:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
-    color: white !important;
-  }
-
+  .mat-mdc-form-field-subscript-wrapper { display: none; }
+  
   .mat-mdc-text-field-wrapper {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    height: 40px !important;
+    display: flex;
+    align-items: center;
+    background-color: transparent !important;
   }
-}
-
-mat-form-field {
-  margin-bottom: -1.25em;
 }
 
 .buttons {
-  flex-shrink: 0;
-  width: 100%;
-  padding-top: 15px;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .cpForm {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  max-height: 400px;
-  overflow: hidden;
 }
-
-.tableContainer {
-  flex: 1;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-}
-
-/* Scrollbar styling */
-.tableContainer::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.tableContainer::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.4);
-  border-radius: 10px;
-}
-

@@ -1,107 +1,114 @@
 @use '@angular/material' as mat;
 
 :root {
-  --bg-color-primary: #2C2142FF;
-  --bg-color-secondary: #FFFFFF;
-  --bg-color-tertiary: #3B82F6;
-  --bg-color-quaternary: #3e3559;
-  --bg-color-primary-hover: #50455e;
-  --bg-color-success: #4CAF50;
-  --bg-color-error: #f44336;
-  --bg-color-scrollbar: rgb(60, 59, 59);
-  --container-blury: rgba(255, 255, 255, 0.8);
-  --user-details-background: rgb(255, 255, 255);
-  --user-details-text: rgba(0, 0, 0, 0);
-  --background: rgb(30, 31, 34);
+  --bg-main: #000000;
+  --bg-card: #0d0d0d;
+  --bg-inner: #050505; 
+  --bg-overlay: #1a1a1a;
+  --primary: #8b5cf6;
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --border-color: #262626; 
+  --radius-md: 20px;
 
-  ::-webkit-scrollbar-thumb {
-    background-color: black;
-    width: 5px;
-    border-radius: 8px;
-    border: solid var(--bg-color-scrollbar);
-  }
+  --status-success: #059669;
+  --status-error: #dc2626;
 
-  ::-webkit-scrollbar {
-    background-color: unset;
-    width: 5px;
-  }
-
-  @include mat.paginator-overrides((
-    container-text-color: var(--bg-color-secondary),
-    container-background-color: var(--bg-color-primary),
-  ));
-  @include mat.select-overrides((
-    enabled-trigger-text-color: var(--bg-color-quaternary),
-  ));
-}
-  @include mat.menu-overrides((
-    container-color: var(--user-details-background),          // tło menu
-  ));
-.successSnackBar {
-  .mdc-snackbar__surface {
-    background-color: var(--bg-color-success) !important;
-    color: white !important;
-  }
+  /* MATERIAL 19 DESIGN TOKENS */
+  --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.3);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-outline-width: 1px;
+  --mdc-outlined-text-field-input-text-color: #ffffff;
+  
+  --mat-select-trigger-text-color: #ffffff;
 }
 
-.errorSnackBar {
-  .mdc-snackbar__surface {
-    background-color: var(--bg-color-error) !important; // czerwony
-    color: white !important;
-  }
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
 }
 
-.primary {
-  background-color: var(--bg-color-primary) !important;
-}
-.background {
-  background-color: var(--background) !important;
-}
-.secondary {
-  background-color: var(--bg-color-secondary) !important;
-}
-.tertiary {
-  background-color: var(--bg-color-tertiary) !important;
-}
-.quaternary {
-  background-color: var(--bg-color-quaternary) !important;
-}
-.blury {
-  background-color: var(--container-blury) !important;
-}
-.shadow {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-.table {
-
-}
-.searchDialog {
-  width: 220px !important;
-  max-width: 220px !important;
-  min-width: 0 !important;
-  max-height: 180px !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-.popupForm {
-  justify-content: space-between;
+/* Centrowanie tekstu */
+input, .mat-mdc-input-element { text-align: center !important; }
+.mat-mdc-select-value {
   width: 100% !important;
-  max-width: 600px !important;
-  height: 100% !important;
-  max-height: 800px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.mat-mdc-select-value-text { color: #ffffff !important; text-align: center !important; width: 100% !important; }
+.mat-mdc-select-trigger { display: flex !important; justify-content: center !important; width: 100% !important; }
+
+/* Stylizacja kart i dialogów */
+.primary, mat-card, .mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
 }
 
-.invisible-select .mat-mdc-select-value {
+/* Stylizacja kontenerów tabel */
+.table-scroll, .tableContainer, .tableDiv {
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-inner) !important;
+  border-radius: 12px !important;
+}
+
+/* --- OSTATECZNA NAPRAWA SNACKBARÓW (ELIMINACJA "PÓŁ I PÓŁ") --- */
+
+/* 1. Sukces */
+.successSnackBar .mdc-snackbar__surface {
+  background-color: var(--status-success) !important;
+}
+
+/* 2. Błąd */
+.errorSnackBar .mdc-snackbar__surface {
+  background-color: var(--status-error) !important;
+}
+
+/* 3. Ostrzeżenie */
+.warnSnackBar .mdc-snackbar__surface {
+  background-color: #f59e0b !important;
+}
+
+/* KLUCZ: Wymuszenie przezroczystości na wszystkich elementach wewnętrznych */
+.successSnackBar .mdc-snackbar__label,
+.successSnackBar .mdc-snackbar__actions,
+.successSnackBar .mat-mdc-snack-bar-label,
+.successSnackBar app-snack-bar,
+.errorSnackBar .mdc-snackbar__label,
+.errorSnackBar .mdc-snackbar__actions,
+.errorSnackBar .mat-mdc-snack-bar-label,
+.errorSnackBar app-snack-bar,
+.warnSnackBar .mdc-snackbar__label,
+.warnSnackBar .mdc-snackbar__actions,
+.warnSnackBar .mat-mdc-snack-bar-label,
+.warnSnackBar app-snack-bar {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Wymuszenie pełnej szerokości etykiety, aby nie było luki "actions" */
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  flex-grow: 1 !important;
+  padding-right: 16px !important; /* Domyślny padding */
+}
+
+/* Ukrycie kontenera akcji jeśli jest pusty (często powoduje czarne luki) */
+.mat-mdc-snack-bar-container .mdc-snackbar__actions {
   display: none !important;
 }
-html{
-  background-color: var(--background);
-  color: white;
-}
 
-html, body { height: 100vh; }
-body { margin: 0;
-  font-family: Biome Light, "Helvetica Neue", sans-serif
-}
+/* --- KONIEC NAPRAWY SNACKBARÓW --- */
 
+/* Widoczność opcji w selectach */
+.cdk-overlay-pane { background-color: var(--bg-overlay) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; }
+.mat-mdc-option { color: #ffffff !important; }
+.mat-mdc-option:hover:not(.mdc-list-item--disabled) { background-color: rgba(255, 255, 255, 0.05) !important; }
 
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }

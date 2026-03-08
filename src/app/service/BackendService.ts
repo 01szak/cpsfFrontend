@@ -8,6 +8,7 @@ import {inject} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
 import {BackendEntity} from '../components/Interface/BackendEntity';
+import {SnackBarComponent} from '../components/admin/popups/snack-bar/snack-bar.component';
 
 export class BackendService<T extends BackendEntity> {
 
@@ -25,7 +26,8 @@ export class BackendService<T extends BackendEntity> {
   public pageData$: Observable<Page<T>>;
 
   protected successSnackBar (response: {[key: string]: string } ) {
-    this.snackBar.open(response['success'], undefined, {
+    this.snackBar.openFromComponent(SnackBarComponent, {
+      data: response['success'],
       panelClass: 'successSnackBar',
       duration: 5000,
       horizontalPosition: 'start',
@@ -34,7 +36,8 @@ export class BackendService<T extends BackendEntity> {
   }
 
   protected errorSnackBar (error: any) {
-    this.snackBar.open(error.error || 'Coś poszło nie tak', undefined, {
+    this.snackBar.openFromComponent(SnackBarComponent, {
+      data: error.error || 'Coś poszło nie tak',
       panelClass: 'errorSnackBar',
       duration: 5000,
       horizontalPosition: 'start',
@@ -69,11 +72,7 @@ export class BackendService<T extends BackendEntity> {
   }
 
   public update(t: T | T[]) {
-    //
-    // if (!Array.isArray(t)) {
-    //   api += '/' + t.id;
-    // }
-    return this.http.patch<{[k159ey: string]: string}>(this.api, t)
+    return this.http.patch<{[key: string]: string}>(this.api, t)
       .pipe(
         tap({
             next: (response) => {

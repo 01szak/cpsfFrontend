@@ -1,8 +1,8 @@
 import { Component, Input, inject } from '@angular/core';
-import { CamperPlaceForTable } from '../../../../Interface/CamperPlaceForTable';
-import { CamperPlaceType } from '../../../../Interface/CamperPlaceType';
-import { CamperPlaceService } from '../../../../../service/CamperPlaceService';
-import { FormFieldDeclaration, SettingsFormComponent } from '../settings-form-component/settings-form.component';
+import { CamperPlaceForTable } from '../../../../../Interface/CamperPlaceForTable';
+import { CamperPlaceType } from '../../../../../Interface/CamperPlaceType';
+import { CamperPlaceService } from '../../../../../../service/CamperPlaceService';
+import { FormFieldDeclaration, SettingsFormComponent } from '../settings-form.component';
 
 @Component({
   selector: 'app-camper-place-form',
