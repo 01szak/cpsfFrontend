@@ -15,6 +15,9 @@ export class BackendService<T extends BackendEntity> {
   protected pageDataBs: BehaviorSubject<Page<T>>;
   private snackBar = inject(MatSnackBar);
 
+  protected refreshTrigger$ = new BehaviorSubject<void>(undefined);
+  public refreshed$ = this.refreshTrigger$.asObservable();
+
   protected api;
   protected formDialog = inject(MatDialog);
   protected event?: PageEvent;
@@ -24,6 +27,10 @@ export class BackendService<T extends BackendEntity> {
   protected filter?: Filter;
 
   public pageData$: Observable<Page<T>>;
+
+  public notifyChange() {
+    this.refreshTrigger$.next();
+  }
 
   protected successSnackBar (response: {[key: string]: string } ) {
     this.snackBar.openFromComponent(SnackBarComponent, {
@@ -62,6 +69,7 @@ export class BackendService<T extends BackendEntity> {
           next: (response) => {
             this.successSnackBar(response);
             this.formDialog.closeAll();
+            this.notifyChange();
             this.fetchAllData();
           },
           error: (error) => {
@@ -78,6 +86,7 @@ export class BackendService<T extends BackendEntity> {
             next: (response) => {
               this.successSnackBar(response);
               this.formDialog.closeAll();
+              this.notifyChange();
             },
             error: (error) => {
               this.errorSnackBar(error);
@@ -94,6 +103,7 @@ export class BackendService<T extends BackendEntity> {
             next: (response ) => {
               this.successSnackBar(response);
               this.formDialog.closeAll();
+              this.notifyChange();
             },
             error: (error) => {
               this.errorSnackBar(error);

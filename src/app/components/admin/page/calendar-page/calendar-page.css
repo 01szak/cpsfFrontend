@@ -94,7 +94,7 @@ p {
 
 /* Kolory rezerwacji - Dark Theme */
 .reserved {
-  background-color: rgba(218, 194, 37, 0.78) !important; // Green
+  background-color: rgba(218, 194, 37, 0.78) !important;
 }
 
 .weekend {
@@ -102,7 +102,7 @@ p {
 }
 
 .paid.reserved {
-background-color: rgba(92, 164, 246, 0.4) !important; // Violet
+background-color: rgba(92, 164, 246, 0.4) !important;
 }
 
 /* Fix dla klikalności i krawędzi */

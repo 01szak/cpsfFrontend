@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, shareReplay, switchMap, tap} from 'rxjs';
 import {BackendService} from './BackendService';
 import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 
@@ -8,7 +8,11 @@ import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {
 
   private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
-  public camperPlaceType$ = this.camperPlaceTypeSubject.asObservable();
+  
+  public camperPlaceType$ = this.refreshed$.pipe(
+    switchMap(() => this.getCamperPlaceTypes()),
+    shareReplay(1)
+  );
 
   constructor(http: HttpClient) {
     super('api/camperPlaceType', http, new BehaviorSubject<CamperPlaceType | null>(null));

@@ -39,7 +39,6 @@
         <tr mat-row
           (click)="onClickFunc(row)"
           [ngClass]="{
-          'quaternary':  i % 2 !== 0,
           'row': true
           }"
           *matRowDef="let row;let i = index; columns: columnFields">

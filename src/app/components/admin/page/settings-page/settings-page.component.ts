@@ -1,16 +1,7 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {CamperPlaceTypeService} from '../../../../service/CamperPlaceTypeService';
-import {CamperPlaceForTable} from '../../../Interface/CamperPlaceForTable';
-import {CamperPlaceType} from '../../../Interface/CamperPlaceType';
-import {forkJoin, Observable, Subscription} from 'rxjs';
-import { MatTableModule } from '@angular/material/table';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {FormsModule} from '@angular/forms';
-import {MatSelectModule} from '@angular/material/select';
-import { ReactiveFormsModule} from '@angular/forms';
 import {CamperPlaceFormComponent} from './settings-form-component/form-component/camper-place-form.component';
 import {MatCard} from '@angular/material/card';
 import {CamperPlaceTypeFormComponent} from './settings-form-component/form-component/camper-place-type-form.component';
@@ -19,12 +10,6 @@ import {CamperPlaceTypeFormComponent} from './settings-form-component/form-compo
   selector: 'settings-page',
   imports: [
     CommonModule,
-    MatTableModule,
-    FormsModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-    MatFormFieldModule,
     CamperPlaceFormComponent,
     MatCard,
     CamperPlaceTypeFormComponent
@@ -33,31 +18,14 @@ import {CamperPlaceTypeFormComponent} from './settings-form-component/form-compo
   styleUrl: './settings-page.component.css',
   standalone: true,
 })
-export class SettingsPage implements OnInit, OnDestroy {
+export class SettingsPage {
 
-  protected camperPlaces$!: Observable<CamperPlaceForTable[]>;
-  protected camperPlaceTypes$!: Observable<CamperPlaceType[]>;
-
-  private sub = new Subscription();
+  // Dane pobiorą się same, gdy tylko komponent się wyrenderuje
+  protected camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
+  protected camperPlaceTypes$ = this.camperPlaceTypeService.camperPlaceType$;
 
   constructor(
     private camperPlaceService: CamperPlaceService,
     private camperPlaceTypeService: CamperPlaceTypeService
   ) {}
-
-  ngOnInit() {
-    this.sub.add(
-      forkJoin({
-        places: this.camperPlaceService.getCamperPlacesForTable(),
-        types: this.camperPlaceTypeService.getCamperPlaceTypes()
-      }).subscribe(({ places, types }) => {
-        this.camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
-        this.camperPlaceTypes$ = this.camperPlaceTypeService.camperPlaceType$;
-      })
-    );
-  }
-
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
 }

@@ -2,7 +2,7 @@
   @if (data) {
     <form [formGroup]="form" class="cpForm">
       <div class="tableContainer">
-        <table mat-table [dataSource]="rows.controls" formArrayName="rows">
+        <table mat-table [dataSource]="dataSource" formArrayName="rows">
           @for (f of formDeclaration; track f.columnDef) {
             @switch (f.rowType){
               @case ('select') {

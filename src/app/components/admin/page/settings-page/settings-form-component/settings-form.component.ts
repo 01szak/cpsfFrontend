@@ -1,8 +1,8 @@
-import { Component, inject, Input, OnDestroy } from '@angular/core';
+import { Component, inject, Input, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BackendService } from '../../../../../service/BackendService';
 import { BackendEntity } from '../../../../Interface/BackendEntity';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { FormButtonsComponent } from '../../../form-buttons/form-buttons.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -63,6 +63,9 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   private dataFromLastState: T[] = [];
   private sub = new Subscription();
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+
+  protected dataSource: any[] = [];
 
   @Input() set data(d: T[] | null) {
     this._data = d;
@@ -72,6 +75,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     } else {
       this.dataFromLastState = [];
       this.rows.clear();
+      this.dataSource = [];
     }
   }
 
@@ -84,7 +88,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   });
 
   get formChanged() {
-    return this.getChangedRows().length > 0;
+    return this.rows.dirty || this.getChangedRows().length > 0;
   }
 
   get rows() {
@@ -99,24 +103,18 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     this.rows.controls.forEach((control, i) => {
       control.reset({ ...this.dataFromLastState[i] });
     });
+    this.rows.markAsPristine();
     this.form.markAsPristine();
   };
 
   protected update = () => {
     const changedRows = this.getChangedRows();
     if (this.service && changedRows.length > 0) {
-      this.sub.add(
-        this.service.update(changedRows).subscribe({
-          next: () => {
-            this.dataFromLastState = JSON.parse(JSON.stringify(this.rows.value));
-            this.rows.controls.forEach((c) => c.markAsPristine());
-            this.form.markAsPristine();
-          },
-          error: () => {
-            this.reset();
-          }
-        })
-      );
+      // Subskrypcja zostanie zamknięta automatycznie po jednym wyniku (take(1))
+      // Serwis zajmie się notifyChange(), co spowoduje przyjście nowych danych przez @Input data
+      this.service.update(changedRows).pipe(take(1)).subscribe({
+        error: () => this.reset()
+      });
     }
   };
 
@@ -127,6 +125,12 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     data.forEach((item) => {
       this.rows.push(this.createGroup(item));
     });
+    this.rows.markAsPristine();
+    this.form.markAsPristine();
+    
+    // Kluczowa zmiana: nowa referencja dla MatTable
+    this.dataSource = [...this.rows.controls];
+    this.cdr.detectChanges();
   }
 
   private createGroup(item: any): FormGroup {
@@ -150,4 +154,3 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
       .map((control) => control.value);
   }
 }
-

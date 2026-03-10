@@ -7,8 +7,7 @@ main {
 
 .tableContainer {
   width: 100%;
-  height: 320px;
-  max-height: 320px;
+  max-height: 500px;
   overflow-y: auto;
   overflow-x: hidden;
   border: 1px solid var(--border-color);
