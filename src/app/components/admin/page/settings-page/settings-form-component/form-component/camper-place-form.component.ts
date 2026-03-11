@@ -46,6 +46,12 @@ export class CamperPlaceFormComponent {
         rowType: 'select',
         selectData: this._camperPlaceTypes,
         displayKey: 'typeName',
+        onValueChange: (newType: CamperPlaceType, group) => {
+          if (newType && 'price' in newType) {
+            group.get('price')?.setValue(newType.price, { emitEvent: false });
+            group.markAsDirty();
+          }
+        }
       },
       { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
     ];

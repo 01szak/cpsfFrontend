@@ -54,7 +54,7 @@ th:hover {
 }
 
 .row:hover {
-  background: rgba(139, 92, 246, 0.05) !important; // Subtle violet highlight
+  background: rgba(139, 92, 246, 0.05) !important;
 }
 
 .tableFooter {

@@ -20,7 +20,6 @@ import {CamperPlaceTypeFormComponent} from './settings-form-component/form-compo
 })
 export class SettingsPage {
 
-  // Dane pobiorą się same, gdy tylko komponent się wyrenderuje
   protected camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
   protected camperPlaceTypes$ = this.camperPlaceTypeService.camperPlaceType$;
 

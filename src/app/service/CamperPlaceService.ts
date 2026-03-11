@@ -15,7 +15,7 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
   private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
 
   public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
-  
+
   // Reaktywny strumień: odświeża się, gdy zmieni się Parcela LUB Typ Parceli
   public camperPlacesForTable$ = merge(
     this.refreshed$,             // Zmiany w parcelach

@@ -19,12 +19,14 @@ export type FormFieldDeclaration =
       selectData: any[] | null;
       displayKey?: string;
       compareFunc?: (a: any, b: any) => boolean;
+      onValueChange?: (newValue: any, group: FormGroup) => void;
     }
   | {
       columnDef: string;
       headerName: string;
       rowType: 'input';
       valueType: 'number' | 'text';
+      onValueChange?: (newValue: any, group: FormGroup) => void;
     };
 
 @Component({
@@ -44,8 +46,9 @@ export type FormFieldDeclaration =
   styleUrl: './settings-form.component.css'
 })
 export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy {
+
   @Input() displayedColumns: string[] = [];
-  
+
   private _formDeclaration: FormFieldDeclaration[] = [];
   @Input() set formDeclaration(f: FormFieldDeclaration[]) {
     this._formDeclaration = f;
@@ -110,8 +113,6 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   protected update = () => {
     const changedRows = this.getChangedRows();
     if (this.service && changedRows.length > 0) {
-      // Subskrypcja zostanie zamknięta automatycznie po jednym wyniku (take(1))
-      // Serwis zajmie się notifyChange(), co spowoduje przyjście nowych danych przez @Input data
       this.service.update(changedRows).pipe(take(1)).subscribe({
         error: () => this.reset()
       });
@@ -121,30 +122,48 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   protected defaultCompare = (a: any, b: any) => (a && b ? a.id === b.id : a === b);
 
   private rebuildForm(data: T[]) {
+    this.sub.unsubscribe();
+    this.sub = new Subscription();
     this.rows.clear();
+
     data.forEach((item) => {
-      this.rows.push(this.createGroup(item));
+      const group = this.createGroup(item);
+
+      this.formDeclaration.forEach(field => {
+        if (field.onValueChange) {
+          const control = group.get(field.columnDef);
+          if (control) {
+            this.sub.add(
+              control.valueChanges.subscribe(val => {
+                field.onValueChange!(val, group);
+              })
+            );
+          }
+        }
+      });
+
+      this.rows.push(group);
     });
+
     this.rows.markAsPristine();
     this.form.markAsPristine();
-    
-    // Kluczowa zmiana: nowa referencja dla MatTable
+
     this.dataSource = [...this.rows.controls];
     this.cdr.detectChanges();
   }
 
   private createGroup(item: any): FormGroup {
     const group: any = {};
-    Object.keys(item).forEach((key) => {
-      const value = item[key];
-      const isSelect = this.formDeclaration.find((f) => f.columnDef === key && f.rowType === 'select');
+    if ('id' in item) {
+      group['id'] = new FormControl(item.id);
+    }
 
-      if (!isSelect && typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        group[key] = this.createGroup(value);
-      } else {
-        group[key] = new FormControl(value);
-      }
+    this.formDeclaration.forEach(field => {
+      const key = field.columnDef;
+      const value = item[key];
+      group[key] = new FormControl(value);
     });
+
     return this.fb.group(group);
   }
 
