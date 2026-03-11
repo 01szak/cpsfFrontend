@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, Input, OnDestroy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BackendService } from '../../../../../service/BackendService';
 import { BackendEntity } from '../../../../Interface/BackendEntity';
@@ -60,7 +60,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     return this._formDeclaration;
   }
 
-  @Input() service!: BackendService<T>;
+  @Output() saveRequest = new EventEmitter<T[]>();
 
   private _data: T[] | null = [];
   private dataFromLastState: T[] = [];
@@ -102,7 +102,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     this.sub.unsubscribe();
   }
 
-  protected reset = () => {
+  public reset = () => {
     this.rows.controls.forEach((control, i) => {
       control.reset({ ...this.dataFromLastState[i] });
     });
@@ -110,12 +110,10 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     this.form.markAsPristine();
   };
 
-  protected update = () => {
+  protected onSaveClick = () => {
     const changedRows = this.getChangedRows();
-    if (this.service && changedRows.length > 0) {
-      this.service.update(changedRows).pipe(take(1)).subscribe({
-        error: () => this.reset()
-      });
+    if (changedRows.length > 0) {
+      this.saveRequest.emit(changedRows);
     }
   };
 
