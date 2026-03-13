@@ -5,7 +5,13 @@
     <div class="searchDialogAction">
       <mat-form-field>
         <mat-label>{{ data.label }}</mat-label>
-        @if (data.type !== 'checkbox') {
+        @if (data.type === 'date') {
+          <input matInput
+                 [matDatepicker]="picker"
+                 [(ngModel)]="value">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        } @else if (data.type !== 'checkbox') {
           <input matInput
                   [type]=data.type
                   [(ngModel)]="value">

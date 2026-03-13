@@ -42,8 +42,8 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
     super.fetchData(this.event, this.page, this. size);
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
+  override ngOnDestroy() {
+    super.ngOnDestroy();
   }
 
   protected override openCreatePopup() {

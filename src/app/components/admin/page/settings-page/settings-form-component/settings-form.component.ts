@@ -1,8 +1,7 @@
 import { Component, inject, Input, OnDestroy, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { BackendService } from '../../../../../service/BackendService';
 import { BackendEntity } from '../../../../Interface/BackendEntity';
-import { Subscription, take } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { FormButtonsComponent } from '../../../form-buttons/form-buttons.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,6 +27,11 @@ export type FormFieldDeclaration =
       valueType: 'number' | 'text';
       onValueChange?: (newValue: any, group: FormGroup) => void;
     };
+
+export interface RowChange<T> {
+  original: T;
+  updated: T;
+}
 
 @Component({
   selector: 'app-settings-form-component',
@@ -60,7 +64,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     return this._formDeclaration;
   }
 
-  @Output() saveRequest = new EventEmitter<T[]>();
+  @Output() saveRequest = new EventEmitter<RowChange<T>[]>();
 
   private _data: T[] | null = [];
   private dataFromLastState: T[] = [];
@@ -91,7 +95,7 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   });
 
   get formChanged() {
-    return this.rows.dirty || this.getChangedRows().length > 0;
+    return this.rows.dirty || this.getChanges().length > 0;
   }
 
   get rows() {
@@ -111,9 +115,9 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
   };
 
   protected onSaveClick = () => {
-    const changedRows = this.getChangedRows();
-    if (changedRows.length > 0) {
-      this.saveRequest.emit(changedRows);
+    const changes = this.getChanges();
+    if (changes.length > 0) {
+      this.saveRequest.emit(changes);
     }
   };
 
@@ -163,6 +167,19 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
     });
 
     return this.fb.group(group);
+  }
+
+  private getChanges(): RowChange<T>[] {
+    const changes: RowChange<T>[] = [];
+    this.rows.controls.forEach((control, index) => {
+      if (control.dirty) {
+        changes.push({
+          original: this.dataFromLastState[index],
+          updated: control.value as T
+        });
+      }
+    });
+    return changes;
   }
 
   private getChangedRows(): T[] {

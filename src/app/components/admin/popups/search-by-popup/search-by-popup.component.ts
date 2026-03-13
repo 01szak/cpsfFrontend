@@ -4,12 +4,25 @@ import {
   MatDialogActions, MatDialogRef,
   MatDialogTitle
 } from '@angular/material/dialog';
-import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import {MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
 import {FormButtonsComponent} from '../../form-buttons/form-buttons.component';
-import {FormData} from '../popup-form/popup-form.component';
-import {ReservationService} from '../../../../service/ReservationService';
-import {UserService} from '../../../../service/UserService';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import moment from 'moment';
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'DD.MM.YY',
+  },
+  display: {
+    dateInput: 'DD.MM.YY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-search-by-popup',
@@ -20,7 +33,13 @@ import {UserService} from '../../../../service/UserService';
     MatLabel,
     MatFormField,
     FormsModule,
-    FormButtonsComponent
+    FormButtonsComponent,
+    MatDatepickerModule,
+    MatSuffix
+  ],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'pl-PL'},
+    provideMomentDateAdapter(MY_FORMATS),
   ],
   templateUrl: './search-by-popup.component.html',
   styleUrl: './search-by-popup.component.css'
@@ -34,20 +53,23 @@ export class SearchByPopupComponent {
   firstAction = () => this.close();
   secondAction = () => this.searchBy();
 
-  value: string = '';
+  value: any = '';
 
   close() {
     this.dialogRef.close();
   }
 
   searchBy() {
-    const service = this.data.service;
+    let searchValue = this.value;
+    
+    if (this.data.type === 'date' && moment.isMoment(this.value)) {
+      searchValue = this.value.format('YYYY-MM-DD');
+    }
+
     this.dialogRef.close({
       by: this.data.by,
-      value: this.value
+      value: searchValue
     });
-
-    // service.findAll(undefined, 0, 0, undefined, this.data.searchBy, this.value);
   }
 
 }

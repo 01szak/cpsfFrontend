@@ -5,10 +5,10 @@ import {Observable, Subscription} from 'rxjs';
 import {Page} from '../../Interface/Page';
 import {BackendEntity} from '../../Interface/BackendEntity';
 import {BackendService} from '../../../service/BackendService';
-import {Directive} from "@angular/core";
+import {Directive, OnDestroy} from "@angular/core";
 
 @Directive()
-export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>> {
+export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>> implements OnDestroy {
 
 
   protected pagedData!: Observable<Page<T>>;
@@ -29,6 +29,10 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
 
   constructor(protected backendService: S) {
     this.pagedData = this.backendService.pageData$;
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   protected fetchData(event?: PageEvent, page?: number, size?: number) {

@@ -41,6 +41,10 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
     );
   }
 
+  getCamperPlacesWithUniquePriceAndCamperTypeId(cptId: number): Observable<CamperPlaceForTable[]> {
+    return this.http.get<CamperPlaceForTable[]>(`${this.api}/${cptId}`);
+  }
+
   getCamperPlacesAsync() {
     this.http.get<CamperPlace[]>(this.api)
       .subscribe(cp => {

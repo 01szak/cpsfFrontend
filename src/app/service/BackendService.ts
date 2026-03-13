@@ -79,8 +79,16 @@ export class BackendService<T extends BackendEntity> {
       );
   }
 
-  public update(t: T | T[]) {
-    return this.http.patch<{[key: string]: string}>(this.api, t)
+  public update(t: T | T[], params?: any[]) {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      params.forEach(p => {
+        httpParams = httpParams.append('cpIdToOverride', p);
+      });
+    }
+
+    return this.http.patch<{[key: string]: string}>(this.api, t, { params: httpParams })
       .pipe(
         tap({
             next: (response) => {

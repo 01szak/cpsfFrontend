@@ -17,10 +17,12 @@ table {
 }
 
 td, th {
-  padding: 1rem 1.5rem !important;
+  padding: 0 1.5rem !important;
+  height: 50px;
   text-align: left;
-  place-items: center;
   color: var(--text-primary);
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 th {
@@ -57,7 +59,21 @@ th:hover {
   background: rgba(139, 92, 246, 0.05) !important;
 }
 
+/* Scrollbar specific to table body */
+.tableDiv {
+  height: 56vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
 .tableFooter {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,12 +116,6 @@ th:hover {
 
 .descArrow {
   transform: rotate(180deg);
-}
-
-/* Scrollbar specific to table body */
-.tableDiv {
-  max-height: 75vh;
-  overflow-y: auto;
 }
 
 /* Ensure sticky header works with rounded corners */

@@ -9,8 +9,7 @@ import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@
 import {PopupConfirmationService} from '../../../../service/PopupConfirmationService';
 import {ReservationService} from '../../../../service/ReservationService';
 import {Guest} from '../../../Interface/Guest';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
+import {MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
 import {FormButtonsComponent} from '../../form-buttons/form-buttons.component';
@@ -18,6 +17,22 @@ import {AsyncPipe} from '@angular/common';
 import {UserService} from '../../../../service/UserService';
 import { MatSelectModule } from '@angular/material/select';
 import {Reservation} from '../../../Interface/Reservation';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import moment from 'moment';
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'DD.MM.YY',
+  },
+  display: {
+    dateInput: 'DD.MM.YY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   imports: [
@@ -34,6 +49,12 @@ import {Reservation} from '../../../Interface/Reservation';
     AsyncPipe,
     MatSelect,
     MatSelectModule,
+    MatDatepickerModule,
+    MatSuffix
+  ],
+  providers: [
+    {provide: MAT_DATE_LOCALE, useValue: 'pl-PL'},
+    provideMomentDateAdapter(MY_FORMATS),
   ],
   selector: 'app-popup-form',
   standalone: true,
@@ -69,9 +90,14 @@ export class PopupFormComponent implements OnInit {
       const value = input.defaultValue;
       if (input.checkbox === true) {
         this.formValues[input.field] = !!value
+      } else if (input.type === 'date') {
+        if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
+          this.formValues[input.field] = moment(value);
+        } else {
+          this.formValues[input.field] = null;
+        }
       } else {
-        this.formValues[input.field] =
-          value instanceof Date ? value.toLocaleDateString('en-CA') : value?.toString() ?? '';
+        this.formValues[input.field] = value?.toString() ?? '';
       }
     }
   }
@@ -109,7 +135,14 @@ export class PopupFormComponent implements OnInit {
   }
 
   submit() {
-    this.popupFormRef.close(this.formValues);
+    const finalValues = { ...this.formValues };
+    // Convert moments back to strings for the backend
+    for (const input of this.formData.formInputs) {
+      if (input.type === 'date' && moment.isMoment(finalValues[input.field])) {
+        finalValues[input.field] = finalValues[input.field].format('YYYY-MM-DD');
+      }
+    }
+    this.popupFormRef.close(finalValues);
   }
 
   hasAdditional(formData: FormData) {

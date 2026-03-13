@@ -8,7 +8,7 @@ import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {
 
   private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
-  
+
   public camperPlaceType$ = this.refreshed$.pipe(
     switchMap(() => this.getCamperPlaceTypes()),
     shareReplay(1)
