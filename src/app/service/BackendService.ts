@@ -8,11 +8,15 @@ import {inject} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
 import {BackendEntity} from '../components/Interface/BackendEntity';
+import {SnackBarComponent} from '../components/admin/popups/snack-bar/snack-bar.component';
 
 export class BackendService<T extends BackendEntity> {
 
   protected pageDataBs: BehaviorSubject<Page<T>>;
   private snackBar = inject(MatSnackBar);
+
+  protected refreshTrigger$ = new BehaviorSubject<void>(undefined);
+  public refreshed$ = this.refreshTrigger$.asObservable();
 
   protected api;
   protected formDialog = inject(MatDialog);
@@ -24,8 +28,13 @@ export class BackendService<T extends BackendEntity> {
 
   public pageData$: Observable<Page<T>>;
 
+  public notifyChange() {
+    this.refreshTrigger$.next();
+  }
+
   protected successSnackBar (response: {[key: string]: string } ) {
-    this.snackBar.open(response['success'], undefined, {
+    this.snackBar.openFromComponent(SnackBarComponent, {
+      data: response['success'],
       panelClass: 'successSnackBar',
       duration: 5000,
       horizontalPosition: 'start',
@@ -34,7 +43,8 @@ export class BackendService<T extends BackendEntity> {
   }
 
   protected errorSnackBar (error: any) {
-    this.snackBar.open(error.error || 'Coś poszło nie tak', undefined, {
+    this.snackBar.openFromComponent(SnackBarComponent, {
+      data: error.error || 'Coś poszło nie tak',
       panelClass: 'errorSnackBar',
       duration: 5000,
       horizontalPosition: 'start',
@@ -59,6 +69,7 @@ export class BackendService<T extends BackendEntity> {
           next: (response) => {
             this.successSnackBar(response);
             this.formDialog.closeAll();
+            this.notifyChange();
             this.fetchAllData();
           },
           error: (error) => {
@@ -68,19 +79,22 @@ export class BackendService<T extends BackendEntity> {
       );
   }
 
-  public update(t: T | T[]) {
-    let api = this.api;
-    //
-    // if (!Array.isArray(t)) {
-    //   api += '/' + t.id;
-    // }
+  public update(t: T | T[], params?: any[]) {
+    let httpParams = new HttpParams();
 
-    return this.http.patch<{[k159ey: string]: string}>(api, t)
+    if (params) {
+      params.forEach(p => {
+        httpParams = httpParams.append('cpIdToOverride', p);
+      });
+    }
+
+    return this.http.patch<{[key: string]: string}>(this.api, t, { params: httpParams })
       .pipe(
         tap({
             next: (response) => {
               this.successSnackBar(response);
               this.formDialog.closeAll();
+              this.notifyChange();
             },
             error: (error) => {
               this.errorSnackBar(error);
@@ -97,6 +111,7 @@ export class BackendService<T extends BackendEntity> {
             next: (response ) => {
               this.successSnackBar(response);
               this.formDialog.closeAll();
+              this.notifyChange();
             },
             error: (error) => {
               this.errorSnackBar(error);

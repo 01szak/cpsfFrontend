@@ -1,7 +1,6 @@
 import {Routes} from '@angular/router';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
-import {GuestPageComponent} from './components/guest/guest-page/guest-page.component';
 import {StatisticsPage} from './components/admin/page/statistics-page/statistics-page';
 import {UserPage} from './components/admin/page/user-page/user-page';
 import {ReservationPage} from './components/admin/page/reservation-page/reservation-page';
@@ -48,10 +47,7 @@ export const routes: Routes = [
       },
     ]
   },
-  {
-    path: 'guest-page',
-    component: GuestPageComponent
-  }
+
 
 
 ]

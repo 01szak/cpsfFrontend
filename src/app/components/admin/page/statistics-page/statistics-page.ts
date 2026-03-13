@@ -6,6 +6,7 @@ import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {StatisticsService} from '../../../../service/StatisticsService';
 import {StatisticTableComponent} from './statistic-table/statistic-table.component';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
+import {forkJoin, take} from 'rxjs';
 
 @Component({
   selector: 'statistics',
@@ -49,19 +50,16 @@ export class StatisticsPage implements OnInit{
   }
 
   loadData() {
-    this.camperPlaceService.getCamperPlaces().subscribe(cps => {
-      this.camperPlaceIds = []
-      cps.forEach(c => this.camperPlaceIds.push(c.id))
+    this.camperPlaceService.getCamperPlaces().pipe(take(1)).subscribe(cps => {
+      this.camperPlaceIds = cps.map(c => c.id);
 
-      this.statisticsService.getRevenue(this.month, this.year).subscribe(s => {
-        this.revenue = [];
-        this.revenue = s;
-      })
-
-      this.statisticsService.getReservationCount(this.month, this.year).subscribe(s => {
-        this.reservationCount = [];
-        this.reservationCount = s;
-      })
-    })
+      forkJoin({
+        revenue: this.statisticsService.getRevenue(this.month, this.year).pipe(take(1)),
+        count: this.statisticsService.getReservationCount(this.month, this.year).pipe(take(1))
+      }).subscribe(({revenue, count}) => {
+        this.revenue = revenue;
+        this.reservationCount = count;
+      });
+    });
   }
 }

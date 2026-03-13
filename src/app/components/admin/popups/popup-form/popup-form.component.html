@@ -11,7 +11,17 @@
           @if (!formInput.checkbox) {
               @if (!additionalFieldsCheckbox && formInput.replacedByAdditional || !formInput.replacedByAdditional) {
                 <!--flag that checks whether the field is replaced by additional fields-->
-                  @if (!formInput.select) {
+                  @if (formInput.type === 'date') {
+                        <mat-form-field>
+                          <mat-label>{{ formInput.name }}</mat-label>
+                          <input matInput
+                                 [matDatepicker]="picker"
+                                 [(ngModel)]="formValues[formInput.field]"
+                                 [readonly]="formInput.readonly ?? false">
+                          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                          <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                  } @else if (!formInput.select) {
                         <!--normal inputs-->
                         <mat-form-field>
                           <mat-label>{{ formInput.name }}</mat-label>
@@ -20,7 +30,8 @@
                                  [(ngModel)]="formValues[formInput.field]"
                                  [readonly]="formInput.readonly ?? false">
                         </mat-form-field>
-                  } @else if (!formInput.readonly) {
+                  }
+ @else if (!formInput.readonly) {
                         <!--select forms-->
                         @if (formInput.autocomplete) {
                         <!--autocomplete form (currently only for users)  -->
@@ -88,13 +99,25 @@
         @for (additionalInput of formData.formInputs; track additionalInput) {
           @if (additionalInput.additional) {
             <!--additional inputs-->
-            <mat-form-field>
-              <mat-label>{{ additionalInput.name }}</mat-label>
-              <input matInput
-                     type="{{additionalInput.type}}"
-                     [(ngModel)]="formValues[additionalInput.field]"
-                     [readonly]="additionalInput.readonly ?? false">
-            </mat-form-field>
+            @if (additionalInput.type === 'date') {
+              <mat-form-field>
+                <mat-label>{{ additionalInput.name }}</mat-label>
+                <input matInput
+                       [matDatepicker]="addPicker"
+                       [(ngModel)]="formValues[additionalInput.field]"
+                       [readonly]="additionalInput.readonly ?? false">
+                <mat-datepicker-toggle matIconSuffix [for]="addPicker"></mat-datepicker-toggle>
+                <mat-datepicker #addPicker></mat-datepicker>
+              </mat-form-field>
+            } @else {
+              <mat-form-field>
+                <mat-label>{{ additionalInput.name }}</mat-label>
+                <input matInput
+                       type="{{additionalInput.type}}"
+                       [(ngModel)]="formValues[additionalInput.field]"
+                       [readonly]="additionalInput.readonly ?? false">
+              </mat-form-field>
+            }
           }
 
         }

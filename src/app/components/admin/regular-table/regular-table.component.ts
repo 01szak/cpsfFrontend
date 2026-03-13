@@ -127,13 +127,19 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
 
     const clickSub = fromEvent(document, 'click').subscribe((event: Event) => {
       const targetEl = event.target as HTMLElement;
-      if (!target.contains(targetEl) && !document.querySelector('.searchDialog')?.contains(targetEl)) {
+      
+      // Sprawdzamy czy kliknięcie było wewnątrz dialogu, przycisku otwierającego lub kalendarza
+      const isInsideDialog = !!targetEl.closest('.searchDialog');
+      const isInsideDatePicker = !!targetEl.closest('.mat-datepicker-content') || !!targetEl.closest('.mat-calendar');
+      const isInsideOrigin = target.contains(targetEl);
+
+      if (!isInsideOrigin && !isInsideDialog && !isInsideDatePicker) {
         dialogRef.close();
-        clickSub.unsubscribe();
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      clickSub.unsubscribe();
       if (result) {
         this.sendFilterInfo(result.by, result.value)
       }

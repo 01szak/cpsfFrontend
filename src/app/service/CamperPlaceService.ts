@@ -1,21 +1,29 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, merge, shareReplay, switchMap, tap} from 'rxjs';
 import {CamperPlace} from '../components/Interface/CamperPlace';
-import {CamperPlaceType} from '../components/Interface/CamperPlaceType';
 import {CamperPlaceForTable} from '../components/Interface/CamperPlaceForTable';
 import {BackendService} from './BackendService';
+import {CamperPlaceTypeService} from './CamperPlaceTypeService';
 
 @Injectable({providedIn: "root"})
 export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
 
+  private typeService = inject(CamperPlaceTypeService);
+
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
   private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
-  private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
 
   public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
-  public camperPlacesForTable$: Observable<CamperPlaceForTable[]> = this.camperPlaceForTableSubject.asObservable();
-  public camperPlaceType = this.camperPlaceTypeSubject.asObservable();
+
+  // Reaktywny strumień: odświeża się, gdy zmieni się Parcela LUB Typ Parceli
+  public camperPlacesForTable$ = merge(
+    this.refreshed$,             // Zmiany w parcelach
+    this.typeService.refreshed$  // Zmiany w typach (TUTAJ JEST MAGIA)
+  ).pipe(
+    switchMap(() => this.getCamperPlacesForTable()),
+    shareReplay(1)
+  );
 
   constructor(http: HttpClient) {
     super('api/camperPlace', http, new BehaviorSubject<CamperPlaceForTable | null>(null));
@@ -33,12 +41,8 @@ export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
     );
   }
 
-  getCamperPlaceTypes(): Observable<CamperPlaceType[]> {
-    return this.http.get<CamperPlaceType[]>(this.api + '/type').pipe(
-      tap(p => {
-        this.camperPlaceTypeSubject.next(p)
-      })
-    );
+  getCamperPlacesWithUniquePriceAndCamperTypeId(cptId: number): Observable<CamperPlaceForTable[]> {
+    return this.http.get<CamperPlaceForTable[]>(`${this.api}/${cptId}`);
   }
 
   getCamperPlacesAsync() {

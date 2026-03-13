@@ -7,13 +7,27 @@ export class PopupConfirmationService {
 
   readonly popupConfirmation: MatDialog = inject(MatDialog);
 
-  openConfirmationPopup(message: string, action: () => void) {
-    const confirmationData: ConfirmationData = {
-      message: message,
-      action: action,
+  /**
+   * Opens a confirmation popup.
+   * Can be used as simple (message, action) or with full configuration (ConfirmationData).
+   */
+  openConfirmationPopup(messageOrData: string | ConfirmationData, action?: () => void) {
+    let confirmationData: ConfirmationData;
+
+    if (typeof messageOrData === 'string') {
+      confirmationData = {
+        message: messageOrData,
+        action: action!
+      };
+    } else {
+      confirmationData = messageOrData;
     }
+
     this.popupConfirmation.open(PopupConfirmationComponent, {
       data: confirmationData,
-    })
+      width: 'auto',
+      maxWidth: '600px',
+      minWidth: '350px'
+    });
   }
 }

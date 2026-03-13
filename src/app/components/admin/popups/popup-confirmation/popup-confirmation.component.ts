@@ -1,23 +1,30 @@
-import {Component, inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef} from '@angular/material/dialog';
+import {Component, inject, Type} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {FormButtonsComponent} from '../../form-buttons/form-buttons.component';
+import {CommonModule} from '@angular/common';
 
 
 @Component({
   selector: 'app-popup-confirmation',
+  standalone: true,
   imports: [
+    CommonModule,
     MatDialogContent,
+    MatDialogTitle,
     FormButtonsComponent
   ],
   templateUrl: './popup-confirmation.component.html',
   styleUrl: './popup-confirmation.component.css'
 })
 export class PopupConfirmationComponent {
-  readonly popupConfirmationRef = inject(MatDialogRef<PopupConfirmationComponent,ConfirmationData>);
+  readonly popupConfirmationRef = inject(MatDialogRef<PopupConfirmationComponent, ConfirmationData>);
   readonly confirmationData = inject<ConfirmationData>(MAT_DIALOG_DATA);
 
   firstAction = () => this.close();
-  secondAction = () => {this.confirmationData.action(); this.firstAction()}
+  secondAction = () => {
+    this.confirmationData.action();
+    this.firstAction();
+  }
 
   close() {
     this.popupConfirmationRef.close();
@@ -25,6 +32,9 @@ export class PopupConfirmationComponent {
 }
 
 export interface ConfirmationData {
-  message: string,
+  title?: string;
+  message?: string;
+  component?: Type<any>;
+  componentData?: Record<string, any>;
   action: () => void;
 }

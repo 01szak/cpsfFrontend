@@ -1,6 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {MatDrawer, MatDrawerContainer, MatDrawerContent} from '@angular/material/sidenav';
 import {EmployeeService} from '../../../service/EmployeeService';
 import {Observable} from 'rxjs';
 import {Employee} from '../../Interface/Employee';
@@ -12,8 +11,6 @@ import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
   selector: 'app-navbar',
   imports: [
     RouterLink,
-    MatDrawerContainer,
-    MatDrawer,
     AsyncPipe,
     MatMenuTrigger,
     MatMenu,
@@ -33,6 +30,19 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.service.getEmployee().subscribe();
+    this.applyPersistedTheme();
+  }
+
+  private applyPersistedTheme(): void {
+    const theme = sessionStorage.getItem('theme');
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    }
+  }
+
+  protected toggleTheme(): void {
+    const isLight = document.body.classList.toggle('light-theme');
+    sessionStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
 
   protected logout():void{

@@ -10,6 +10,7 @@
   import {Reservation} from '../components/Interface/Reservation';
   import {PopupFormComponent, FormData} from '../components/admin/popups/popup-form/popup-form.component';
   import {CamperPlaceService} from './CamperPlaceService';
+  import moment from 'moment';
 
   @Injectable({providedIn: "root"})
   export class PopupFormService {
@@ -53,11 +54,15 @@
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
           const guestToCreate = this.getDefaultGuest(result);
+          
+          const checkin = moment(result['checkin']).isValid() ? moment(result['checkin']).format('YYYY-MM-DD') : result['checkin']?.toString() ?? '';
+          const checkout = moment(result['checkout']).isValid() ? moment(result['checkout']).format('YYYY-MM-DD') : result['checkout']?.toString() ?? '';
+
           const reservationToCreate: Reservation = {
             paid: false,
             camperPlaceIndex: result['camperPlaceIndex'].toString() ?? '',
-            checkin: result['checkin'].toString() ?? '',
-            checkout: result['checkout'].toString() ?? '',
+            checkin: checkin,
+            checkout: checkout,
             price: 0,
             guest: result['guest'] === undefined || result['guest'] === '' ? guestToCreate : result['guest']
           }
@@ -111,8 +116,12 @@
       dialogRef.afterOpened().subscribe(() => {
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
-          reservationToUpdate.checkin = result['checkin']?.toString() ?? reservationToUpdate.checkin;
-          reservationToUpdate.checkout = result['checkout']?.toString() ?? reservationToUpdate.checkout;
+
+          const checkin = moment(result['checkin']).isValid() ? moment(result['checkin']).format('YYYY-MM-DD') : result['checkin']?.toString() ?? reservationToUpdate.checkin;
+          const checkout = moment(result['checkout']).isValid() ? moment(result['checkout']).format('YYYY-MM-DD') : result['checkout']?.toString() ?? reservationToUpdate.checkout;
+
+          reservationToUpdate.checkin = checkin;
+          reservationToUpdate.checkout = checkout;
           reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
           reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
           reservationToUpdate.guest!.firstname = result['firstname']?.toString() ?? reservationToUpdate.guest?.firstname;

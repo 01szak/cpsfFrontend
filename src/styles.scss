@@ -1,107 +1,214 @@
 @use '@angular/material' as mat;
 
+/* --- Variables --- */
 :root {
-  --bg-color-primary: #2C2142FF;
-  --bg-color-secondary: #FFFFFF;
-  --bg-color-tertiary: #3B82F6;
-  --bg-color-quaternary: #3e3559;
-  --bg-color-primary-hover: #50455e;
-  --bg-color-success: #4CAF50;
-  --bg-color-error: #f44336;
-  --bg-color-scrollbar: rgb(60, 59, 59);
-  --container-blury: rgba(255, 255, 255, 0.8);
-  --user-details-background: rgb(255, 255, 255);
-  --user-details-text: rgba(0, 0, 0, 0);
-  --background: rgb(30, 31, 34);
+  /* Common Tokens */
+  --radius-md: 20px;
+  --radius-full: 9999px;
+  --radius-sm: 8px;
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
+  /* Dark Theme (Default) */
+  --bg-main: #000000;
+  --bg-card: #0d0d0d;
+  --bg-inner: #050505;
+  --bg-overlay: #1a1a1a;
+  --primary: #8b5cf6;
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --border-color: #262626;
+  --glass: rgba(0, 0, 0, 0.4);
+
+  /* Calendar theme */
+  --calendar-border: 1px solid rgba(255, 255, 255, 0.1);
+  --calendar-weekend: rgba(255, 255, 255, 0.03);
+
+  /* Status Colors */
+  --status-success: #059669;
+  --status-error: #dc2626;
+  --status-warning: #f59e0b;
+
+  /* Angular Material 19 Design Tokens */
+  --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.3);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-outline-width: 1px;
+  --mdc-outlined-text-field-input-text-color: #ffffff;
+  --mat-sys-primary: var(--primary);
+  --mat-select-trigger-text-color: #ffffff;
+  --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
+}
+
+/* Light Theme Overrides */
+.light-theme {
+  --bg-main: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-inner: #f9fafb;
+  --bg-overlay: #ffffff;
+  --primary: #7c3aed;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --border-color: #e5e7eb;
+  --glass: rgba(255, 255, 255, 0.6);
+
+  /* Calendar theme */
+  --calendar-border: 1px solid rgba(94, 94, 94, 0.1);
+  --calendar-weekend: rgba(0, 0, 0, 0.03);
+
+  /* Material Tokens for Light Theme */
+  --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, 0.12);
+  --mdc-outlined-text-field-input-text-color: #111827;
+  --mat-select-trigger-text-color: #111827;
+  --mat-sys-on-surface-variant: rgba(0, 0, 0, 0.6);
+
+  /* Scrollbar for Light Theme */
   ::-webkit-scrollbar-thumb {
-    background-color: black;
-    width: 5px;
-    border-radius: 8px;
-    border: solid var(--bg-color-scrollbar);
-  }
-
-  ::-webkit-scrollbar {
-    background-color: unset;
-    width: 5px;
-  }
-
-  @include mat.paginator-overrides((
-    container-text-color: var(--bg-color-secondary),
-    container-background-color: var(--bg-color-primary),
-  ));
-  @include mat.select-overrides((
-    enabled-trigger-text-color: var(--bg-color-quaternary),
-  ));
-}
-  @include mat.menu-overrides((
-    container-color: var(--user-details-background),          // tło menu
-  ));
-.successSnackBar {
-  .mdc-snackbar__surface {
-    background-color: var(--bg-color-success) !important;
-    color: white !important;
+    background: #d1d5db;
   }
 }
 
-.errorSnackBar {
-  .mdc-snackbar__surface {
-    background-color: var(--bg-color-error) !important; // czerwony
-    color: white !important;
-  }
+/* --- Base Styles --- */
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
 }
 
-.primary {
-  background-color: var(--bg-color-primary) !important;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-.background {
-  background-color: var(--background) !important;
-}
-.secondary {
-  background-color: var(--bg-color-secondary) !important;
-}
-.tertiary {
-  background-color: var(--bg-color-tertiary) !important;
-}
-.quaternary {
-  background-color: var(--bg-color-quaternary) !important;
-}
-.blury {
-  background-color: var(--container-blury) !important;
-}
-.shadow {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-.table {
 
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
 }
-.searchDialog {
-  width: 220px !important;
-  max-width: 220px !important;
-  min-width: 0 !important;
-  max-height: 180px !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
+
+/* --- Global Input & Select Alignment --- */
+input, .mat-mdc-input-element {
+  text-align: center !important;
 }
-.popupForm {
-  justify-content: space-between;
+
+.mat-mdc-select-value {
   width: 100% !important;
-  max-width: 600px !important;
-  height: 100% !important;
-  max-height: 800px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
-.invisible-select .mat-mdc-select-value {
+.mat-mdc-select-value-text {
+  color: var(--text-primary) !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.mat-mdc-select-trigger {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* --- Cards & Dialogs --- */
+.primary,
+mat-card,
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Tables & Containers --- */
+.table-scroll,
+.mat-mdc-table,
+.tableContainer .tableDiv {
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-inner) !important;
+  border-radius: 12px !important;
+}
+
+.mat-mdc-paginator-container {
+  background-color: var(--bg-inner) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Form Fields Overrides --- */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: inherit !important;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input,
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-checkbox .mat-internal-form-field {
+  color: var(--text-primary) !important;
+}
+
+/* --- Snackbar Custom Styles --- */
+
+/* Snackbar Surface Backgrounds */
+.successSnackBar .mdc-snackbar__surface { background-color: var(--status-success) !important; }
+.errorSnackBar .mdc-snackbar__surface   { background-color: var(--status-error) !important; }
+.warnSnackBar .mdc-snackbar__surface    { background-color: var(--status-warning) !important; }
+
+/*
+   Ensure transparency for internal elements to avoid "split" background issues
+   (where half the snackbar is colored and half is black/different)
+*/
+.successSnackBar,
+.errorSnackBar,
+.warnSnackBar {
+  .mdc-snackbar__label,
+  .mdc-snackbar__actions,
+  .mat-mdc-snack-bar-label,
+  app-snack-bar {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+}
+
+/* Full width label to avoid action gaps */
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  flex-grow: 1 !important;
+  padding-right: 16px !important;
+}
+
+/* Hide empty actions to prevent black gaps */
+.mat-mdc-snack-bar-container .mdc-snackbar__actions {
   display: none !important;
 }
-html{
-  background-color: var(--background);
-  color: white;
+
+/* --- Overlays & Options (Selects & Menus) --- */
+.cdk-overlay-pane {
+  background-color: var(--bg-overlay) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
 }
 
-html, body { height: 100vh; }
-body { margin: 0;
-  font-family: Biome Light, "Helvetica Neue", sans-serif
+.mat-mdc-option {
+  color: black !important;
+
+  &:hover:not(.mdc-list-item--disabled) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
 }
 
-
+/* --- Mat-Datepicker Global Font Color --- */
+.mat-datepicker-content,
+.mat-calendar,
+.mat-calendar-header,
+.mat-calendar-body-cell-content,
+.mat-calendar-table-header,
+.mat-calendar-table-header th,
+.mat-calendar-period-button,
+.mat-calendar-next-button,
+.mat-calendar-previous-button {
+  color: black !important;
+}

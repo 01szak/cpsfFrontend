@@ -12,18 +12,23 @@
 }
 p {
   display: flex;
-  align-items: flex-start; /* wyrównanie do góry */
-  justify-content: center; /* tekst na środku w poziomie */
+  align-items: flex-start;
+  justify-content: center;
   font-size: large !important;
   width: 100%;
   padding: 0 10px 0 10px;
   text-align: center;
   height: 40px;
 }
+
 mat-dialog-actions {
   padding: 5px 20px;
 }
 app-form-buttons {
   flex-shrink: 0;
   width: 100%;
+}
+
+.mat-mdc-dialog-title {
+  color: var(--text-primary) !important;
 }

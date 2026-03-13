@@ -1,7 +1,3 @@
 :host {
-  background: transparent !important;
-  display: block;
-  padding: 0;
-  margin: 0;
-  color: inherit;
+  display: contents; /* Eliminuje "jeden div za dużo" z układu */
 }

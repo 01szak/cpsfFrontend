@@ -54,8 +54,8 @@ export class ReservationPage extends BaseTablePage<Reservation, ReservationServi
     super.fetchData(this.event, this.page, this. size);
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
+  override ngOnDestroy() {
+    super.ngOnDestroy();
   }
 
   protected override openCreatePopup() {

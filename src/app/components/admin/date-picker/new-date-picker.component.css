@@ -12,8 +12,9 @@
   background-color: inherit;
   max-height: 30px;
   align-self: center;
-  color: white;
+  color: var(--text-primary);
 }
+
 .arrow:hover {
   cursor: pointer;
 }
