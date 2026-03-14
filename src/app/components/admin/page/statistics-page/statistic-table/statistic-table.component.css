@@ -1,16 +1,88 @@
-th, td, tr {
+:host {
+  display: block;
+  width: 100%;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 10px 10px;
+}
+
+h3 {
+  margin: 0;
   color: var(--text-primary);
+}
+
+.change-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+.change-button:hover {
+  opacity: 0.8;
+}
+
+.container-card {
+  height: 600px; /* Same height for both table and graph */
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.content-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .table {
   overflow-y: auto;
-  height: 600px;
+  flex: 1;
 }
+
+.graph-wrapper {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.1);
+  padding: 5px; /* Added padding as requested */
+}
+
+/* Fix for GraphComponent inside the card */
+.graph-wrapper ::ng-deep mat-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+th, td, tr {
+  color: var(--text-primary);
+}
+
 .header {
   position: sticky;
-  top: 0
+  top: 0;
+  z-index: 10;
+  background: var(--bg-card) !important;
 }
+
 .footer {
   position: sticky;
   bottom: 0;
+  z-index: 10;
+  background: var(--bg-card) !important;
 }

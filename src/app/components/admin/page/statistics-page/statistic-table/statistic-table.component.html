@@ -1,32 +1,47 @@
-<h3>{{title}}</h3>
-<mat-card>
-  <div class="table primary">
-    <table mat-table [dataSource]="displayData || []">
+<link rel="stylesheet" href="../../../popups/search-by-popup/search-by-popup.component.css">
+<div class="table-header">
+  <h3>{{title}}</h3>
+    <i (click)="toggleView()" class="change-button" [ngClass]="showGraph ? 'fa-solid fa-table' : 'fa-solid fa-chart-column'"></i>
+</div>
 
-      <ng-container matColumnDef="camperPlaceNumber">
-        <th mat-header-cell *matHeaderCellDef> Nr. parceli</th>
-        <td mat-cell *matCellDef="let displayData"> {{ displayData.camperPlaceNumber }}</td>
-        <td mat-footer-cell *matFooterCellDef>Suma:</td>
-      </ng-container>
+<mat-card class="container-card">
+  <div class="content-wrapper">
+    <div class="table primary" [style.display]="showGraph ? 'none' : 'block'">
+      <table mat-table [dataSource]="displayData || []">
 
-      <ng-container matColumnDef="reservationCount">
-        <th mat-header-cell *matHeaderCellDef> Ilość rezerwacji</th>
-        <td mat-cell *matCellDef="let displayData"> {{ displayData.reservationCount }}</td>
-        <td mat-footer-cell *matFooterCellDef>{{ countResCount() }}</td>
-      </ng-container>
+        <ng-container matColumnDef="camperPlaceNumber">
+          <th mat-header-cell *matHeaderCellDef> Nr. parceli</th>
+          <td mat-cell *matCellDef="let displayData"> {{ displayData.camperPlaceNumber }}</td>
+          <td mat-footer-cell *matFooterCellDef>Suma:</td>
+        </ng-container>
 
-      <ng-container matColumnDef="revenue">
-        <th mat-header-cell *matHeaderCellDef> Obrót </th>
-        <td mat-cell *matCellDef="let displayData"> {{ displayData.revenue }} zł</td>
-        <td mat-footer-cell *matFooterCellDef>{{ countRevenue() }} zł</td>
-      </ng-container>
+        <ng-container matColumnDef="reservationCount">
+          <th mat-header-cell *matHeaderCellDef> Ilość rezerwacji</th>
+          <td mat-cell *matCellDef="let displayData"> {{ displayData.reservationCount }}</td>
+          <td mat-footer-cell *matFooterCellDef>{{ countResCount() }}</td>
+        </ng-container>
 
-      <tr mat-header-row class="header" *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row  *matRowDef="let row; let i = index; columns: displayedColumns;"
-          [ngClass]="{
-          'quaternary': i % 2 !== 0,
-           }"></tr>
-      <tr mat-row class="footer" *matFooterRowDef="displayedColumns;"></tr>
-    </table>
+        <ng-container matColumnDef="revenue">
+          <th mat-header-cell *matHeaderCellDef> Obrót </th>
+          <td mat-cell *matCellDef="let displayData"> {{ displayData.revenue }} zł</td>
+          <td mat-footer-cell *matFooterCellDef>{{ countRevenue() }} zł</td>
+        </ng-container>
+
+        <tr mat-header-row class="header" *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row  *matRowDef="let row; let i = index; columns: displayedColumns;"
+            [ngClass]="{
+            'quaternary': i % 2 !== 0,
+             }"></tr>
+        <tr mat-row class="footer" *matFooterRowDef="displayedColumns;"></tr>
+      </table>
+    </div>
+
+    <div class="graph-wrapper" [style.display]="showGraph ? 'flex' : 'none'">
+      <app-graph
+        [results]="getGraphData()"
+        [xAxisLabel]="'Parcele'"
+        [yAxisLabel]="'Obrót (zł)'">
+      </app-graph>
+    </div>
   </div>
 </mat-card>

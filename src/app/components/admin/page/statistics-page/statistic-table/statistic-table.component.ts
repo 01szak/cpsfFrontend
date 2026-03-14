@@ -3,6 +3,8 @@ import {MatTableModule} from '@angular/material/table';
 import {CommonModule} from '@angular/common';
 import {MatCard} from '@angular/material/card';
 import {Revenue} from '../statistics-page';
+import {GraphComponent} from '../graph/graph.component';
+import {Statistic} from '../../../../Interface/Statistic';
 
 
 @Component({
@@ -13,6 +15,7 @@ import {Revenue} from '../statistics-page';
     MatTableModule,
     CommonModule,
     MatCard,
+    GraphComponent
   ],
   standalone: true
 })
@@ -26,6 +29,7 @@ export class StatisticTableComponent implements OnInit, OnChanges{
   @Input() title: string = '';
 
   displayData: {camperPlaceNumber: string, reservationCount: string, revenue: string}[] = []
+  showGraph: boolean = false;
 
   ngOnInit() {
     this.connectTables();
@@ -35,6 +39,18 @@ export class StatisticTableComponent implements OnInit, OnChanges{
     if (changes['revenue'] || changes['reservationCount'] || changes['potentialRevenue']) {
       this.connectTables();
     }
+  }
+
+  toggleView() {
+    this.showGraph = !this.showGraph;
+    this.cdr.detectChanges();
+  }
+
+  getGraphData(): Statistic[] {
+    return this.revenue.map(r => ({
+      name: r.cpIndex,
+      value: r.revenue
+    }));
   }
 
   connectTables() {
@@ -59,7 +75,6 @@ export class StatisticTableComponent implements OnInit, OnChanges{
 
     this.displayData = newData;
     this.cdr.detectChanges();
-    console.log('Statistics Table Rendered with rows:', this.displayData.length);
   }
 
 

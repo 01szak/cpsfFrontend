@@ -50,7 +50,6 @@ export class StatisticsPage implements OnInit {
   }
 
   loadData() {
-    // Fetch statistics independently
     forkJoin({
       revenue: this.statisticsService.getRevenue(this.month, this.year).pipe(
         take(1),
