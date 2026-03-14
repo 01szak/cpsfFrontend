@@ -30,6 +30,7 @@ export class StatisticTableComponent implements OnInit, OnChanges{
 
   displayData: {camperPlaceNumber: string, reservationCount: string, revenue: string}[] = []
   showGraph: boolean = false;
+  graphMode: 'revenue' | 'count' = 'revenue';
 
   ngOnInit() {
     this.connectTables();
@@ -46,10 +47,15 @@ export class StatisticTableComponent implements OnInit, OnChanges{
     this.cdr.detectChanges();
   }
 
+  toggleGraphMode() {
+    this.graphMode = this.graphMode === 'revenue' ? 'count' : 'revenue';
+    this.cdr.detectChanges();
+  }
+
   getGraphData(): Statistic[] {
     return this.revenue.map(r => ({
       name: r.cpIndex,
-      value: r.revenue
+      value: this.graphMode === 'revenue' ? r.revenue : (r.count ?? 0)
     }));
   }
 

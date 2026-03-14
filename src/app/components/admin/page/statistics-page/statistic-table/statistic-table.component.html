@@ -1,7 +1,21 @@
 <link rel="stylesheet" href="../../../popups/search-by-popup/search-by-popup.component.css">
 <div class="table-header">
   <h3>{{title}}</h3>
-    <i (click)="toggleView()" class="change-button" [ngClass]="showGraph ? 'fa-solid fa-table' : 'fa-solid fa-chart-column'"></i>
+  <div class="header-actions">
+    @if (showGraph) {
+      <i (click)="toggleGraphMode()" 
+         class="change-button fa-solid" 
+         [ngClass]="graphMode === 'revenue' ? 'fa-hashtag' : 'fa-dollar-sign'"
+         style="margin-right: 12px; cursor: pointer;"
+         [title]="graphMode === 'revenue' ? 'Pokaż ilość rezerwacji' : 'Pokaż obrót'">
+      </i>
+    }
+    <i (click)="toggleView()" 
+       class="change-button fa-solid" 
+       [ngClass]="showGraph ? 'fa-table' : 'fa-chart-column'"
+       style="cursor: pointer;">
+    </i>
+  </div>
 </div>
 
 <mat-card class="container-card">
@@ -40,7 +54,7 @@
       <app-graph
         [results]="getGraphData()"
         [xAxisLabel]="'Parcele'"
-        [yAxisLabel]="'Obrót (zł)'">
+        [yAxisLabel]="graphMode === 'revenue' ? 'Obrót (zł)' : 'Ilość rezerwacji'">
       </app-graph>
     </div>
   </div>

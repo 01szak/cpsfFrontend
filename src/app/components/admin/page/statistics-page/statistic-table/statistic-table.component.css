@@ -7,13 +7,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 10px 10px;
+  margin-bottom: 10px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 h3 {
   margin: 0;
   color: var(--text-primary);
 }
+
 
 .change-button {
   width: 36px;
