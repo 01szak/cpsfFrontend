@@ -28,6 +28,7 @@ export class CamperPlaceFormComponent {
   private _camperPlaces: CamperPlaceForTable[] | null = [];
   @Input() set camperPlaces(value: CamperPlaceForTable[] | null) {
     this._camperPlaces = value;
+    this.updateFormDeclaration();
   }
   get camperPlaces() {
     return this._camperPlaces;

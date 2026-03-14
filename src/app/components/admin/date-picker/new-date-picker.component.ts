@@ -1,13 +1,21 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatCard} from '@angular/material/card';
 import {MatOption, MatSelect} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-new-date-picker',
   imports: [
+    CommonModule,
+    FormsModule,
     MatCard,
     MatSelect,
-    MatOption
+    MatOption,
+    MatFormFieldModule,
+    MatInputModule
   ],
   templateUrl: './new-date-picker.component.html',
   standalone: true,
@@ -37,7 +45,8 @@ export class NewDatePickerComponent implements OnInit {
   currentYear: number = new Date().getFullYear();
 
   ngOnInit() {
-    this.getYears()
+    this.getYears();
+    // Initial emission if needed
   }
 
 

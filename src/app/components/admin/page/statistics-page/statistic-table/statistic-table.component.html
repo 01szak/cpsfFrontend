@@ -1,11 +1,14 @@
+<h3>{{title}}</h3>
 <mat-card>
   <div class="table primary">
     <table mat-table [dataSource]="displayData || []">
+
       <ng-container matColumnDef="camperPlaceNumber">
         <th mat-header-cell *matHeaderCellDef> Nr. parceli</th>
         <td mat-cell *matCellDef="let displayData"> {{ displayData.camperPlaceNumber }}</td>
         <td mat-footer-cell *matFooterCellDef>Suma:</td>
       </ng-container>
+
       <ng-container matColumnDef="reservationCount">
         <th mat-header-cell *matHeaderCellDef> Ilość rezerwacji</th>
         <td mat-cell *matCellDef="let displayData"> {{ displayData.reservationCount }}</td>
@@ -13,9 +16,9 @@
       </ng-container>
 
       <ng-container matColumnDef="revenue">
-        <th mat-header-cell *matHeaderCellDef> Obrót</th>
-        <td mat-cell *matCellDef="let displayData"> {{ displayData.revenue }}</td>
-        <td mat-footer-cell *matFooterCellDef>{{ countRevenue() }}</td>
+        <th mat-header-cell *matHeaderCellDef> Obrót </th>
+        <td mat-cell *matCellDef="let displayData"> {{ displayData.revenue }} zł</td>
+        <td mat-footer-cell *matFooterCellDef>{{ countRevenue() }} zł</td>
       </ng-container>
 
       <tr mat-header-row class="header" *matHeaderRowDef="displayedColumns"></tr>

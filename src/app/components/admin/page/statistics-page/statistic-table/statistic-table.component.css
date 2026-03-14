@@ -1,18 +1,10 @@
-
-table {
-  background-color: inherit;
-}
-
 th, td, tr {
   color: var(--text-primary);
 }
 
-.tableRow:hover {
-  background-color: mediumpurple;
-}
 .table {
   overflow-y: auto;
-  height: 800px;
+  height: 600px;
 }
 .header {
   position: sticky;
@@ -21,8 +13,4 @@ th, td, tr {
 .footer {
   position: sticky;
   bottom: 0;
-}
-
-.odd {
-  background-color: var(--bg-color-tertiary);
 }
