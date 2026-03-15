@@ -1,17 +1,19 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
-import {GraphComponent} from './graph/graph.component';
+import {Component, Input, OnInit} from '@angular/core';
 import {NewDatePickerComponent} from '../../date-picker/new-date-picker.component';
-import {Statistic} from '../../../Interface/Statistic';
-import {CamperPlaceService} from '../../../../service/CamperPlaceService';
 import {StatisticsService} from '../../../../service/StatisticsService';
 import {StatisticTableComponent} from './statistic-table/statistic-table.component';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
-import {forkJoin, take} from 'rxjs';
+import {forkJoin, take, catchError, of} from 'rxjs';
+
+export type Revenue = {
+  cpIndex: string,
+  count: number,
+  revenue: number
+}
 
 @Component({
   selector: 'statistics',
   imports: [
-    GraphComponent,
     NewDatePickerComponent,
     StatisticTableComponent,
     MatGridList,
@@ -21,17 +23,15 @@ import {forkJoin, take} from 'rxjs';
   styleUrl: './statistics-page.css',
   standalone: true
 })
-export class StatisticsPage implements OnInit{
+export class StatisticsPage implements OnInit {
 
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
-  @Output() reservationCount: Statistic[] = [];
-  @Output() revenue: Statistic[] = [];
 
-  camperPlaceIds: number[] = []
+  revenueOfPaidReservations: Revenue[] = [];
+  revenueOfUnPaidReservations: Revenue[] = [];
 
   constructor(
-    private camperPlaceService: CamperPlaceService,
     private statisticsService: StatisticsService
   ) {}
 
@@ -50,16 +50,18 @@ export class StatisticsPage implements OnInit{
   }
 
   loadData() {
-    this.camperPlaceService.getCamperPlaces().pipe(take(1)).subscribe(cps => {
-      this.camperPlaceIds = cps.map(c => c.id);
-
-      forkJoin({
-        revenue: this.statisticsService.getRevenue(this.month, this.year).pipe(take(1)),
-        count: this.statisticsService.getReservationCount(this.month, this.year).pipe(take(1))
-      }).subscribe(({revenue, count}) => {
-        this.revenue = revenue;
-        this.reservationCount = count;
-      });
+    forkJoin({
+      revenue: this.statisticsService.getRevenue(this.month, this.year).pipe(
+        take(1),
+        catchError(() => of([[], []]))
+      ),
+    }).subscribe({
+      next: ({revenue}) => {
+        this.revenueOfPaidReservations = revenue[0] || [];
+        this.revenueOfUnPaidReservations = revenue[1] || [];
+        console.log('Statistics loaded:', { paid: this.revenueOfPaidReservations, unpaid: this.revenueOfUnPaidReservations });
+      },
+      error: (err) => console.error('Error loading statistics:', err)
     });
   }
 }
