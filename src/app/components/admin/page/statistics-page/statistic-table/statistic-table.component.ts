@@ -53,10 +53,21 @@ export class StatisticTableComponent implements OnInit, OnChanges{
   }
 
   getGraphData(): Statistic[] {
-    return this.revenue.map(r => ({
-      name: r.cpIndex,
-      value: this.graphMode === 'revenue' ? r.revenue : (r.count ?? 0)
-    }));
+
+    return [...this.revenue]   // ważne — kopia do sortowania
+      .sort((a, b) => {
+        const A = this.parseCpIndex(a.cpIndex);
+        const B = this.parseCpIndex(b.cpIndex);
+
+        return A.num - B.num || A.letter.localeCompare(B.letter);
+      })
+      .map(r => ({
+        name: r.cpIndex,
+        value: this.graphMode === 'revenue'
+          ? r.revenue
+          : (r.count ?? 0)
+      }));
+
   }
 
   connectTables() {
@@ -77,12 +88,24 @@ export class StatisticTableComponent implements OnInit, OnChanges{
       });
     });
 
-    newData.sort((a, b) => a.camperPlaceNumber.localeCompare(b.camperPlaceNumber, undefined, {numeric: true}));
+    newData.sort((a, b) => {
+      const A = this.parseCpIndex(a.camperPlaceNumber);
+      const B = this.parseCpIndex(b.camperPlaceNumber);
+
+      return A.num - B.num || A.letter.localeCompare(B.letter);
+    });
 
     this.displayData = newData;
     this.cdr.detectChanges();
   }
 
+  private parseCpIndex(value: string) {
+    const match = value.match(/^(\d+)([a-zA-Z]?)$/);
+    return {
+      num: match ? Number(match[1]) : Number.MAX_SAFE_INTEGER,
+      letter: match ? match[2] || '' : ''
+    };
+  }
 
   countResCount() {
     return this.displayData.reduce((sum, row) => sum + Number(row.reservationCount), 0);

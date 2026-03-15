@@ -16,8 +16,6 @@ export type Revenue = {
   imports: [
     NewDatePickerComponent,
     StatisticTableComponent,
-    MatGridList,
-    MatGridTile,
   ],
   templateUrl: './statistics-page.html',
   styleUrl: './statistics-page.css',
@@ -59,9 +57,7 @@ export class StatisticsPage implements OnInit {
       next: ({revenue}) => {
         this.revenueOfPaidReservations = revenue[0] || [];
         this.revenueOfUnPaidReservations = revenue[1] || [];
-        console.log('Statistics loaded:', { paid: this.revenueOfPaidReservations, unpaid: this.revenueOfUnPaidReservations });
       },
-      error: (err) => console.error('Error loading statistics:', err)
     });
   }
 }
