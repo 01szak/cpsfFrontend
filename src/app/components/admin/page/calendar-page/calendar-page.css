@@ -2,9 +2,6 @@ mat-card {
   padding: 0 25px 25px 25px;
   width: 100%;
   max-width: 1850px;
-  overflow-y: auto;
-  height: 100%;
-  max-height: 700px;
   justify-self: center;
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
@@ -71,8 +68,7 @@ thead {
   background-color: var(--bg-card) !important;
 }
 
-.table-scroll {
-  overflow-y: auto;
+.table-container {
   flex-grow: 1;
   border: 1px solid var(--border-color);
   background: var(--bg-inner);
@@ -92,7 +88,6 @@ p {
   margin: 2px 0;
 }
 
-/* Kolory rezerwacji - Dark Theme */
 .reserved {
   background-color: rgba(218, 194, 37, 0.78) !important;
 }
@@ -105,7 +100,6 @@ p {
 background-color: rgba(92, 164, 246, 0.4) !important;
 }
 
-/* Fix dla klikalności i krawędzi */
 .left:hover {
   border-right: solid white 1px;
 }
