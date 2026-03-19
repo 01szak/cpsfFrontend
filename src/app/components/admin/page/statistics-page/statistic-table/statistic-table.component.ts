@@ -54,7 +54,7 @@ export class StatisticTableComponent implements OnInit, OnChanges{
 
   getGraphData(): Statistic[] {
 
-    return [...this.revenue]   // ważne — kopia do sortowania
+    return [...this.revenue]
       .sort((a, b) => {
         const A = this.parseCpIndex(a.cpIndex);
         const B = this.parseCpIndex(b.cpIndex);

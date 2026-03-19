@@ -61,9 +61,17 @@ export class SearchByPopupComponent {
 
   searchBy() {
     let searchValue = this.value;
-    
+
+    function isBool(value: any) {
+      if (value == null) return false;
+      const stringVal = String(value).trim().toLowerCase();
+      return stringVal === 'tak' || stringVal === 'nie';
+    }
+
     if (this.data.type === 'date' && moment.isMoment(this.value)) {
       searchValue = this.value.format('YYYY-MM-DD');
+    } else if (isBool(this.value)) {
+      searchValue = this.value.toString().toLowerCase() === 'tak';
     }
 
     this.dialogRef.close({
