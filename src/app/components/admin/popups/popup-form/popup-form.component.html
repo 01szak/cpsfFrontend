@@ -19,7 +19,7 @@
                                  [(ngModel)]="formValues[formInput.field]"
                                  [readonly]="formInput.readonly ?? false">
                           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                          <mat-datepicker #picker></mat-datepicker>
+                          <mat-datepicker #picker [startAt]="formData.startAt"></mat-datepicker>
                         </mat-form-field>
                   } @else if (!formInput.select) {
                         <!--normal inputs-->
@@ -107,7 +107,7 @@
                        [(ngModel)]="formValues[additionalInput.field]"
                        [readonly]="additionalInput.readonly ?? false">
                 <mat-datepicker-toggle matIconSuffix [for]="addPicker"></mat-datepicker-toggle>
-                <mat-datepicker #addPicker></mat-datepicker>
+                <mat-datepicker #addPicker [startAt]="formData.startAt"></mat-datepicker>
               </mat-form-field>
             } @else {
               <mat-form-field>
