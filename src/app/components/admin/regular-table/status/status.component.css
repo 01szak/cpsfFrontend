@@ -4,7 +4,6 @@ div {
   width: 100%;
   max-width: 60px;
   max-height: 30px;
-  justify-self: center;
 }
 .active {
   border: solid 4px #036703;
