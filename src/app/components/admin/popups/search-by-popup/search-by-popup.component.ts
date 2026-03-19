@@ -63,7 +63,8 @@ export class SearchByPopupComponent {
     let searchValue = this.value;
 
     function isBool(value: any) {
-      const stringVal = value.toString().toLowerCase();
+      if (value == null) return false;
+      const stringVal = String(value).trim().toLowerCase();
       return stringVal === 'tak' || stringVal === 'nie';
     }
 
