@@ -185,8 +185,9 @@ export class PopupFormComponent implements OnInit {
 export interface FormData {
   header: string,
   update?: boolean,
-  objectToUpdate?: any
+  objectToUpdate?: any,
   formInputs: FormInput[],
+  startAt: moment.Moment | null;
 }
 
 export interface FormInput {

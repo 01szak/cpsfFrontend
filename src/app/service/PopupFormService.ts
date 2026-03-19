@@ -32,8 +32,10 @@
 
     openCreateReservationFormPopup(camperPlace?: CamperPlace, year?: number, month?: number, day?: number) {
       const checkinDefaultDate = (year === undefined || month === undefined || day === undefined) ? undefined : new Date(year, month, day);
+      const startAt = (year !== undefined && month !== undefined) ? moment({ year, month, day: 1 }) : null;
       const formData: FormData = {
         header: 'Nowa rezerwacja',
+        startAt: startAt,
         formInputs: [
           { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: checkinDefaultDate, readonly: checkinDefaultDate instanceof Date, additional: false},
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', additional: false},
@@ -91,9 +93,11 @@
         reservationToUpdate.checkin = this.reservationHelper.formatToStringDate(reservationToUpdate.checkin);
         reservationToUpdate.checkout = this.reservationHelper.formatToStringDate(reservationToUpdate.checkout);
       }
+      const startAt = (year !== undefined && month !== undefined) ? moment({ year, month, day: 1 }) : null;
       const formData: FormData = {
         header: 'Edycja Rezerwacji',
         update: true,
+        startAt: startAt,
         objectToUpdate: reservationToUpdate,
         formInputs: [
           { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: reservationToUpdate.checkin},
@@ -141,6 +145,7 @@
     openCreateUserFormPopup() {
       const formData: FormData = {
         header: 'Nowy gość',
+        startAt: null,
         formInputs: [
           { name: 'Imie', field: 'firstname', type: 'text'},
           { name: 'Nazwisko', field: 'lastname', type: 'text'},
@@ -182,6 +187,7 @@
       const formData: FormData = {
         header: 'Edycja Gościa',
         update: true,
+        startAt: null,
         objectToUpdate: userToUpdate,
         formInputs: [
           { name: 'Imie', field: 'firstname', type: 'text', defaultValue: guest.firstname},
