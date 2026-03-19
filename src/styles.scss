@@ -73,7 +73,7 @@ html, body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Custom Scrollbar */
@@ -122,7 +122,6 @@ mat-card,
 }
 
 /* --- Tables & Containers --- */
-.table-scroll,
 .mat-mdc-table,
 .tableContainer .tableDiv {
   border: 1px solid var(--border-color) !important;
