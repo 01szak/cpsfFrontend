@@ -1,12 +1,12 @@
 import {Routes} from '@angular/router';
-import {LoginComponent} from './components/login/login.component';
-import {RegisterComponent} from './components/register/register.component';
-import {StatisticsPage} from './components/admin/page/statistics-page/statistics-page';
-import {UserPage} from './components/admin/page/user-page/user-page';
-import {ReservationPage} from './components/admin/page/reservation-page/reservation-page';
-import {AdminPageComponent} from './components/admin/page/main-page/admin-page.component';
-import {CalendarPage} from './components/admin/page/calendar-page/calendar-page';
-import {SettingsPage} from './components/admin/page/settings-page/settings-page.component';
+import {LoginComponent} from '@features/auth/login.component';
+import {RegisterComponent} from '@features/auth/register.component';
+import {StatisticsPage} from '@features/statistics/statistics-page/statistics-page';
+import {UserPage} from '@features/users/user-page/user-page';
+import {ReservationPage} from '@features/reservations/table/reservation-page';
+import {AdminPageComponent} from '@features/main-page/admin-page.component';
+import {CalendarPage} from '@features/reservations/calendar/calendar-page';
+import {SettingsPage} from '@features/settings/settings-page/settings-page.component';
 
 export const routes: Routes = [
   {
@@ -47,7 +47,4 @@ export const routes: Routes = [
       },
     ]
   },
-
-
-
 ]
