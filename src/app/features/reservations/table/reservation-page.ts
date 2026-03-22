@@ -59,7 +59,7 @@ export class ReservationPage extends BaseTablePage<Reservation, ReservationServi
   }
 
   protected override openCreatePopup() {
-    this.formService.openCreateReservationFormPopup();
+    // this.formService.openCreateReservationFormPopup();
   }
 
   protected override openUpdatePopup(reservation: Reservation) {

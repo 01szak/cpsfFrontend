@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {ReservationService} from '@features/reservations/services/ReservationService';
-import {PopupFormService} from '@core/services/PopupFormService';
+import {PopupFormService, ReservationFormData} from '@core/services/PopupFormService';
 import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
 import {ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
 import {CamperPlace} from '@core/models/CamperPlace';
@@ -142,11 +142,14 @@ export class CalendarPage implements OnInit, OnDestroy{
           && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
       });
     }
-    if (reservationToUpdate) {
-      this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
-    } else {
-      this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
-    }
+    const reservationFd: ReservationFormData = {reservation: reservationToUpdate, year: year, month: month, day: day};
+    console.log(reservationFd)
+    this.popupFormService.openReservationFormPopup(reservationFd);
+    // if (reservationToUpdate) {
+    //   this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
+    // } else {
+    //   this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
+    // }
   }
 
   findWeekDay(year: number, month: number, day: number) {

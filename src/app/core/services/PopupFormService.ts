@@ -1,23 +1,396 @@
-  import {inject, Injectable} from '@angular/core';
-  import { MatDialog } from '@angular/material/dialog';
-  import {map, Observable} from 'rxjs';
-  import {ReservationService} from '@features/reservations/services/ReservationService';
-  import {UserService} from '@features/users/services/UserService';
-  import {PopupConfirmationService} from './PopupConfirmationService';
-  import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
-  import {CamperPlace} from '@core/models/CamperPlace';
-  import {Guest} from '@core/models/Guest';
-  import {Reservation} from '@core/models/Reservation';
-  import {PopupFormComponent, FormData} from '@shared/popups/form-shell/popup-form.component';
-  import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-  import moment from 'moment';
+import {ChangeDetectionStrategy, Component, inject, Injectable, Input, OnInit, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
+import {debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap} from 'rxjs';
+import {ReservationService} from '@features/reservations/services/ReservationService';
+import {UserService} from '@features/users/services/UserService';
+import {PopupConfirmationService} from './PopupConfirmationService';
+import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
+import {Guest} from '@core/models/Guest';
+import {Reservation} from '@core/models/Reservation';
+import {PopupFormContainer} from '@shared/popups/form-shell/popup-form-container.component';
+import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import moment, {Moment} from 'moment';
+import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatFormField, MatInput, MatInputModule, MatLabel} from '@angular/material/input';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerModule,
+  MatDatepickerToggle
+} from '@angular/material/datepicker';
+import {MatOption, MatSelect, MatSelectTrigger} from '@angular/material/select';
+import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {MatMomentDateModule, provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MatCardTitle} from '@angular/material/card';
+import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
+import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 
-  @Injectable({providedIn: "root"})
-  export class PopupFormService {
-    readonly popupForm: MatDialog = inject(MatDialog);
+
+export const DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD.MM.YY',
+  },
+  display: {
+    dateInput: 'DD.MM.YY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+export type ReservationFormData = {reservation?: Reservation, year?: number, month?: number, day?: number};
+export type GuestFormData = {guest?: Guest};
+
+@Component({
+  selector: 'app-guest-form-component',
+  imports: [
+    PopupFormContainer,
+    MatFormField,
+    ReactiveFormsModule,
+    MatLabel,
+    MatInput,
+    MatCardTitle,
+    NgTemplateOutlet
+  ],
+  standalone: true,
+  styles: `
+    mat-dialog-content {
+      gap: 1rem;
+      padding: 1.5rem !important;
+      max-height: 60vh;
+      color: #ffffff !important;
+    }
+    form {
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+    h2 {
+      margin: 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary) !important;
+      padding: 1rem !important;
+    }
+  `,
+  template: `
+    <ng-template #formTemplate>
+      <form [formGroup]="formGroup">
+
+        <mat-form-field>
+          <mat-label>Imie</mat-label>
+          <input type="text" matInput formControlName="firstName">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Nazwisko</mat-label>
+          <input type="text" matInput formControlName="lastName">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input type="email" matInput formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Nr Telefonu</mat-label>
+          <input type="tel" matInput formControlName="phoneNumber">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Rejestracja</mat-label>
+          <input type="text" matInput formControlName="carRegistration">
+        </mat-form-field>
+
+      </form>
+    </ng-template>
+
+    @if (isDialog) {
+      <app-popup-form-container [formTitle]="formTitle" [deleteAction]="deleteAction" [isUpdate]="isUpdate">
+        <ng-container *ngTemplateOutlet="formTemplate"></ng-container>
+      </app-popup-form-container>
+    } @else {
+      <h2 mat-card-title> {{formTitle}} </h2>
+      <ng-container *ngTemplateOutlet="formTemplate"></ng-container>
+    }
+  `,
+})
+export class GuestFormComponent {
+  @Input() isDialog = true;
+  private readonly formFactoryService = inject(FormFactoryService);
+  private readonly guestService = inject(UserService);
+  private readonly fd: GuestFormData = inject<GuestFormData>(MAT_DIALOG_DATA);
+
+  protected isUpdate = !!this.fd.guest;
+  protected formTitle = this.isUpdate ? 'Edytuj Gościa' : 'Nowy Gość';
+  protected deleteAction = () => this.guestService.delete(this.fd.guest!);
+  protected formGroup = this.formFactoryService.buildGuestForm();
+}
+
+@Component({
+  selector: 'app-reservation-form-component',
+  imports: [
+    ReactiveFormsModule,
+    PopupFormContainer,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatSelect,
+    MatOption,
+    AsyncPipe,
+    MatInputModule,
+    MatCheckbox,
+    NgComponentOutlet,
+    FormsModule,
+    MatAutocomplete,
+    MatAutocompleteTrigger
+  ],
+  providers: [
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'pl-PL'
+    },
+    provideMomentDateAdapter(DATE_FORMATS),
+  ],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    mat-dialog-content {
+      gap: 1rem;
+      padding: 1.5rem !important;
+      max-height: 60vh;
+      color: #ffffff !important;
+    }
+    form {
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+    mat-checkbox {
+      margin: 0.5rem 0;
+      color: var(--text-secondary);
+    }
+    app-form-buttons {
+      display: block;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border-color);
+    }
+    .guestForm {
+      padding: 0 !important;
+    }
+  `,
+  template: `
+    <app-popup-form-container [formTitle]="formTitle" [deleteAction]="deleteAction" [isUpdate]="isUpdate" [proceedAction]="proceedAction">
+      <form [formGroup]="formGroup">
+        <mat-form-field>
+          <mat-label>Data Wjazdu</mat-label>
+          <input matInput [matDatepicker]="checkin" formControlName="checkinDate">
+          <mat-datepicker-toggle matIconSuffix [for]="checkin"></mat-datepicker-toggle>
+          <mat-datepicker #checkin [startAt]="checkinDate"></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Data Wyjazdu</mat-label>
+          <input matInput [matDatepicker]="checkout" formControlName="checkoutDate">
+          <mat-datepicker-toggle matIconSuffix [for]="checkout"></mat-datepicker-toggle>
+          <mat-datepicker #checkout [startAt]="startAt"></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Numer Parceli</mat-label>
+          <mat-select formControlName="camperPlace">
+            @for (cp of camperPlaces$ | async; track cp.id) {
+              <mat-option [value]="cp">{{ cp.index }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div>
+          <mat-checkbox [checked]="newGuest" (change)="checkNewGuest()"></mat-checkbox>
+          <span> {{checkBoxText}} </span>
+        </div>
+
+        @if (newGuest) {
+          <ng-container class="guestForm" *ngComponentOutlet="guestFormComponent; inputs: {isDialog: false}"/>
+        } @else {
+          <mat-form-field>
+            <mat-label>Gość</mat-label>
+            <input type="text" matInput #input formControlName="guestSearch" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayGuest" (optionSelected)="onGuestSelected($event.option.value)">
+              @for (guest of (guests$ | async); track guest.guest.id) {
+                <mat-option [value]="guest">
+                  {{guest.name}}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        }
+      </form>
+    </app-popup-form-container>
+  `
+})
+export class ReservationFormComponent implements OnInit {
+
+  private readonly formFactoryService = inject(FormFactoryService);
+  private readonly reservationService = inject(ReservationService);
+  private readonly camperPlaceService = inject(CamperPlaceService);
+  private readonly guestService = inject(UserService);
+  private readonly popupConfirmationService = inject(PopupConfirmationService);
+  private readonly fd: ReservationFormData = inject<ReservationFormData>(MAT_DIALOG_DATA);
+
+  protected readonly guestFormComponent = GuestFormComponent;
+
+  protected isUpdate = !!this.fd.reservation;
+  protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
+  protected deleteAction = this.isUpdate ?
+    () => this.reservationService.deleteReservation(this.fd.reservation!).pipe(take(1)).subscribe() : null;
+  protected proceedAction = () => this.popupConfirmationService.openConfirmationPopup(this.confirmationData);
+  protected formGroup = this.formFactoryService.buildReservationForm();
+  protected camperPlaces$ = this.camperPlaceService.getCamperPlacesForTable();
+  protected guests$: Observable<{ name: string, guest: Guest }[]> = of([]);
+  protected startAt = '';
+  protected checkinDate = '';
+  protected newGuest = false;
+  protected checkBoxText = 'Nowy Gość';
+
+  protected createAction = () => {
+
+    const checkin = this.formGroup.get('checkinDate')?.value;
+    const checkout = this.formGroup.get('checkoutDate')?.value;
+    const camperPlace = this.formGroup.get('camperPlace')?.value;
+    const rawGuest = this.formGroup.get('guest')?.value;
+
+    const guest: Guest | undefined = rawGuest
+      ? {
+        id: rawGuest.id!,
+        firstname: rawGuest.firstname ?? '',
+        lastname: rawGuest.lastname ?? '',
+        email: rawGuest.email ?? '',
+        phoneNumber: rawGuest.phoneNumber ?? '',
+        carRegistration: rawGuest.carRegistration ?? ''
+      }
+      : undefined;
+
+    const payload: Reservation = {
+      id: this.fd.reservation?.id,
+      checkin: checkin?.format('YYYY-MM-DD') ?? '',
+      checkout: checkout?.format('YYYY-MM-DD') ?? '',
+      camperPlaceIndex: this.formGroup.get('camperPlace')?.value?.index ?? '',
+      guest: guest,
+      paid: false,
+    };
+
+    this.reservationService.create(payload)
+      .pipe(take(1))
+      .subscribe({
+        error: () => console.log(payload)
+      });
+  };
+
+  private confirmationData: ConfirmationData = {
+    title: 'Czy chcesz kontynuować?',
+    componentData: this.fd.reservation,
+    message: this.isUpdate ? 'Rezerwacja zostanie edytowana' : 'Rezerwacja zostanie utworzona',
+    action: this.createAction,
+  }
+
+  ngOnInit() {
+    this.startAt =
+      (this.fd.year !== undefined && this.fd.month !== undefined) ? this.getDateFromParams(this.fd.year, this.fd.month, 1) : '';
+    this.formGroup.get('checkinDate')?.setValue(moment({year: this.fd.year!, month: this.fd.month!, day: this.fd.day!}));
+
+    this.guests$ = this.formGroup.get('guestSearch')!.valueChanges.pipe(
+      debounceTime(150),
+      distinctUntilChanged(),
+      filter(v => typeof v === 'string'),
+      switchMap(v => this.guestService.findAll(undefined, 0, 100, undefined, { by: 'fullName', value: v?? ''})),
+      map(e =>
+        e.content.map(g => ({
+          name: g.firstname + ' ' + g.lastname,
+          guest: g
+        }))
+      )
+    );
+  }
+
+  private getDateFromParams(year: number, month: number, day: number): string {
+    return moment({ year: year, month: month, day: day }).format('YYYY-MM-DD');
+  }
+
+  private formatMomentToString(moment: Moment): string {
+    return moment.format('YYYY-MM-DD');
+  }
+
+  protected checkNewGuest() {
+    this.newGuest = !this.newGuest;
+    if (this.newGuest) {
+      this.checkBoxText = 'Wybierz Istniejącego';
+    } else {
+      this.checkBoxText = 'Nowy Gość';
+    }
+  }
+
+  protected displayGuest(value: any): string {
+    return value?.name ?? '';
+  }
+
+  protected onGuestSelected(selected: { name: string, guest: Guest }) {
+    this.formGroup.get('guest')!.patchValue({
+        id: selected.guest.id,
+        firstname: selected.guest.firstname,
+        lastname: selected.guest.lastname,
+        email: selected.guest.email,
+        phoneNumber: selected.guest.phoneNumber,
+        carRegistration: selected.guest.carRegistration
+      });
+
+    this.formGroup.get('guestSearch')!.setValue(selected);
+  }
+
+}
+
+@Injectable({providedIn: "root"})
+export class FormFactoryService {
+
+  private readonly formBuilder = inject(FormBuilder);
+
+  buildReservationForm() {
+    return this.formBuilder.group({
+      checkinDate: new FormControl<Moment | null>(null),
+      checkoutDate: new FormControl<Moment | null>(null),
+      camperPlace: new FormControl<CamperPlaceForTable | null>(null),
+      guestSearch: new FormControl<{name: string, guest: Guest} | null>(null),
+      guest: new FormControl<Guest | null>(null),
+    });
+  }
+
+  buildGuestForm() {
+    return this.formBuilder.group({
+      id: [''],
+      firstname: [''],
+      lastname: [''],
+      email: [''],
+      phoneNumber: [''],
+      carRegistration: ['']
+    })
+  }
+}
+
+@Injectable({providedIn: "root"})
+export class PopupFormService {
+
+    private readonly popupForm: MatDialog = inject(MatDialog);
+    private readonly formFactoryService = inject(FormFactoryService);
     guests$: Observable<Guest[]>;
     camperPlaces$: Observable<string[]>;
-
     constructor(
       private popupConfirmationService: PopupConfirmationService,
       private reservationService: ReservationService,
@@ -30,205 +403,11 @@
       this.camperPlaces$ = this.camperPlaceService.getCamperPlaces().pipe(map(camperPlaces => camperPlaces.map(cp => cp.index)));
     }
 
-    openCreateReservationFormPopup(camperPlace?: CamperPlace, year?: number, month?: number, day?: number) {
-      const checkinDefaultDate = (year === undefined || month === undefined || day === undefined) ? undefined : new Date(year, month, day);
-      const startAt = (year !== undefined && month !== undefined) ? moment({ year, month, day: 1 }) : null;
-      const formData: FormData = {
-        header: 'Nowa rezerwacja',
-        startAt: startAt,
-        formInputs: [
-          { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: checkinDefaultDate, readonly: checkinDefaultDate instanceof Date, additional: false},
-          { name: 'Data wyjazdu', field: 'checkout', type: 'date', additional: false},
-          { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: camperPlace?.index || undefined, readonly: (camperPlace?.index.length || 0) > 0, additional: false},
-          { name: 'Gość', field: 'guest', type: 'text', select: true, selectList: this.guests$, additional: false, replacedByAdditional: true, autocomplete: true},
-          { name: 'Imię', field: 'firstname', type: 'text', additional: true },
-          { name: 'Nazwisko', field: 'lastname', type: 'text', additional: true },
-          { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true },
-          { name: 'Email', field: 'email', type: 'email', additional: true },
-          { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true },
-        ]
-      };
-      const dialogRef = this.popupForm.open(PopupFormComponent, {
-        data: formData,
+    openReservationFormPopup(reservationFd?: ReservationFormData) {
+      const dialogRef = this.popupForm.open(ReservationFormComponent, {
+        data: reservationFd,
         panelClass: 'popupForm'
       })
-      dialogRef.afterOpened().subscribe(() => {
-        dialogRef.componentInstance.secondAction = () => {
-          const result = dialogRef.componentInstance.formValues;
-          const guestToCreate = this.getDefaultGuest(result);
-          
-          const checkin = moment(result['checkin']).isValid() ? moment(result['checkin']).format('YYYY-MM-DD') : result['checkin']?.toString() ?? '';
-          const checkout = moment(result['checkout']).isValid() ? moment(result['checkout']).format('YYYY-MM-DD') : result['checkout']?.toString() ?? '';
-
-          const reservationToCreate: Reservation = {
-            paid: false,
-            camperPlaceIndex: result['camperPlaceIndex'].toString() ?? '',
-            checkin: checkin,
-            checkout: checkout,
-            price: 0,
-            guest: result['guest'] === undefined || result['guest'] === '' ? guestToCreate : result['guest']
-          }
-          this.popupConfirmationService.openConfirmationPopup(
-            "Rezerwacja zostanie dodana. Czy chcesz kontynuować?",
-            () => this.reservationService.createReservation(reservationToCreate).subscribe()
-          );
-        }
-      })
-
-    }
-
-    openUpdateReservationFormPopup(reservation: Reservation, year?: number, month?: number, day?: number) {
-      if (!reservation) {
-        return
-      }
-      let reservationToUpdate: Reservation = {
-        id: reservation.id,
-        checkin: reservation.checkin,
-        checkout: reservation.checkout,
-        camperPlaceIndex: reservation.camperPlaceIndex,
-        guest: reservation.guest,
-        paid: reservation.paid
-      };
-      if(reservationToUpdate.checkin.includes('.')) {
-        reservationToUpdate.checkin = this.reservationHelper.formatToStringDate(reservationToUpdate.checkin);
-        reservationToUpdate.checkout = this.reservationHelper.formatToStringDate(reservationToUpdate.checkout);
-      }
-      const startAt = (year !== undefined && month !== undefined) ? moment({ year, month, day: 1 }) : null;
-      const formData: FormData = {
-        header: 'Edycja Rezerwacji',
-        update: true,
-        startAt: startAt,
-        objectToUpdate: reservationToUpdate,
-        formInputs: [
-          { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: reservationToUpdate.checkin},
-          { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
-          { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlaceIndex},
-          { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
-          { name: 'Gość', field: 'guest', type: 'select', defaultValue: reservationToUpdate.guest ? (reservationToUpdate.guest.firstname + " " + reservationToUpdate.guest.lastname) : '',  replacedByAdditional: true, readonly: true},
-          { name: 'Imię', field: 'firstname', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.firstname },
-          { name: 'Nazwisko', field: 'lastname', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.lastname },
-          { name: 'Rejestracja', field: 'carRegistration', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.carRegistration },
-          { name: 'Email', field: 'email', type: 'email', additional: true, defaultValue: reservationToUpdate.guest?.email },
-          { name: 'Numer Telefonu', field: 'phoneNumber', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.phoneNumber },
-        ]
-      }
-      reservationToUpdate.checkin
-      const dialogRef = this.popupForm.open(PopupFormComponent, {
-        data: formData,
-        panelClass: 'popupForm'
-      })
-      dialogRef.afterOpened().subscribe(() => {
-        dialogRef.componentInstance.secondAction = () => {
-          const result = dialogRef.componentInstance.formValues;
-
-          const checkin = moment(result['checkin']).isValid() ? moment(result['checkin']).format('YYYY-MM-DD') : result['checkin']?.toString() ?? reservationToUpdate.checkin;
-          const checkout = moment(result['checkout']).isValid() ? moment(result['checkout']).format('YYYY-MM-DD') : result['checkout']?.toString() ?? reservationToUpdate.checkout;
-
-          reservationToUpdate.checkin = checkin;
-          reservationToUpdate.checkout = checkout;
-          reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
-          reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
-          reservationToUpdate.guest!.firstname = result['firstname']?.toString() ?? reservationToUpdate.guest?.firstname;
-          reservationToUpdate.guest!.lastname = result['lastname']?.toString() ?? reservationToUpdate.guest?.lastname;
-          reservationToUpdate.guest!.carRegistration = result['carRegistration']?.toString() ?? reservationToUpdate.guest?.carRegistration;
-          reservationToUpdate.guest!.email = result['email']?.toString() ?? reservationToUpdate.guest?.email;
-          reservationToUpdate.guest!.phoneNumber = result['phoneNumber']?.toString() ?? reservationToUpdate.guest?.phoneNumber;
-
-          this.popupConfirmationService.openConfirmationPopup(
-            "Rezerwacja zostanie edytowana. Czy chcesz kontynuować?",
-            () => this.reservationService.updateReservation(reservationToUpdate).subscribe()
-          );
-        }
-      })
-    }
-
-    openCreateUserFormPopup() {
-      const formData: FormData = {
-        header: 'Nowy gość',
-        startAt: null,
-        formInputs: [
-          { name: 'Imie', field: 'firstname', type: 'text'},
-          { name: 'Nazwisko', field: 'lastname', type: 'text'},
-          { name: 'Email', field: 'email', type: 'text'},
-          { name: 'Numer telefonu', field: 'phoneNumber', type: 'text'},
-          { name: 'Rejestracja', field: 'carRegistration', type: 'text'},
-        ]
-      };
-      const dialogRef = this.popupForm.open(PopupFormComponent, {
-        data: formData,
-        panelClass: 'popupForm'
-      })
-      dialogRef.afterOpened().subscribe(() => {
-        dialogRef.componentInstance.secondAction = () => {
-          const result = dialogRef.componentInstance.formValues;
-          const guestToCreate: Guest = this.getDefaultGuest(result);
-
-          this.popupConfirmationService.openConfirmationPopup(
-            "Gość zostanie dodany. Czy chcesz kontynuować?",
-            () => this.userService.create(guestToCreate).subscribe()
-          );
-        }
-      })
-
-    }
-
-    openUpdateUserPopup(guest: Guest) {
-      if (!guest) {
-        return
-      }
-      let userToUpdate: Guest = {
-        id: guest.id,
-        firstname: guest.firstname,
-        lastname: guest.lastname,
-        email: guest.email,
-        phoneNumber: guest.phoneNumber,
-        carRegistration: guest.carRegistration
-      };
-      const formData: FormData = {
-        header: 'Edycja Gościa',
-        update: true,
-        startAt: null,
-        objectToUpdate: userToUpdate,
-        formInputs: [
-          { name: 'Imie', field: 'firstname', type: 'text', defaultValue: guest.firstname},
-          { name: 'Nazwisko', field: 'lastname', type: 'text', defaultValue: guest.lastname},
-          { name: 'Email', field: 'email', type: 'text',defaultValue: guest.email},
-          { name: 'Numer telefonu', field: 'phoneNumber', type: 'text', defaultValue: guest.phoneNumber},
-          { name: 'Rejestracja', field: 'carRegistration', type: 'text', defaultValue: guest.carRegistration},
-        ]
-      }
-      const dialogRef = this.popupForm.open(PopupFormComponent, {
-        data: formData,
-        panelClass: 'popupForm'
-      })
-      dialogRef.afterOpened().subscribe(() => {
-
-        dialogRef.componentInstance.secondAction = () => {
-          const result = dialogRef.componentInstance.formValues;
-          userToUpdate.firstname = result['firstname']?.toString() ?? userToUpdate.firstname;
-          userToUpdate.lastname = result['lastname']?.toString() ?? userToUpdate.lastname;
-          userToUpdate.carRegistration = result['carRegistration']?.toString() ?? userToUpdate.carRegistration;
-          userToUpdate.email = result['email']?.toString() ?? userToUpdate.email;
-          userToUpdate.phoneNumber = result['phoneNumber']?.toString() ?? userToUpdate.phoneNumber;
-
-          this.popupConfirmationService.openConfirmationPopup(
-            "Gość zostanie edytowany. Czy chcesz kontynuować?",
-            () => this.userService.update(userToUpdate).subscribe()
-          );
-        }
-       }
-      );
-    }
-
-    private getDefaultGuest(result: Record<string, any>): Guest {
-      return {
-        id: '',
-        firstname: result['firstname']?.toString() ?? '',
-        lastname: result['lastname']?.toString() ?? '',
-        carRegistration: result['carRegistration']?.toString() ?? '',
-        email: result['email']?.toString() ?? '',
-        phoneNumber: result['phoneNumber']?.toString() ?? '',
-      }
     }
 
   }
