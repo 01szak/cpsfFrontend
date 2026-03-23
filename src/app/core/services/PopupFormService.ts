@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, Component, inject, Injectable, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component, DestroyRef,
+  EventEmitter,
+  inject,
+  Injectable,
+  Input,
+  OnInit,
+  Output,
+  ViewChild, ViewContainerRef
+} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
 import {debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap} from 'rxjs';
 import {ReservationService} from '@features/reservations/services/ReservationService';
@@ -10,7 +20,7 @@ import {Reservation} from '@core/models/Reservation';
 import {PopupFormContainer} from '@shared/popups/form-shell/popup-form-container.component';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import moment, {Moment} from 'moment';
-import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatFormField, MatInput, MatInputModule, MatLabel} from '@angular/material/input';
 import {
   MatDatepicker,
@@ -27,6 +37,7 @@ import {MatCardTitle} from '@angular/material/card';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 
 export const DATE_FORMATS = {
@@ -81,27 +92,27 @@ export type GuestFormData = {guest?: Guest};
 
         <mat-form-field>
           <mat-label>Imie</mat-label>
-          <input type="text" matInput formControlName="firstName">
+          <input type="text" matInput formControlName="firstname" (input)="emitGuestForm()">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Nazwisko</mat-label>
-          <input type="text" matInput formControlName="lastName">
+          <input type="text" matInput formControlName="lastname" (input)="emitGuestForm()">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Email</mat-label>
-          <input type="email" matInput formControlName="email">
+          <input type="email" matInput formControlName="email" (input)="emitGuestForm()">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Nr Telefonu</mat-label>
-          <input type="tel" matInput formControlName="phoneNumber">
+          <input type="tel" matInput formControlName="phoneNumber" (input)="emitGuestForm()">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Rejestracja</mat-label>
-          <input type="text" matInput formControlName="carRegistration">
+          <input type="text" matInput formControlName="carRegistration" (input)="emitGuestForm()">
         </mat-form-field>
 
       </form>
@@ -119,6 +130,7 @@ export type GuestFormData = {guest?: Guest};
 })
 export class GuestFormComponent {
   @Input() isDialog = true;
+  @Output() guestFormEvent = new EventEmitter<FormGroup>();
   private readonly formFactoryService = inject(FormFactoryService);
   private readonly guestService = inject(UserService);
   private readonly fd: GuestFormData = inject<GuestFormData>(MAT_DIALOG_DATA);
@@ -127,6 +139,10 @@ export class GuestFormComponent {
   protected formTitle = this.isUpdate ? 'Edytuj Gościa' : 'Nowy Gość';
   protected deleteAction = () => this.guestService.delete(this.fd.guest!);
   protected formGroup = this.formFactoryService.buildGuestForm();
+
+  protected emitGuestForm() {
+    this.guestFormEvent.emit(this.formGroup);
+  }
 }
 
 @Component({
@@ -147,7 +163,6 @@ export class GuestFormComponent {
     AsyncPipe,
     MatInputModule,
     MatCheckbox,
-    NgComponentOutlet,
     FormsModule,
     MatAutocomplete,
     MatAutocompleteTrigger
@@ -219,7 +234,7 @@ export class GuestFormComponent {
         </div>
 
         @if (newGuest) {
-          <ng-container class="guestForm" *ngComponentOutlet="guestFormComponent; inputs: {isDialog: false}"/>
+          <ng-container #guestForm class="guestForm"/>
         } @else {
           <mat-form-field>
             <mat-label>Gość</mat-label>
@@ -239,14 +254,15 @@ export class GuestFormComponent {
 })
 export class ReservationFormComponent implements OnInit {
 
+  @ViewChild('guestForm', {read: ViewContainerRef}) vcr!: ViewContainerRef;
+
   private readonly formFactoryService = inject(FormFactoryService);
   private readonly reservationService = inject(ReservationService);
   private readonly camperPlaceService = inject(CamperPlaceService);
   private readonly guestService = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly popupConfirmationService = inject(PopupConfirmationService);
   private readonly fd: ReservationFormData = inject<ReservationFormData>(MAT_DIALOG_DATA);
-
-  protected readonly guestFormComponent = GuestFormComponent;
 
   protected isUpdate = !!this.fd.reservation;
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
@@ -263,27 +279,27 @@ export class ReservationFormComponent implements OnInit {
 
   protected createAction = () => {
 
-    const checkin = this.formGroup.get('checkinDate')?.value;
-    const checkout = this.formGroup.get('checkoutDate')?.value;
-    const camperPlace = this.formGroup.get('camperPlace')?.value;
-    const rawGuest = this.formGroup.get('guest')?.value;
+    const checkin = this.formGroup.get('checkinDate')!.value;
+    const checkout = this.formGroup.get('checkoutDate')!.value;
+    const camperPlace = this.formGroup.get('camperPlace')!.value;
+    const rawGuest = this.formGroup.get('guest')!.value;
 
     const guest: Guest | undefined = rawGuest
       ? {
         id: rawGuest.id!,
-        firstname: rawGuest.firstname ?? '',
-        lastname: rawGuest.lastname ?? '',
-        email: rawGuest.email ?? '',
-        phoneNumber: rawGuest.phoneNumber ?? '',
-        carRegistration: rawGuest.carRegistration ?? ''
+        firstname: rawGuest.firstname,
+        lastname: rawGuest.lastname,
+        email: rawGuest.email,
+        phoneNumber: rawGuest.phoneNumber,
+        carRegistration: rawGuest.carRegistration
       }
       : undefined;
 
     const payload: Reservation = {
       id: this.fd.reservation?.id,
-      checkin: checkin?.format('YYYY-MM-DD') ?? '',
-      checkout: checkout?.format('YYYY-MM-DD') ?? '',
-      camperPlaceIndex: this.formGroup.get('camperPlace')?.value?.index ?? '',
+      checkin: checkin!.format('YYYY-MM-DD') ?? '',
+      checkout: checkout!.format('YYYY-MM-DD') ?? '',
+      camperPlaceIndex: camperPlace!.index ?? '',
       guest: guest,
       paid: false,
     };
@@ -325,17 +341,30 @@ export class ReservationFormComponent implements OnInit {
     return moment({ year: year, month: month, day: day }).format('YYYY-MM-DD');
   }
 
-  private formatMomentToString(moment: Moment): string {
-    return moment.format('YYYY-MM-DD');
-  }
-
   protected checkNewGuest() {
     this.newGuest = !this.newGuest;
     if (this.newGuest) {
       this.checkBoxText = 'Wybierz Istniejącego';
+      setTimeout(() => {this.createGuestForm()})
     } else {
       this.checkBoxText = 'Nowy Gość';
+      this.vcr?.clear();
     }
+  }
+
+  private createGuestForm() {
+    if (!this.vcr) return;
+    this.vcr.clear();
+
+    const guestFormRef = this.vcr.createComponent(GuestFormComponent);
+    guestFormRef.setInput('isDialog', false);
+
+    guestFormRef.instance.guestFormEvent
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(form => {
+        console.log(form);
+        this.patchGuestForm(form)
+      });
   }
 
   protected displayGuest(value: any): string {
@@ -353,6 +382,10 @@ export class ReservationFormComponent implements OnInit {
       });
 
     this.formGroup.get('guestSearch')!.setValue(selected);
+  }
+
+  protected patchGuestForm(form: FormGroup) {
+    this.formGroup.get('guest')?.patchValue(form.value);
   }
 
 }

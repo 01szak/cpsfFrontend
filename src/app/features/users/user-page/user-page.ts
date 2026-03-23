@@ -47,11 +47,11 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
   }
 
   protected override openCreatePopup() {
-    this.formService.openCreateUserFormPopup();
+    // this.formService.openCreateUserFormPopup();
   }
 
   protected override openUpdatePopup(guest: Guest) {
-    this.formService.openUpdateUserPopup(guest);
+    // this.formService.openUpdateUserPopup(guest);
   }
 
 
