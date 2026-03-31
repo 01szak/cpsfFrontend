@@ -16,7 +16,7 @@
   export class PopupFormService {
     readonly popupForm: MatDialog = inject(MatDialog);
     guests$: Observable<Guest[]>;
-    camperPlaces$: Observable<string[]>;
+    camperPlaces$: Observable<CamperPlace[]>;
 
     constructor(
       private popupConfirmationService: PopupConfirmationService,
@@ -27,7 +27,7 @@
     ) {
       this.guests$ = this.userService.findAll().pipe(map(p=> p.content))
 
-      this.camperPlaces$ = this.camperPlaceService.getCamperPlaces().pipe(map(camperPlaces => camperPlaces.map(cp => cp.index)));
+      this.camperPlaces$ = this.camperPlaceService.getCamperPlaces();
     }
 
     openCreateReservationFormPopup(camperPlace?: CamperPlace, year?: number, month?: number, day?: number) {
@@ -39,7 +39,7 @@
         formInputs: [
           { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: checkinDefaultDate, readonly: checkinDefaultDate instanceof Date, additional: false},
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', additional: false},
-          { name: 'Numer parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: camperPlace?.index || undefined, readonly: (camperPlace?.index.length || 0) > 0, additional: false},
+          { name: 'Numer parceli', field: 'camperPlace', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: camperPlace || undefined, readonly: !!camperPlace, additional: false},
           { name: 'Gość', field: 'guest', type: 'text', select: true, selectList: this.guests$, additional: false, replacedByAdditional: true, autocomplete: true},
           { name: 'Imię', field: 'firstname', type: 'text', additional: true },
           { name: 'Nazwisko', field: 'lastname', type: 'text', additional: true },
@@ -62,7 +62,7 @@
 
           const reservationToCreate: Reservation = {
             paid: false,
-            camperPlace: result['camperPlaceIndex'].toString() ?? '',
+            camperPlace: result['camperPlace'] ?? camperPlace,
             checkin: checkin,
             checkout: checkout,
             price: 0,
@@ -126,7 +126,7 @@
 
           reservationToUpdate.checkin = checkin;
           reservationToUpdate.checkout = checkout;
-          reservationToUpdate.camperPlace = result['camperPlace']?.toString() ?? reservationToUpdate.camperPlace;
+          reservationToUpdate.camperPlace = result['camperPlace'] ?? reservationToUpdate.camperPlace;
           reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
           reservationToUpdate.guest!.firstname = result['firstname']?.toString() ?? reservationToUpdate.guest?.firstname;
           reservationToUpdate.guest!.lastname = result['lastname']?.toString() ?? reservationToUpdate.guest?.lastname;
