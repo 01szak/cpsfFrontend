@@ -21,6 +21,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import moment from 'moment';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 
 export const MY_FORMATS = {
   parse: {
@@ -97,7 +98,7 @@ export class PopupFormComponent implements OnInit {
           this.formValues[input.field] = null;
         }
       } else {
-        this.formValues[input.field] = value?.toString() ?? '';
+        this.formValues[input.field] = value ?? '';
       }
     }
   }
@@ -165,6 +166,13 @@ export class PopupFormComponent implements OnInit {
 
   protected readonly console = console;
 
+  compareObjects(o1: any, o2: any): boolean {
+    if (o1 && o2 && typeof o1 === 'object' && typeof o2 === 'object') {
+      return o1.id === o2.id;
+    }
+    return o1 === o2;
+  }
+
   deleteObject(objectToUpdate: any) {
     let deleteFunc: () => void;
     let message: string = '';
@@ -197,7 +205,7 @@ export interface FormInput {
   select?: boolean,
   selectList?: Observable<any[]>,
   checkbox?: boolean
-  defaultValue?: string | Date | number | Guest | boolean
+  defaultValue?: any
   readonly?: boolean,
   additional?: boolean
   replacedByAdditional?: boolean

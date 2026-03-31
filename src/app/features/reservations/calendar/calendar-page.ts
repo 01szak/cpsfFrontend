@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {find, map, Observable, Subscription, take} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
@@ -13,6 +13,9 @@ import {PaidReservationsWithSets} from '@core/models/PaidReservations';
 import {UserPerReservation} from '@core/models/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
+import {HttpParams} from '@angular/common/http';
+import {Filter} from '@shared/ui/data-table/regular-table.component';
+import {Reservation} from '@core/models/Reservation';
 
 @Component({
   selector: 'calendar',
@@ -110,42 +113,78 @@ export class CalendarPage implements OnInit, OnDestroy{
   }
 
   openFormPopup(year: number, month: number, day: number, camperPlace: CamperPlace, event: MouseEvent) {
-   if (!camperPlace) {
-     return;
-   }
+    if (!camperPlace) return;
+
     const target = event.target as HTMLElement;
     const date = new Date(year, month, day);
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
-    let reservationToUpdate;
+
+    const openPopup = (reservationToUpdate?: Reservation) => {
+      if (reservationToUpdate) {
+        console.log(reservationToUpdate)
+        this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
+      } else {
+        this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
+      }
+    };
 
     if (isLeft) {
-      reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
-        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
-        const checkin = new Date(checkinStr);
-        const checkout = new Date(checkoutStr);
-        checkin.setHours(0, 0, 0, 0);
-        checkout.setHours(0, 0, 0, 0);
-        return date.getTime() <= checkout.getTime() && date.getTime() > new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate() - 1).getTime();
-      });
-    } else if (isRight) {
-      reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
-        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
-        const checkin = new Date(checkinStr);
-        const checkout = new Date(checkoutStr);
-        checkin.setHours(0, 0, 0, 0);
-        checkout.setHours(0, 0, 0, 0);
-        return date.getTime() >= checkin.getTime()
-          && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
-      });
+      this.reservationService
+        .findByDateInBetweenAndCamperPlaceId(
+          this.reservationHelper.mapDateToString(date.getFullYear(), date.getMonth() + 1, date.getDate()),
+          camperPlace.id
+        )
+        .pipe(
+          map(r => {
+            if (!r) return undefined;
+
+            const checkin = new Date(this.reservationHelper.formatToStringDate(r.checkin));
+            const checkout = new Date(this.reservationHelper.formatToStringDate(r.checkout));
+
+            checkin.setHours(0,0,0,0);
+            checkout.setHours(0,0,0,0);
+
+            const checkinMinusOneDay = new Date(checkin);
+            checkinMinusOneDay.setDate(checkinMinusOneDay.getDate() - 1);
+
+            const isInside =
+              date.getTime() <= checkout.getTime() &&
+              date.getTime() > checkinMinusOneDay.getTime();
+
+            return isInside ? r : undefined;
+          }),
+          take(1)
+        )
+        .subscribe(openPopup);
     }
-    if (reservationToUpdate) {
-      this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
-    } else {
-      this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
+
+    else if (isRight) {
+      this.reservationService
+        .findByDateInBetweenAndCamperPlaceId(
+          this.reservationHelper.mapDateToString(date.getFullYear(), date.getMonth() + 1, date.getDate()),
+          camperPlace.id
+        )
+        .pipe(
+          map(r => {
+            if (!r) return undefined;
+
+            const checkin = new Date(this.reservationHelper.formatToStringDate(r.checkin));
+            const checkout = new Date(this.reservationHelper.formatToStringDate(r.checkout));
+
+            checkin.setHours(0,0,0,0);
+            checkout.setHours(0,0,0,0);
+
+            const isInside =
+              date.getTime() >= checkin.getTime() &&
+              date.getTime() < checkout.getTime();
+
+            return isInside ? r : undefined;
+          }),
+          take(1)
+        )
+        .subscribe(openPopup);
     }
   }
 

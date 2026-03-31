@@ -56,9 +56,9 @@
                         } @else {
                             <mat-form-field>
                               <mat-label>{{ formInput.name }}</mat-label>
-                              <mat-select [(value)]="formValues[formInput.field]">
+                              <mat-select [(value)]="formValues[formInput.field]" [compareWith]="compareObjects">
                                 @for (el of formInput.selectList  | async; track el) {
-                                  <mat-option [value]="el">{{el.toString()}}</mat-option>
+                                  <mat-option [value]="el">{{el.index || el}}</mat-option>
                                 }
                               </mat-select>
                             </mat-form-field>
@@ -68,7 +68,7 @@
                         <mat-form-field>
                           <mat-label>{{ formInput.name }}</mat-label>
                           <input matInput
-                                 [(ngModel)]="formValues[formInput.field]"
+                                 [value]="formValues[formInput.field]?.index || formValues[formInput.field] || ''"
                                  [readonly]="true">
                         </mat-form-field>
                   }
