@@ -21,6 +21,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import moment from 'moment';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 
 export const MY_FORMATS = {
   parse: {
@@ -197,7 +198,7 @@ export interface FormInput {
   select?: boolean,
   selectList?: Observable<any[]>,
   checkbox?: boolean
-  defaultValue?: string | Date | number | Guest | boolean
+  defaultValue?: any
   readonly?: boolean,
   additional?: boolean
   replacedByAdditional?: boolean

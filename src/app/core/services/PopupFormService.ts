@@ -56,13 +56,13 @@
         dialogRef.componentInstance.secondAction = () => {
           const result = dialogRef.componentInstance.formValues;
           const guestToCreate = this.getDefaultGuest(result);
-          
+
           const checkin = moment(result['checkin']).isValid() ? moment(result['checkin']).format('YYYY-MM-DD') : result['checkin']?.toString() ?? '';
           const checkout = moment(result['checkout']).isValid() ? moment(result['checkout']).format('YYYY-MM-DD') : result['checkout']?.toString() ?? '';
 
           const reservationToCreate: Reservation = {
             paid: false,
-            camperPlaceIndex: result['camperPlaceIndex'].toString() ?? '',
+            camperPlace: result['camperPlaceIndex'].toString() ?? '',
             checkin: checkin,
             checkout: checkout,
             price: 0,
@@ -85,7 +85,7 @@
         id: reservation.id,
         checkin: reservation.checkin,
         checkout: reservation.checkout,
-        camperPlaceIndex: reservation.camperPlaceIndex,
+        camperPlace: reservation.camperPlace,
         guest: reservation.guest,
         paid: reservation.paid
       };
@@ -102,7 +102,7 @@
         formInputs: [
           { name: 'Data wjazdu', field: 'checkin', type: 'date', defaultValue: reservationToUpdate.checkin},
           { name: 'Data wyjazdu', field: 'checkout', type: 'date', defaultValue: reservationToUpdate.checkout},
-          { name: 'Numer Parceli', field: 'camperPlaceIndex', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlaceIndex},
+          { name: 'Numer Parceli', field: 'camperPlace', type: 'text', select:true, selectList: this.camperPlaces$, defaultValue: reservationToUpdate.camperPlace},
           { name: 'Zaplacone', field: 'paid', type: 'checkbox', checkbox: true, defaultValue: reservationToUpdate.paid},
           { name: 'Gość', field: 'guest', type: 'select', defaultValue: reservationToUpdate.guest ? (reservationToUpdate.guest.firstname + " " + reservationToUpdate.guest.lastname) : '',  replacedByAdditional: true, readonly: true},
           { name: 'Imię', field: 'firstname', type: 'text', additional: true, defaultValue: reservationToUpdate.guest?.firstname },
@@ -126,7 +126,7 @@
 
           reservationToUpdate.checkin = checkin;
           reservationToUpdate.checkout = checkout;
-          reservationToUpdate.camperPlaceIndex = result['camperPlaceIndex']?.toString() ?? reservationToUpdate.camperPlaceIndex;
+          reservationToUpdate.camperPlace = result['camperPlace']?.toString() ?? reservationToUpdate.camperPlace;
           reservationToUpdate.paid = result['paid'] ?? reservationToUpdate.paid;
           reservationToUpdate.guest!.firstname = result['firstname']?.toString() ?? reservationToUpdate.guest?.firstname;
           reservationToUpdate.guest!.lastname = result['lastname']?.toString() ?? reservationToUpdate.guest?.lastname;
