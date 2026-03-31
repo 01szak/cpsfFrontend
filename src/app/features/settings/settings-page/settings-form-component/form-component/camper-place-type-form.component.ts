@@ -37,7 +37,7 @@ import {CamperPlaceService} from '@features/settings/services/CamperPlaceService
                   [checked]="isTypeAllSelected(e[0])"
                   [indeterminate]="isSomeTypeSelected(e[0]) && !isTypeAllSelected(e[0])" />
                 <span style="font-weight: 600; color: var(--text-primary)">
-                  Typ: {{ e[1][0].type.typeName }}
+                  Typ: {{ e[1][0].type!.typeName }}
                   <span style="font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-left: 8px;">
                     (Zmieniana na: <strong style="color: #4caf50;">{{ getNewPrice(e[0]) }} zł</strong>)
                   </span>

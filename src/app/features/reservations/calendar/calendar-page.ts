@@ -2,7 +2,8 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {ReservationService} from '@features/reservations/services/ReservationService';
-import {PopupFormService, ReservationFormData} from '@core/services/PopupFormService';
+import {PopupFormService} from '@core/services/PopupFormService';
+import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
 import {ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
 import {CamperPlace} from '@core/models/CamperPlace';
@@ -13,6 +14,8 @@ import {PaidReservationsWithSets} from '@core/models/PaidReservations';
 import {UserPerReservation} from '@core/models/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {DateDelimiter, DateFormater, DateParams} from '@shared/helper/DateFormater';
 
 @Component({
   selector: 'calendar',
@@ -114,7 +117,7 @@ export class CalendarPage implements OnInit, OnDestroy{
      return;
    }
     const target = event.target as HTMLElement;
-    const date = new Date(year, month, day);
+    const date = DateFormater.MOMENT({year: year, month: month,day: day});
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
@@ -122,27 +125,19 @@ export class CalendarPage implements OnInit, OnDestroy{
 
     if (isLeft) {
       reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
-        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
-        const checkin = new Date(checkinStr);
-        const checkout = new Date(checkoutStr);
-        checkin.setHours(0, 0, 0, 0);
-        checkout.setHours(0, 0, 0, 0);
-        return date.getTime() <= checkout.getTime() && date.getTime() > new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate() - 1).getTime();
+        const checkin = DateFormater.MOMENT(r.checkin);
+        const checkout = DateFormater.MOMENT(r.checkout);
+        return checkin.isBefore(checkout.subtract(1, "day"));
       });
     } else if (isRight) {
       reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkoutStr = this.reservationHelper.formatToStringDate(r.checkout);
-        const checkinStr = this.reservationHelper.formatToStringDate(r.checkin);
-        const checkin = new Date(checkinStr);
-        const checkout = new Date(checkoutStr);
-        checkin.setHours(0, 0, 0, 0);
-        checkout.setHours(0, 0, 0, 0);
-        return date.getTime() >= checkin.getTime()
-          && date.getTime() < new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate()).getTime();
+        const checkin = DateFormater.MOMENT(r.checkin);
+        const checkout = DateFormater.MOMENT(r.checkout);
+        return checkout.isAfter(checkin) && date.isBefore(checkout);
       });
     }
-    const reservationFd: ReservationFormData = {reservation: reservationToUpdate, year: year, month: month, day: day};
+    const cp: CamperPlaceForTable = {id: camperPlace.id, index: camperPlace.index, price: 0}
+    const reservationFd: ReservationFormData = {reservation: reservationToUpdate, year: year, month: month, day: day, camperPlace: cp};
     console.log(reservationFd)
     this.popupFormService.openReservationFormPopup(reservationFd);
     // if (reservationToUpdate) {
