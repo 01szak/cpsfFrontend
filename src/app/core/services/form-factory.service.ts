@@ -36,7 +36,7 @@ export class FormFactoryService {
     formGroup.patchValue({
       checkinDate: DateFormater.MOMENT(reservation.checkin),
       checkoutDate: DateFormater.MOMENT(reservation.checkout),
-      camperPlace: {index: reservation.camperPlace.index} as CamperPlaceForTable,
+      camperPlace: {id: reservation.camperPlace.id, index: reservation.camperPlace.index } as CamperPlaceForTable,
       guestSearch: guestName,
       guest: this.patchGuest(formGroup, reservation.guest!),
     })

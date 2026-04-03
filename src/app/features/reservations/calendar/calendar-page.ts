@@ -153,7 +153,6 @@ export class CalendarPage implements OnInit, OnDestroy{
         )
         .subscribe(openPopup);
     }
-
     else if (isRight) {
       this.reservationService
         .findByDateInBetweenAndCamperPlaceId(

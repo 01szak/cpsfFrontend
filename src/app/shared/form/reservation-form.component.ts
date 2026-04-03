@@ -175,6 +175,9 @@ export class ReservationFormComponent implements OnInit {
   }
 
   private initialPatch() {
+    if (this.fd?.camperPlace) {
+      this.formGroup.get('camperPlace')?.setValue(this.fd.camperPlace);
+    }
     if (this.fd?.reservation) {
       this.factory.patchReservation(this.formGroup, this.fd?.reservation!);
       const checkin = DateFormater.MOMENT(this.fd.reservation.checkin);
@@ -187,11 +190,7 @@ export class ReservationFormComponent implements OnInit {
         const g = this.fd.reservation.guest;
         this.formGroup.get('guestSearch')?.setValue(`${g.firstname} ${g.lastname}`);
       }
-
     } else {
-      if (this.fd?.camperPlace) {
-        this.formGroup.get('camperPlace')?.setValue(this.fd.camperPlace);
-      }
       if (this.fd?.year && this.fd?.month !== undefined && this.fd?.day) {
         const date = DateFormater.MOMENT({year: this.fd.year, month: this.fd.month, day: this.fd.day});
         this.formGroup.get('checkinDate')?.setValue(date);
@@ -226,16 +225,16 @@ export class ReservationFormComponent implements OnInit {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
-      camperPlace: camperPlace!.index,
+      camperPlace: camperPlace!,
       guest: guest,
-      paid: this.fd.reservation!.paid
+      paid: this.fd.reservation?.paid || false
     };
 
     this.confirmation.openConfirmationPopup({
       title: 'Zapisywanie',
       message: 'Czy chcesz zapisać zmiany?',
       action: () => (this.isUpdate ? this.reservationService.update(payload) : this.reservationService.create(payload))
-        .pipe(take(1)).subscribe(() => this.dialogRef.close())
+        .subscribe(() => this.dialogRef.close())
     });
   }
 
