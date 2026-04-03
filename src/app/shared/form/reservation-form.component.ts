@@ -13,16 +13,26 @@ import {PopupFormContainer} from './popup-form-container.component';
 import {GuestFormComponent} from './guest-form.component';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
+import {MatInput, MatInputModule} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {AsyncPipe} from '@angular/common';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {Page} from '@core/models/Page';
-import {MatDatepickerInput, MatDatepickerModule, MatDatepickerToggle} from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerModule,
+  MatDatepickerToggle
+} from '@angular/material/datepicker';
 import moment from 'moment';
-import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import {
+  MatMomentDateModule,
+  MomentDateAdapter,
+  MomentDateModule,
+  provideMomentDateAdapter
+} from '@angular/material-moment-adapter';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {DateDelimiter, DateFormater, DateParams} from '@shared/helper/DateFormater';
 
@@ -32,18 +42,6 @@ export type ReservationFormData = {
   month?: number;
   day?: number;
   camperPlace?: CamperPlaceForTable;
-};
-
-export const DATE_FORMATS = {
-  parse: {
-    dateInput: 'DD.MM.YY',
-  },
-  display: {
-    dateInput: 'DD.MM.YY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
 };
 
 @Component({
@@ -65,16 +63,12 @@ export const DATE_FORMATS = {
     MatDatepickerInput,
     MatDatepickerToggle,
     MatDatepickerModule,
-    MatIconModule
+    MatInputModule,
+    MatIconModule,
+    MatDatepicker,
+    MatMomentDateModule
   ],
   standalone: true,
-  providers: [
-    {
-      provide: MAT_DATE_LOCALE,
-      useValue: 'pl-PL'
-    },
-    provideMomentDateAdapter(DATE_FORMATS),
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-popup-form-container
@@ -156,8 +150,8 @@ export class ReservationFormComponent implements OnInit {
 
   protected selectedCp? = this.fd?.camperPlace;
   protected currentGuest? = this.fd?.reservation?.guest;
-  protected formGroup: FormGroup = this.factory.buildReservationForm();
   protected isUpdate = !!this.fd?.reservation;
+  protected formGroup: FormGroup = this.factory.buildReservationForm();
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
   protected isNewGuest = false;
   protected camperPlaces$ = this.camperPlaceService.getCamperPlacesForTable();
@@ -190,11 +184,6 @@ export class ReservationFormComponent implements OnInit {
       const checkin = DateFormater.MOMENT(this.fd.reservation.checkin);
       const checkout = DateFormater.MOMENT(this.fd.reservation.checkout);
 
-      this.formGroup.patchValue({
-        checkinDate: checkin,
-        checkoutDate: checkout
-      });
-
       this.checkinCalendarStart = checkin;
       this.checkoutCalendarStart = checkout;
 
@@ -211,6 +200,7 @@ export class ReservationFormComponent implements OnInit {
         const date = DateFormater.MOMENT({year: this.fd.year, month: this.fd.month, day: this.fd.day});
         this.formGroup.get('checkinDate')?.setValue(date);
         this.checkinCalendarStart = date;
+        this.checkoutCalendarStart = DateFormater.MOMENT({year: this.fd.year, month: this.fd.month, day: 1});
       }
     }
     this.cdr.markForCheck();
@@ -240,9 +230,9 @@ export class ReservationFormComponent implements OnInit {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
-      camperPlace: camperPlace?.index ?? '',
+      camperPlace: camperPlace!.index,
       guest: guest,
-      paid: this.fd.reservation?.paid ?? false
+      paid: this.fd.reservation!.paid
     };
 
     this.confirmation.openConfirmationPopup({

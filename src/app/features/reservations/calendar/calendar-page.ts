@@ -16,6 +16,7 @@ import moment from 'moment';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Reservation} from '@core/models/Reservation';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 
 @Component({
   selector: 'calendar',
@@ -120,9 +121,15 @@ export class CalendarPage implements OnInit, OnDestroy{
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
-
+    const formatedCp: CamperPlaceForTable = {id: camperPlace.id, index: camperPlace.index, price: 0}
     const openPopup = (reservationToUpdate?: Reservation) => {
-        this.popupFormService.openReservationFormPopup({reservationToUpdate, year, month, day} as ReservationFormData);
+        this.popupFormService.openReservationFormPopup({
+          reservation: reservationToUpdate,
+          year: year,
+          month: month,
+          day: day,
+          camperPlace: formatedCp
+        } as ReservationFormData);
     };
 
     if (isLeft) {
