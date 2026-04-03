@@ -46,7 +46,6 @@ export class NewDatePickerComponent implements OnInit {
 
   ngOnInit() {
     this.getYears();
-    // Initial emission if needed
   }
 
 
