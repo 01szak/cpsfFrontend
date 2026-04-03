@@ -8,12 +8,20 @@ export enum DateDelimiter {
 }
 export class DateFormater {
 
-  static YYYYMMDD(date: string | Date | DateParams, delimiter: DateDelimiter): string {
-    return this.MOMENT(date).format(`YYYY${delimiter}MM${delimiter}DD`);
+  static YYYYMMDD(date: string | Date | DateParams | Moment, delimiter: DateDelimiter): string {
+    const format = `YYYY${delimiter}MM${delimiter}DD`;
+    if (moment.isMoment(date)) {
+      return date.format(format);
+    }
+    return this.MOMENT(date).format(format);
   }
 
-  static DDMMYYYY(date: string | Date | DateParams, delimiter: DateDelimiter): string {
-    return this.MOMENT(date).format(`DD${delimiter}MM${delimiter}YYYY`);
+  static DDMMYYYY(date: string | Date | DateParams | Moment, delimiter: DateDelimiter): string {
+    const format = `DD${delimiter}MM${delimiter}YYYY`;
+    if (moment.isMoment(date)) {
+      return date.format(format);
+    }
+    return this.MOMENT(date).format(format);
   }
 
   static MOMENT(date: string | Date | DateParams): Moment {

@@ -1,5 +1,6 @@
 import {Guest} from './Guest';
 import {BackendEntity} from './BackendEntity';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 
 export  interface Reservation extends BackendEntity{
   __type?: 'Reservation';
@@ -8,7 +9,7 @@ export  interface Reservation extends BackendEntity{
   checkout: string;
   guest?: Guest;
   stringUser?: string;
-  camperPlaceIndex: string;
+  camperPlace: CamperPlaceForTable;
   price?: number;
   reservationStatus?: string;
   paid: boolean;

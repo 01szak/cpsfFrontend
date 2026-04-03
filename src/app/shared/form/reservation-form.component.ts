@@ -240,7 +240,7 @@ export class ReservationFormComponent implements OnInit {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
-      camperPlaceIndex: camperPlace?.index ?? '',
+      camperPlace: camperPlace?.index ?? '',
       guest: guest,
       paid: this.fd.reservation?.paid ?? false
     };

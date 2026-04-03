@@ -1,9 +1,8 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {map, Observable, Subscription, take} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
-import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
 import {ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
 import {CamperPlace} from '@core/models/CamperPlace';
@@ -14,8 +13,9 @@ import {PaidReservationsWithSets} from '@core/models/PaidReservations';
 import {UserPerReservation} from '@core/models/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
-import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
-import {DateDelimiter, DateFormater, DateParams} from '@shared/helper/DateFormater';
+import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import {Reservation} from '@core/models/Reservation';
+import {ReservationFormData} from '@shared/form/reservation-form.component';
 
 @Component({
   selector: 'calendar',
@@ -113,38 +113,61 @@ export class CalendarPage implements OnInit, OnDestroy{
   }
 
   openFormPopup(year: number, month: number, day: number, camperPlace: CamperPlace, event: MouseEvent) {
-   if (!camperPlace) {
-     return;
-   }
+    if (!camperPlace) return;
+
     const target = event.target as HTMLElement;
     const date = DateFormater.MOMENT({year: year, month: month,day: day});
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
-    let reservationToUpdate;
+
+    const openPopup = (reservationToUpdate?: Reservation) => {
+        this.popupFormService.openReservationFormPopup({reservationToUpdate, year, month, day} as ReservationFormData);
+    };
 
     if (isLeft) {
-      reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkin = DateFormater.MOMENT(r.checkin);
-        const checkout = DateFormater.MOMENT(r.checkout);
-        return checkin.isBefore(checkout.subtract(1, "day"));
-      });
-    } else if (isRight) {
-      reservationToUpdate = camperPlace.reservations.find(r => {
-        const checkin = DateFormater.MOMENT(r.checkin);
-        const checkout = DateFormater.MOMENT(r.checkout);
-        return checkout.isAfter(checkin) && date.isBefore(checkout);
-      });
+      this.reservationService
+        .findByDateInBetweenAndCamperPlaceId(
+          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
+          camperPlace.id
+        )
+        .pipe(
+          map(r => {
+            if (!r) return undefined;
+
+            const checkin = DateFormater.MOMENT(r.checkin);
+            const checkout = DateFormater.MOMENT(r.checkout);
+
+            const isInside = checkin.isBefore(checkout.subtract(1, "day"));
+
+            return isInside ? r : undefined;
+          }),
+          take(1)
+        )
+        .subscribe(openPopup);
     }
-    const cp: CamperPlaceForTable = {id: camperPlace.id, index: camperPlace.index, price: 0}
-    const reservationFd: ReservationFormData = {reservation: reservationToUpdate, year: year, month: month, day: day, camperPlace: cp};
-    console.log(reservationFd)
-    this.popupFormService.openReservationFormPopup(reservationFd);
-    // if (reservationToUpdate) {
-    //   this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
-    // } else {
-    //   this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
-    // }
+
+    else if (isRight) {
+      this.reservationService
+        .findByDateInBetweenAndCamperPlaceId(
+          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
+          camperPlace.id
+        )
+        .pipe(
+          map(r => {
+            if (!r) return undefined;
+
+            const checkin = DateFormater.MOMENT(r.checkin);
+            const checkout = DateFormater.MOMENT(r.checkout);
+
+            const isInside = checkout.isAfter(checkin) && date.isBefore(checkout);
+
+            return isInside ? r : undefined;
+          }),
+          take(1)
+        )
+        .subscribe(openPopup);
+    }
   }
 
   findWeekDay(year: number, month: number, day: number) {

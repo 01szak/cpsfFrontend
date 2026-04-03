@@ -1,9 +1,10 @@
-import { inject, Injectable } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Guest } from '@core/models/Guest';
-import { CamperPlaceForTable } from '@core/models/CamperPlaceForTable';
+import {inject, Injectable} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {Guest} from '@core/models/Guest';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {Reservation} from '@core/models/Reservation';
 import moment from 'moment';
+import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 
 @Injectable({ providedIn: 'root' })
 export class FormFactoryService {
@@ -33,9 +34,9 @@ export class FormFactoryService {
   patchReservation(formGroup: FormGroup, reservation: Reservation) {
     const guestName = `${reservation.guest!.firstname} ${reservation.guest!.lastname}`
     formGroup.patchValue({
-      checkinDate: moment(reservation.checkin, 'YYYY-MM-DD'),
-      checkoutDate: moment(reservation.checkout, 'YYYY-MM-DD'),
-      camperPlace: {index: reservation.camperPlaceIndex} as CamperPlaceForTable,
+      checkinDate: DateFormater.YYYYMMDD(reservation.checkin, DateDelimiter.DASH),
+      checkoutDate: DateFormater.YYYYMMDD(reservation.checkout, DateDelimiter.DASH),
+      camperPlace: {index: reservation.camperPlace.index} as CamperPlaceForTable,
       guestSearch: guestName,
       guest: this.patchGuest(formGroup, reservation.guest!),
     })
