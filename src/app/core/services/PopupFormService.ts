@@ -21,8 +21,8 @@ export class PopupFormService {
     return this.popupForm.open(GuestFormComponent, {
       data: guestFd,
       panelClass: 'popupForm',
-      width: 'auto',
-      maxWidth: '500px'
+      width: '450px',
+      maxWidth: '90vw'
     });
   }
 }

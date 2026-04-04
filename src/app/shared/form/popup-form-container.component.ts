@@ -61,7 +61,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     </mat-dialog-content>
 
     <mat-dialog-actions style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); justify-content: flex-end;">
-      <app-form-buttons
+      <app-form-buttons style="width: 100%"
         [firstAction]="closeAction"
         [secondAction]="proceedAction"
       />
