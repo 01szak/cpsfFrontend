@@ -10,6 +10,7 @@ export  interface Reservation extends BackendEntity{
   guest?: Guest;
   stringUser?: string;
   camperPlace: CamperPlaceForTable;
+  camperPlaceIndex?: string;
   price?: number;
   reservationStatus?: string;
   paid: boolean;
