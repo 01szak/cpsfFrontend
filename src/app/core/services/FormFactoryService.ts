@@ -15,6 +15,7 @@ export class FormFactoryService {
       checkinDate: new FormControl<moment.Moment | null>(null),
       checkoutDate: new FormControl<moment.Moment | null>(null),
       camperPlace: new FormControl<CamperPlaceForTable | null>(null),
+      isPaid: new FormControl<boolean>(false),
       guestSearch: new FormControl<{ name: string; guest: Guest } | null>(null),
       guest: this.buildGuestForm(),
     });
@@ -36,7 +37,8 @@ export class FormFactoryService {
     formGroup.patchValue({
       checkinDate: DateFormater.MOMENT(reservation.checkin),
       checkoutDate: DateFormater.MOMENT(reservation.checkout),
-      camperPlace: {id: reservation.camperPlace.id, index: reservation.camperPlace.index } as CamperPlaceForTable,
+      camperPlace: reservation.camperPlace,
+      isPaid: reservation.paid,
       guestSearch: guestName,
       guest: this.patchGuest(formGroup, reservation.guest!),
     })

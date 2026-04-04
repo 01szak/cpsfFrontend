@@ -1,14 +1,15 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap, take} from 'rxjs';
+import { trigger, style, transition, animate } from '@angular/animations';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {UserService} from '@features/users/services/UserService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 import {Guest} from '@core/models/Guest';
 import {Reservation} from '@core/models/Reservation';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {FormFactoryService} from '@core/services/form-factory.service';
+import {FormFactoryService} from '@core/services/FormFactoryService';
 import {PopupFormContainer} from './popup-form-container.component';
 import {GuestFormComponent} from './guest-form.component';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -31,6 +32,7 @@ import {
   MatMomentDateModule,
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import {MatButton} from '@angular/material/button';
 
 export type ReservationFormData = {
   reservation?: Reservation;
@@ -62,10 +64,24 @@ export type ReservationFormData = {
     MatInputModule,
     MatIconModule,
     MatDatepicker,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatDialogTitle,
+    MatButton,
   ],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('expandCollapse', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0, overflow: 'hidden', display: 'block' }),
+        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        style({ height: '*', opacity: 1, overflow: 'hidden', display: 'block' }),
+        animate('250ms cubic-bezier(0.4, 0, 0.2, 1)', style({ height: '0', opacity: 0 }))
+      ])
+    ])
+  ],
   template: `
     <app-popup-form-container
       [formTitle]="formTitle"
@@ -73,7 +89,8 @@ export type ReservationFormData = {
       [isUpdate]="isUpdate"
       [proceedAction]="onSave">
 
-      <form [formGroup]="formGroup" style="display: flex; flex-direction: column; gap: 1rem;">
+      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled"
+            style="display: flex; flex-direction: column; gap: 1rem;">
         <mat-form-field>
           <mat-label>Data Wjazdu</mat-label>
           <input matInput [matDatepicker]="checkin" formControlName="checkinDate">
@@ -105,30 +122,44 @@ export type ReservationFormData = {
           }
         </mat-form-field>
 
-        <div style="margin: 1rem 0;">
-          <mat-checkbox [(ngModel)]="isNewGuest" [ngModelOptions]="{standalone: true}">
-            {{ isUpdate ? 'Zmień dane gościa' : 'Nowy gość' }}
+        <div style="margin: 0.5rem 0;">
+          <mat-checkbox formControlName="isPaid">
+            Zapłacone
           </mat-checkbox>
         </div>
 
+        <div style="margin: 0.5rem 0;">
+          <button mat-stroked-button (click)="setNewGuest()">
+            {{ isUpdate ? (isNewGuest ? 'Cofnij' : 'Zmień dane gościa' ) : (isNewGuest ? 'Wybierz Istniejącego' : 'Nowy Gość' ) }}
+          </button>
+        </div>
+
         @if (isNewGuest) {
-          <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>
+          <div [@expandCollapse] style="overflow: hidden;">
+            <h2 mat-dialog-title
+                style="margin: 0; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary) !important; padding: 1rem !important;">{{ GuestTittle }}</h2>
+            <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>
+          </div>
         } @else if (isUpdate && currentGuest) {
-          <mat-form-field>
-            <mat-label>Gość</mat-label>
-            <input type="text" matInput [disabled]="true" [value]="guestFullName">
-          </mat-form-field>
+          <div [@expandCollapse] style="overflow: hidden;">
+            <mat-form-field style="width: 100%">
+              <mat-label>Gość</mat-label>
+              <input type="text" matInput [disabled]="true" [value]="guestFullName">
+            </mat-form-field>
+          </div>
         } @else {
-          <mat-form-field>
-            <mat-label>Wyszukaj gościa</mat-label>
-            <input type="text" matInput formControlName="guestSearch" [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayGuestName"
-                              (optionSelected)="onGuestSelected($event.option.value)">
-              @for (g of (guests$ | async); track g.guest.id) {
-                <mat-option [value]="g">{{ g.name }}</mat-option>
-              }
-            </mat-autocomplete>
-          </mat-form-field>
+          <div [@expandCollapse] style="overflow: hidden;">
+            <mat-form-field style="width: 100%">
+              <mat-label>Wyszukaj gościa</mat-label>
+              <input type="text" matInput formControlName="guestSearch" [matAutocomplete]="auto">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayGuestName"
+                                (optionSelected)="onGuestSelected($event.option.value)">
+                @for (g of (guests$ | async); track g.guest.id) {
+                  <mat-option [value]="g">{{ g.name }}</mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
         }
       </form>
     </app-popup-form-container>
@@ -149,11 +180,13 @@ export class ReservationFormComponent implements OnInit {
   protected isUpdate = !!this.fd?.reservation;
   protected formGroup: FormGroup = this.factory.buildReservationForm();
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
+  protected GuestTittle = this.isUpdate ? 'Edycja Gościa' : 'Nowy Gość';
   protected isNewGuest = false;
   protected camperPlaces$ = this.camperPlaceService.getCamperPlacesForTable();
   protected guests$: Observable<{ name: string; guest: Guest }[]> = of([]);
   protected checkinCalendarStart: moment.Moment | null = null;
   protected checkoutCalendarStart: moment.Moment | null = null;
+  protected animationsEnabled = false;
 
   get guestSubForm(): FormGroup {
     return this.formGroup.get('guest') as FormGroup;
@@ -162,6 +195,11 @@ export class ReservationFormComponent implements OnInit {
   ngOnInit() {
     this.setupGuestSearch();
     this.initialPatch();
+
+    setTimeout(() => {
+      this.animationsEnabled = true;
+      this.cdr.markForCheck();
+    }, 500);
   }
 
   private setupGuestSearch() {
@@ -211,23 +249,25 @@ export class ReservationFormComponent implements OnInit {
     this.confirmation.openConfirmationPopup({
       title: 'Usuwanie',
       message: 'Czy na pewno usunąć tę rezerwację?',
-      action: () => this.reservationService.deleteReservation(this.fd.reservation!).pipe().subscribe(() => this.dialogRef.close())
+      action: () => this.reservationService.deleteReservation(this.fd.reservation!).subscribe(() => this.dialogRef.close())
     });
   } : null;
+
 
   protected onSave = () => {
     const checkin = DateFormater.YYYYMMDD(this.formGroup.get('checkinDate')!.value, DateDelimiter.DASH);
     const checkout = DateFormater.YYYYMMDD(this.formGroup.get('checkoutDate')!.value, DateDelimiter.DASH);
     const camperPlace = this.formGroup.get('camperPlace')!.value;
     const guest = this.formGroup.get('guest')!.value;
+    const isPaid = this.formGroup.get('isPaid')!.value;
 
     const payload: Reservation = {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
       camperPlace: camperPlace!,
+      paid: isPaid,
       guest: guest,
-      paid: this.fd.reservation?.paid || false
     };
 
     this.confirmation.openConfirmationPopup({
@@ -237,6 +277,16 @@ export class ReservationFormComponent implements OnInit {
         .subscribe(() => this.dialogRef.close())
     });
   }
+
+  protected setNewGuest() {
+    this.isNewGuest = !this.isNewGuest;
+    if (this.isNewGuest && !this.isUpdate) {
+      //if we want to creat new guest then we have to reset the guest form to prevent duplication / data overriding
+      this.formGroup.get('guest')?.reset();
+      this.formGroup.get('guestSearch')?.reset();
+    }
+  }
+
 
   get camperPlaceIndex() {
     return this.formGroup.get('camperPlace')?.value?.index;

@@ -12,8 +12,8 @@ export class PopupFormService {
     return this.popupForm.open(ReservationFormComponent, {
       data: reservationFd,
       panelClass: 'popupForm',
-      width: 'auto',
-      maxWidth: '600px'
+      width: '450px',
+      maxWidth: '90vw'
     });
   }
 

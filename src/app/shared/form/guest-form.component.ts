@@ -8,7 +8,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
 import { UserService } from '@features/users/services/UserService';
 import { Guest } from '@core/models/Guest';
-import { FormFactoryService } from '@core/services/form-factory.service';
+import { FormFactoryService } from '@core/services/FormFactoryService';
 
 export type GuestFormData = { guest?: Guest };
 
