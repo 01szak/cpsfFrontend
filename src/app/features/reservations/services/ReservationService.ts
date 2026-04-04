@@ -101,8 +101,8 @@ export class ReservationService extends BackendService<Reservation> {
     );
   }
 
-  findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number) {
-    return this.http.get<Reservation>(this.api + '/' + date + '/' + camperPlaceId)
+  findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(this.api + '/' + date + '/' + camperPlaceId)
   }
 
 }

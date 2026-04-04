@@ -211,7 +211,7 @@ export class ReservationFormComponent implements OnInit {
     this.confirmation.openConfirmationPopup({
       title: 'Usuwanie',
       message: 'Czy na pewno usunąć tę rezerwację?',
-      action: () => this.reservationService.deleteReservation(this.fd.reservation!).pipe(take(1)).subscribe(() => this.dialogRef.close())
+      action: () => this.reservationService.deleteReservation(this.fd.reservation!).pipe().subscribe(() => this.dialogRef.close())
     });
   } : null;
 

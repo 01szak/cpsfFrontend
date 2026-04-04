@@ -1,5 +1,5 @@
 mat-card {
-  padding: 0 25px 25px 25px;
+  padding: 25px;
   width: 100%;
   max-width: 1850px;
   justify-self: center;
@@ -115,7 +115,16 @@ background-color: rgba(92, 164, 246, 0.4) !important;
 
 app-new-date-picker {
   display: block;
-  padding: 10px 5px;
+  padding: 10px;
   z-index: 200;
   background: transparent;
 }
+
+.widget-header {
+  padding: 0;
+  box-shadow: none;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+}
+

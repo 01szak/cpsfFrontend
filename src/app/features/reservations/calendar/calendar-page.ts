@@ -17,6 +17,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Reservation} from '@core/models/Reservation';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'calendar',
@@ -31,7 +32,7 @@ import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
   styleUrl: './calendar-page.css',
   standalone: true,
 })
-export class CalendarPage implements OnInit, OnDestroy{
+export class CalendarPage implements OnInit, OnDestroy {
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
@@ -51,6 +52,8 @@ export class CalendarPage implements OnInit, OnDestroy{
     private reservationHelper: ReservationHelper,
     protected popupFormService: PopupFormService,
   ) {
+    this.reservationService.refreshed$.pipe(takeUntilDestroyed())
+      .subscribe(() => {this.reservationService.fetchAllData().subscribe()})
   }
 
 
@@ -139,13 +142,14 @@ export class CalendarPage implements OnInit, OnDestroy{
           camperPlace.id
         )
         .pipe(
-          map(r => {
-            if (!r) return undefined;
+          map(reservations => {
+            if (reservations.length === 0 || reservations.length > 2) return undefined;
+            const r = reservations[0];
 
             const checkin = DateFormater.MOMENT(r.checkin);
             const checkout = DateFormater.MOMENT(r.checkout);
 
-            const isInside = checkin.isBefore(checkout.subtract(1, "day"));
+            const isInside = date.isBefore(checkin.subtract(1, "day")) || date.isBefore(checkout.add(1, "day"));
 
             return isInside ? r : undefined;
           }),
@@ -160,13 +164,14 @@ export class CalendarPage implements OnInit, OnDestroy{
           camperPlace.id
         )
         .pipe(
-          map(r => {
-            if (!r) return undefined;
+          map(reservations => {
+            if (reservations.length === 0 || reservations.length > 2) return undefined;
+            const r = reservations.length > 1 ? reservations[1] : reservations[0];
 
             const checkin = DateFormater.MOMENT(r.checkin);
             const checkout = DateFormater.MOMENT(r.checkout);
 
-            const isInside = checkout.isAfter(checkin) && date.isBefore(checkout);
+            const isInside = date.isBefore(checkout);
 
             return isInside ? r : undefined;
           }),

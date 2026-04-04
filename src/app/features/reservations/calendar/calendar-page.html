@@ -1,5 +1,7 @@
 <mat-card class="primary">
-  <app-new-date-picker class="primary" (month)="changeMonth($event)" (year)="changeYear($event)"></app-new-date-picker>
+  <mat-card class="widget-header">
+    <app-new-date-picker  (month)="changeMonth($event)" (year)="changeYear($event)"/>
+  </mat-card>
   <table class="header primary">
     <thead>
     <tr >
