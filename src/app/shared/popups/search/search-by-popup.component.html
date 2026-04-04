@@ -1,21 +1,12 @@
-
 <div class="content">
   <p mat-dialog-title>Szukaj</p>
   <mat-dialog-actions>
     <div class="searchDialogAction">
       <mat-form-field>
         <mat-label>{{ data.label }}</mat-label>
-        @if (data.type === 'date') {
+        @if (data.type !== 'checkbox') {
           <input matInput
-                 [matDatepicker]="picker"
-                 [(ngModel)]="value">
-          <ng-container matIconSuffix>
-            <mat-datepicker-toggle [for]="picker"></mat-datepicker-toggle>
-          </ng-container>
-          <mat-datepicker #picker></mat-datepicker>
-        } @else if (data.type !== 'checkbox') {
-          <input matInput
-                  [type]=data.type
+                  [type]="data.type"
                   [(ngModel)]="value">
         } @else {
           <input matInput type="text" placeholder="Wpisz 'tak' lub 'nie'" [(ngModel)]="value">

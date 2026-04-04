@@ -8,6 +8,7 @@ import {ReservationService} from '@features/reservations/services/ReservationSer
 import {PopupFormService} from '@core/services/PopupFormService';
 import {RegularTableComponent} from '@shared/ui/data-table/regular-table.component';
 import {BaseTablePage} from '@shared/base/BaseTablePage';
+import {ReservationFormData} from '@shared/form/reservation-form.component';
 
 @Component({
   selector: 'reservations',
@@ -58,14 +59,10 @@ export class ReservationPage extends BaseTablePage<Reservation, ReservationServi
     super.ngOnDestroy();
   }
 
-  protected override openCreatePopup() {
-    this.formService.openCreateReservationFormPopup();
+  protected override openFormPopup(reservation?: Reservation) {
+    const reservationFd: ReservationFormData = {reservation: reservation}
+    this.formService.openReservationFormPopup(reservationFd);
   }
-
-  protected override openUpdatePopup(reservation: Reservation) {
-    this.formService.openUpdateReservationFormPopup(reservation);
-  }
-
 
 }
 

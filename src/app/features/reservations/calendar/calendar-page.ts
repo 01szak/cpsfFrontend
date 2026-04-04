@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {find, map, Observable, Subscription, take} from 'rxjs';
+import {map, Observable, Subscription, take} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
@@ -13,9 +13,11 @@ import {PaidReservationsWithSets} from '@core/models/PaidReservations';
 import {UserPerReservation} from '@core/models/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
-import {HttpParams} from '@angular/common/http';
-import {Filter} from '@shared/ui/data-table/regular-table.component';
+import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Reservation} from '@core/models/Reservation';
+import {ReservationFormData} from '@shared/form/reservation-form.component';
+import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'calendar',
@@ -30,7 +32,7 @@ import {Reservation} from '@core/models/Reservation';
   styleUrl: './calendar-page.css',
   standalone: true,
 })
-export class CalendarPage implements OnInit, OnDestroy{
+export class CalendarPage implements OnInit, OnDestroy {
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
@@ -50,6 +52,8 @@ export class CalendarPage implements OnInit, OnDestroy{
     private reservationHelper: ReservationHelper,
     protected popupFormService: PopupFormService,
   ) {
+    this.reservationService.refreshed$.pipe(takeUntilDestroyed())
+      .subscribe(() => {this.reservationService.fetchAllData().subscribe()})
   }
 
 
@@ -116,42 +120,36 @@ export class CalendarPage implements OnInit, OnDestroy{
     if (!camperPlace) return;
 
     const target = event.target as HTMLElement;
-    const date = new Date(year, month, day);
+    const date = DateFormater.MOMENT({year: year, month: month,day: day});
 
     const isLeft = target.classList.contains('left');
     const isRight = target.classList.contains('right');
-
+    const formatedCp: CamperPlaceForTable = {id: camperPlace.id, index: camperPlace.index, price: 0}
     const openPopup = (reservationToUpdate?: Reservation) => {
-      if (reservationToUpdate) {
-        console.log(reservationToUpdate)
-        this.popupFormService.openUpdateReservationFormPopup(reservationToUpdate, year, month, day);
-      } else {
-        this.popupFormService.openCreateReservationFormPopup(camperPlace, year, month, day);
-      }
+        this.popupFormService.openReservationFormPopup({
+          reservation: reservationToUpdate,
+          year: year,
+          month: month,
+          day: day,
+          camperPlace: formatedCp
+        } as ReservationFormData);
     };
 
     if (isLeft) {
       this.reservationService
         .findByDateInBetweenAndCamperPlaceId(
-          this.reservationHelper.mapDateToString(date.getFullYear(), date.getMonth() + 1, date.getDate()),
+          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
           camperPlace.id
         )
         .pipe(
-          map(r => {
-            if (!r) return undefined;
+          map(reservations => {
+            if (reservations.length === 0 || reservations.length > 2) return undefined;
+            const r = reservations[0];
 
-            const checkin = new Date(this.reservationHelper.formatToStringDate(r.checkin));
-            const checkout = new Date(this.reservationHelper.formatToStringDate(r.checkout));
+            const checkin = DateFormater.MOMENT(r.checkin);
+            const checkout = DateFormater.MOMENT(r.checkout);
 
-            checkin.setHours(0,0,0,0);
-            checkout.setHours(0,0,0,0);
-
-            const checkinMinusOneDay = new Date(checkin);
-            checkinMinusOneDay.setDate(checkinMinusOneDay.getDate() - 1);
-
-            const isInside =
-              date.getTime() <= checkout.getTime() &&
-              date.getTime() > checkinMinusOneDay.getTime();
+            const isInside = date.isBefore(checkin.subtract(1, "day")) || date.isBefore(checkout.add(1, "day"));
 
             return isInside ? r : undefined;
           }),
@@ -159,26 +157,21 @@ export class CalendarPage implements OnInit, OnDestroy{
         )
         .subscribe(openPopup);
     }
-
     else if (isRight) {
       this.reservationService
         .findByDateInBetweenAndCamperPlaceId(
-          this.reservationHelper.mapDateToString(date.getFullYear(), date.getMonth() + 1, date.getDate()),
+          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
           camperPlace.id
         )
         .pipe(
-          map(r => {
-            if (!r) return undefined;
+          map(reservations => {
+            if (reservations.length === 0 || reservations.length > 2) return undefined;
+            const r = reservations.length > 1 ? reservations[1] : reservations[0];
 
-            const checkin = new Date(this.reservationHelper.formatToStringDate(r.checkin));
-            const checkout = new Date(this.reservationHelper.formatToStringDate(r.checkout));
+            const checkin = DateFormater.MOMENT(r.checkin);
+            const checkout = DateFormater.MOMENT(r.checkout);
 
-            checkin.setHours(0,0,0,0);
-            checkout.setHours(0,0,0,0);
-
-            const isInside =
-              date.getTime() >= checkin.getTime() &&
-              date.getTime() < checkout.getTime();
+            const isInside = date.isBefore(checkout);
 
             return isInside ? r : undefined;
           }),

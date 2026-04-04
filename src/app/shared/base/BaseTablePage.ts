@@ -69,12 +69,8 @@ export class BaseTablePage<T extends BackendEntity, S extends BackendService<T>>
     this.paginator = paginator;
   }
 
-  protected openCreatePopup() {
+  protected openFormPopup() {
     // to implement by inheritors
-  }
-
-  protected  openUpdatePopup(t: T) {
-  // to implement by inheritors
   }
 
 }

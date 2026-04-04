@@ -22,8 +22,10 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './new-date-picker.component.css'
 })
 export class NewDatePickerComponent implements OnInit {
+
   @Output() month = new EventEmitter<number>();
   @Output() year = new EventEmitter<number>();
+
   months: string[] =
     [
       "Pokaż dla wszystkich",
@@ -46,9 +48,7 @@ export class NewDatePickerComponent implements OnInit {
 
   ngOnInit() {
     this.getYears();
-    // Initial emission if needed
   }
-
 
   decreaseMonth() {
     let index = this.months.indexOf(this.currentMonth);
@@ -103,6 +103,14 @@ export class NewDatePickerComponent implements OnInit {
         this.years.push(2024 + i);
       }
     }
+  }
+
+  reset() {
+    this.currentYear = new Date().getFullYear();
+    const monthNumeric = new Date().getMonth();
+    this.currentMonth = this.months[monthNumeric + 1];
+    this.month.emit(monthNumeric);
+    this.year.emit(this.currentYear);
   }
 
 }

@@ -63,6 +63,7 @@ export class ReservationService extends BackendService<Reservation> {
         const reservations = p.content
         reservations.forEach(r => {
           r.stringUser = r.guest ? (r.guest.firstname + " " + r.guest.lastname) : '';
+          r.camperPlaceIndex = r.camperPlace.index;
         })
         return p;
       }),
@@ -101,8 +102,8 @@ export class ReservationService extends BackendService<Reservation> {
     );
   }
 
-  findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number) {
-    return this.http.get<Reservation>(this.api + '/' + date + '/' + camperPlaceId)
+  findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(this.api + '/' + date + '/' + camperPlaceId)
   }
 
 }

@@ -33,6 +33,11 @@
   --mdc-outlined-text-field-focus-outline-color: var(--primary);
   --mdc-outlined-text-field-outline-width: 1px;
   --mdc-outlined-text-field-input-text-color: #ffffff;
+  --mdc-outlined-text-field-disabled-input-text-color: rgba(255, 255, 255, 0.5);
+  --mdc-outlined-text-field-disabled-outline-color: rgba(255, 255, 255, 0.4);
+  --mdc-outlined-text-field-disabled-label-text-color: rgba(255, 255, 255, 0.4);
+  --mdc-outlined-text-field-disabled-container-color: rgba(255, 255, 255, 0.15); /* Jaśniejszy od tła #000000 */
+  
   --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
   --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
@@ -57,6 +62,10 @@
   /* Material Tokens for Light Theme */
   --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, 0.12);
   --mdc-outlined-text-field-input-text-color: #111827;
+  --mdc-outlined-text-field-disabled-input-text-color: rgba(0, 0, 0, 0.38);
+  --mdc-outlined-text-field-disabled-outline-color: rgba(0, 0, 0, 0.12);
+  --mdc-outlined-text-field-disabled-label-text-color: rgba(0, 0, 0, 0.38);
+
   --mat-select-trigger-text-color: #111827;
   --mat-sys-on-surface-variant: rgba(0, 0, 0, 0.6);
 
@@ -121,6 +130,26 @@ mat-card,
   color: var(--text-primary) !important;
 }
 
+/* Custom Dialog Animation */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  animation: dialog-fast-enter 0.15s cubic-bezier(0, 0, 0.2, 1) forwards !important;
+}
+
+@keyframes dialog-fast-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.cdk-overlay-backdrop {
+  transition: opacity 0.15s linear !important;
+}
+
 /* --- Tables & Containers --- */
 .mat-mdc-table,
 .tableContainer .tableDiv {
@@ -142,6 +171,28 @@ mat-card,
 .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input,
 .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
   color: var(--text-primary) !important;
+}
+
+/* Ensure disabled fields have enough contrast in dark theme */
+.mdc-text-field--disabled {
+  opacity: 1 !important; /* Material default lowers opacity of the whole container */
+  background-color: var(--mdc-outlined-text-field-disabled-container-color) !important;
+  border-radius: 4px; /* Optional: adds a slight rounding to the background fill */
+
+  .mdc-text-field__input {
+
+    color: var(--mdc-outlined-text-field-disabled-input-text-color) !important;
+    -webkit-text-fill-color: var(--mdc-outlined-text-field-disabled-input-text-color) !important;
+  }
+  .mdc-floating-label {
+    color: var(--mdc-outlined-text-field-disabled-label-text-color) !important;
+  }
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: var(--mdc-outlined-text-field-disabled-outline-color) !important;
+    border-width: 1px !important;
+  }
 }
 
 .mat-mdc-checkbox .mat-internal-form-field {
@@ -166,7 +217,6 @@ mat-card,
   .mdc-snackbar__actions,
   .mat-mdc-snack-bar-label,
   app-snack-bar {
-    background-color: transparent !important;
     background: transparent !important;
     color: inherit !important;
   }
@@ -191,7 +241,7 @@ mat-card,
 }
 
 .mat-mdc-option {
-  color: black !important;
+  color: var(--text-primary) !important;
 
   &:hover:not(.mdc-list-item--disabled) {
     background-color: rgba(255, 255, 255, 0.05) !important;

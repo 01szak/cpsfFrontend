@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import {NavbarComponent} from '@shared/ui/navbar/navbar.component';
 import {RouterOutlet} from '@angular/router';
-import {MatCard} from '@angular/material/card';
 @Component({
   selector: 'admin-page',
   imports: [

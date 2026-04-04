@@ -7,6 +7,7 @@ import {PopupFormService} from '@core/services/PopupFormService';
 import {Guest} from '@core/models/Guest';
 import {UserService} from '@features/users/services/UserService';
 import {BaseTablePage} from '@shared/base/BaseTablePage';
+import {GuestFormData} from '@shared/form/guest-form.component';
 
 @Component({
   selector: 'users',
@@ -46,12 +47,9 @@ export class UserPage extends BaseTablePage<Guest, UserService> implements OnIni
     super.ngOnDestroy();
   }
 
-  protected override openCreatePopup() {
-    this.formService.openCreateUserFormPopup();
-  }
-
-  protected override openUpdatePopup(guest: Guest) {
-    this.formService.openUpdateUserPopup(guest);
+  protected override openFormPopup(guest?: Guest) {
+    const guestFd: GuestFormData = {guest: guest}
+    this.formService.openGuestFormPopup(guestFd);
   }
 
 

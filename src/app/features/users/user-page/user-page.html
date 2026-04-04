@@ -7,8 +7,8 @@
   [pageSizeOptions]="pageSizeOptions"
   [serviceInstance]="userService"
   [fetchFunc]="fetchData.bind(this)"
-  [onClickFunc]="openUpdatePopup.bind(this)"
-  [createFunc]="openCreatePopup.bind(this)"
+  [onClickFunc]="openFormPopup.bind(this)"
+  [createFunc]="openFormPopup.bind(this)"
   (sortInfo)="getSortInfo($event)"
   (filterInfo)="getFilterInfo($event)"
   (paginatorReady)="getPaginator($event)">

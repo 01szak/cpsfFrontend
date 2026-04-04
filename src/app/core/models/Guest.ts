@@ -2,7 +2,7 @@ import {BackendEntity} from './BackendEntity';
 
 export interface Guest extends BackendEntity {
   __type?: 'Guest';
-  id: number | string,
+  id: number,
   firstname: string,
   lastname: string,
   email: string;

@@ -47,7 +47,7 @@ export class CamperPlaceFormComponent {
   protected formFieldsDeclaration: FormFieldDeclaration[] = [];
 
   onSave(changes: RowChange<CamperPlaceForTable>[]) {
-    const typeChanged = changes.some(c => c.original.type.id !== c.updated.type.id);
+    const typeChanged = changes.some(c => c.original.type!.id !== c.updated.type!.id);
     const updatedRows = changes.map(c => c.updated);
 
     if (typeChanged) {
