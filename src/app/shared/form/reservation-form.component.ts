@@ -111,21 +111,19 @@ export type ReservationFormData = {
 
         <mat-form-field>
           <mat-label>Numer Parceli</mat-label>
-          @if (!selectedCp) {
-            <mat-select formControlName="camperPlace">
+          @if (selectedCpFromCalendar && !isUpdate) {
+            <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
+          } @else {
+            <mat-select formControlName="camperPlace" [compareWith]="compareFn">
               @for (cp of camperPlaces$ | async; track cp.id) {
                 <mat-option [value]="cp">{{ cp.index }}</mat-option>
               }
             </mat-select>
-          } @else {
-            <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
           }
         </mat-form-field>
 
         <div style="margin: 0.5rem 0;">
-          <mat-checkbox formControlName="isPaid">
-            Zapłacone
-          </mat-checkbox>
+          <mat-checkbox formControlName="isPaid">Opłacone</mat-checkbox>
         </div>
 
         <div style="margin: 0.5rem 0;">
@@ -175,7 +173,7 @@ export class ReservationFormComponent implements OnInit {
   private readonly fd: ReservationFormData = inject(MAT_DIALOG_DATA);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  protected selectedCp? = this.fd?.camperPlace;
+  protected selectedCpFromCalendar? = this.fd?.camperPlace;
   protected currentGuest? = this.fd?.reservation?.guest;
   protected isUpdate = !!this.fd?.reservation;
   protected formGroup: FormGroup = this.factory.buildReservationForm();
@@ -213,9 +211,6 @@ export class ReservationFormComponent implements OnInit {
   }
 
   private initialPatch() {
-    if (this.fd?.camperPlace) {
-      this.formGroup.get('camperPlace')?.setValue(this.fd.camperPlace);
-    }
     if (this.fd?.reservation) {
       this.factory.patchReservation(this.formGroup, this.fd?.reservation!);
       const checkin = DateFormater.MOMENT(this.fd.reservation.checkin);
@@ -228,6 +223,10 @@ export class ReservationFormComponent implements OnInit {
         const g = this.fd.reservation.guest;
         this.formGroup.get('guestSearch')?.setValue(`${g.firstname} ${g.lastname}`);
       }
+
+      if (this.fd?.reservation.camperPlace) {
+        this.formGroup.get('camperPlace')?.setValue(this.fd.reservation.camperPlace);
+      }
     } else {
       if (this.fd?.year && this.fd?.month !== undefined && this.fd?.day) {
         const date = DateFormater.MOMENT({year: this.fd.year, month: this.fd.month, day: this.fd.day});
@@ -235,11 +234,20 @@ export class ReservationFormComponent implements OnInit {
         this.checkinCalendarStart = date;
         this.checkoutCalendarStart = DateFormater.MOMENT({year: this.fd.year, month: this.fd.month, day: 1});
       }
+
+      if (this.fd?.camperPlace) {
+        this.formGroup.get('camperPlace')?.setValue(this.fd.camperPlace);
+      }
     }
+
     this.cdr.markForCheck();
   }
 
   protected displayGuestName(val: any) { return val?.name ?? ''; }
+
+  protected compareFn(o1: any, o2: any): boolean {
+    return (o1 && o2) ? (o1.id == o2.id) : (o1 === o2);
+  }
 
   protected onGuestSelected(val: any) {
     this.factory.patchGuest(this.formGroup, val.guest);
