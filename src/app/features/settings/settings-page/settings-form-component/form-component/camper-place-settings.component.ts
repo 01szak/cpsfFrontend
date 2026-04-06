@@ -2,28 +2,31 @@ import { Component, Input, inject, ViewChild } from '@angular/core';
 import { CamperPlaceForTable } from '@core/models/CamperPlaceForTable';
 import { CamperPlaceType } from '@core/models/CamperPlaceType';
 import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
-import { FormFieldDeclaration, RowChange, SettingsFormComponent } from '../settings-form.component';
+import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { PopupConfirmationService } from '@core/services/PopupConfirmationService';
 import { take } from 'rxjs';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
+import { PopupFormService } from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-camper-place-form',
   standalone: true,
-  imports: [SettingsFormComponent],
+  imports: [SettingsGenericComponent],
   template: `
     <app-settings-form-component
       #settingsForm
       [displayedColumns]="displayedColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaces"
+      [formName]="'Parcele'"
+      [addNewFunc]="addNewFunc"
       (saveRequest)="onSave($any($event))"
     />
   `,
   styles: [``]
 })
-export class CamperPlaceFormComponent {
-  @ViewChild('settingsForm') settingsForm!: SettingsFormComponent<CamperPlaceForTable>;
+export class CamperPlaceSettingsComponent {
+  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceForTable>;
 
   private _camperPlaces: CamperPlaceForTable[] | null = [];
   @Input() set camperPlaces(value: CamperPlaceForTable[] | null) {
@@ -42,9 +45,14 @@ export class CamperPlaceFormComponent {
 
   protected camperPlaceService = inject(CamperPlaceService);
   protected popupService = inject(PopupConfirmationService);
+  protected popupFormService = inject(PopupFormService);
 
   protected displayedColumns = ['index', 'type', 'price'];
   protected formFieldsDeclaration: FormFieldDeclaration[] = [];
+
+  protected addNewFunc = () => {
+    this.popupFormService.openCamperPlaceFormPopup();
+  };
 
   onSave(changes: RowChange<CamperPlaceForTable>[]) {
     const typeChanged = changes.some(c => c.original.type!.id !== c.updated.type!.id);

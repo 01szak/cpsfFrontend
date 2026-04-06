@@ -1,6 +1,6 @@
 import {Component, inject, Input, ViewChild} from '@angular/core';
 import { CamperPlaceType } from '@core/models/CamperPlaceType';
-import { FormFieldDeclaration, RowChange, SettingsFormComponent } from '../settings-form.component';
+import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
 import {forkJoin, map, Observable, take} from 'rxjs';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
@@ -8,6 +8,7 @@ import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {PopupFormService} from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-price-change-details',
@@ -154,20 +155,22 @@ export class CamperPlacesWithUniquePricesComponent {
 @Component({
   selector: 'app-camper-place-type-form',
   standalone: true,
-  imports: [SettingsFormComponent],
+  imports: [SettingsGenericComponent],
   template: `
     <app-settings-form-component
       #settingsForm
       [displayedColumns]="dispColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaceTypes"
+      [formName]="'Rodzaje Parceli'"
+      [addNewFunc]="addNewFunc"
       (saveRequest)="onSave($any($event))"
     />
   `
 })
-export class CamperPlaceTypeFormComponent {
+export class CamperPlaceTypeSettingsComponent {
 
-  @ViewChild('settingsForm') settingsForm!: SettingsFormComponent<CamperPlaceType>;
+  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceType>;
   @Input() camperPlaceTypes: CamperPlaceType[] | null = [];
 
   protected formFieldsDeclaration: FormFieldDeclaration[] = [
@@ -177,8 +180,13 @@ export class CamperPlaceTypeFormComponent {
 
   protected dispColumns = this.formFieldsDeclaration.map((f) => f.columnDef);
   protected popupService = inject(PopupConfirmationService);
+  protected popupFormService = inject(PopupFormService);
   protected camperPlaceTypeService = inject(CamperPlaceTypeService);
   protected camperPlaceService = inject(CamperPlaceService);
+
+  protected addNewFunc = () => {
+    this.popupFormService.openCamperPlaceTypeFormPopup();
+  };
 
   onSave(changes: RowChange<CamperPlaceType>[]) {
     const priceChanged: number[] = changes

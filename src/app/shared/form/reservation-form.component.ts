@@ -9,7 +9,7 @@ import {PopupConfirmationService} from '@core/services/PopupConfirmationService'
 import {Guest} from '@core/models/Guest';
 import {Reservation} from '@core/models/Reservation';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {FormFactoryService} from '@core/services/FormFactoryService';
+import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {PopupFormContainer} from './popup-form-container.component';
 import {GuestFormComponent} from './guest-form.component';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -82,6 +82,9 @@ export type ReservationFormData = {
       ])
     ])
   ],
+  styles: `
+
+  `,
   template: `
     <app-popup-form-container
       [formTitle]="formTitle"
@@ -89,8 +92,7 @@ export type ReservationFormData = {
       [isUpdate]="isUpdate"
       [proceedAction]="onSave">
 
-      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled"
-            style="display: flex; flex-direction: column; gap: 1rem;">
+      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled">
         <mat-form-field>
           <mat-label>Data Wjazdu</mat-label>
           <input matInput [matDatepicker]="checkin" formControlName="checkinDate">

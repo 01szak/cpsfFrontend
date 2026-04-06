@@ -2,17 +2,17 @@ import {Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {CamperPlaceTypeService} from '@features/settings/services/CamperPlaceTypeService';
-import {CamperPlaceFormComponent} from './settings-form-component/form-component/camper-place-form.component';
+import {CamperPlaceSettingsComponent} from './settings-form-component/form-component/camper-place-settings.component';
 import {MatCard} from '@angular/material/card';
-import {CamperPlaceTypeFormComponent} from './settings-form-component/form-component/camper-place-type-form.component';
+import {CamperPlaceTypeSettingsComponent} from './settings-form-component/form-component/camper-place-type-settings.component';
 
 @Component({
   selector: 'settings-page',
   imports: [
     CommonModule,
-    CamperPlaceFormComponent,
+    CamperPlaceSettingsComponent,
     MatCard,
-    CamperPlaceTypeFormComponent
+    CamperPlaceTypeSettingsComponent
   ],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.css',

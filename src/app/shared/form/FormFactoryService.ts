@@ -32,6 +32,23 @@ export class FormFactoryService {
     });
   }
 
+  buildCamperPlaceForm() {
+    return this.formBuilder.group({
+      id: [null],
+      index: [''],
+      type: [null],
+      price: [0]
+    });
+  }
+
+  buildCamperPlaceTypeForm() {
+    return this.formBuilder.group({
+      id: [null],
+      typeName: [''],
+      price: [0]
+    });
+  }
+
   patchReservation(formGroup: FormGroup, reservation: Reservation) {
     const guestName = `${reservation.guest!.firstname} ${reservation.guest!.lastname}`
     formGroup.patchValue({
