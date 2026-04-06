@@ -1,0 +1,57 @@
+mat-expansion-panel {
+  overflow: hidden;
+}
+
+.mat-expansion-panel-body {
+  padding-top: 8px !important;
+}
+
+.rowsContainer {
+  max-height: 55vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+.rowsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rowForm {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 16px;
+  padding: 18px;
+
+  border-radius: 14px;
+  background: rgba(0,0,0,0.035);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.field {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  margin-bottom: -1.25em;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+/* sticky add button na dole listy */
+.addRowBottom {
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-color);
+  background: var(--bg-card);
+}
