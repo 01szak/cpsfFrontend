@@ -34,7 +34,7 @@ export type CamperPlaceFormData = { camperPlace?: CamperPlaceForTable };
       <form [formGroup]="formGroup">
         <mat-form-field>
           <mat-label>Indeks</mat-label>
-          <input type="text" matInput formControlName="index">
+          <input type="text" matInput formControlName="index" [placeholder]="'Ustaw domyślny'">
         </mat-form-field>
 
         <mat-form-field>

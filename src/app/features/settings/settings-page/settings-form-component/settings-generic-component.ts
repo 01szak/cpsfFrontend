@@ -67,6 +67,7 @@ export class SettingsGenericComponent<T extends BackendEntity> implements OnDest
   @Input() displayedColumns: string[] = [];
   @Input() formName: string = '';
   @Input() addNewFunc!: () => any;
+  @Input() deleteFunc?: (deleteObj: any) => any;
 
   private _formDeclaration: FormFieldDeclaration[] = [];
   @Input() set formDeclaration(f: FormFieldDeclaration[]) {

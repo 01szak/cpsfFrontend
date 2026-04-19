@@ -78,6 +78,7 @@ export class CamperPlaceTypeFormComponent implements OnInit {
     const payload = this.formGroup.value;
     const action$ = this.camperPlaceTypeService.create(payload);
 
+    console.log(payload)
     this.confirmation.openConfirmationPopup({
       title: 'Zapisywanie',
       message: 'Czy chcesz zapisać zmiany?',

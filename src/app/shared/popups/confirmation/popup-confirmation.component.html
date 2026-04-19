@@ -1,6 +1,4 @@
-@if (confirmationData.title) {
-  <h2 mat-dialog-title>{{ confirmationData.title }}</h2>
-}
+<h2 mat-dialog-title>{{ confirmationData.title || defaultTittle }}</h2>
 
 <mat-dialog-content>
   @if (confirmationData.message) {

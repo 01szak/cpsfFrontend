@@ -1,4 +1,4 @@
-import {Component, inject, Input, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, Input, ViewChild} from '@angular/core';
 import { CamperPlaceType } from '@core/models/CamperPlaceType';
 import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
@@ -162,8 +162,9 @@ export class CamperPlacesWithUniquePricesComponent {
       [displayedColumns]="dispColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaceTypes"
-      [formName]="'Rodzaje Parceli'"
+      [formName]="'Typy Parcel'"
       [addNewFunc]="addNewFunc"
+      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `
@@ -171,21 +172,46 @@ export class CamperPlacesWithUniquePricesComponent {
 export class CamperPlaceTypeSettingsComponent {
 
   @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceType>;
-  @Input() camperPlaceTypes: CamperPlaceType[] | null = [];
 
-  protected formFieldsDeclaration: FormFieldDeclaration[] = [
-    { columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
-    { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
-  ];
+  private _camperPlaceTypes: CamperPlaceType[] | null = [];
+  @Input() set camperPlaceTypes(value: CamperPlaceType[] | null) {
+    this._camperPlaceTypes = value;
+    this.updateFormDeclaration();
+    this.cdr.markForCheck();
+  }
+  get camperPlaceTypes() {
+    return this._camperPlaceTypes;
+  }
 
-  protected dispColumns = this.formFieldsDeclaration.map((f) => f.columnDef);
+  private readonly popupConfirmationService = inject(PopupConfirmationService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  protected formFieldsDeclaration: FormFieldDeclaration[] = [];
+
+  private updateFormDeclaration() {
+    this.formFieldsDeclaration = [
+      { columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
+      { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
+    ];
+  }
+
+  protected dispColumns = ['typeName', 'price'];
   protected popupService = inject(PopupConfirmationService);
   protected popupFormService = inject(PopupFormService);
   protected camperPlaceTypeService = inject(CamperPlaceTypeService);
   protected camperPlaceService = inject(CamperPlaceService);
 
   protected addNewFunc = () => {
-    this.popupFormService.openCamperPlaceTypeFormPopup();
+     this.popupFormService.openCamperPlaceTypeFormPopup();
+  };
+
+  protected deleteFunc = (cpType: CamperPlaceType) => {
+    this.popupConfirmationService.openConfirmationPopup({
+      action: () => {
+        this.camperPlaceTypeService.delete(cpType).pipe(take(1)).subscribe()
+      },
+      message: "Wybrany typ parceli zostanie usunięty. Czy chcesz kontynuować?",
+    } as ConfirmationData)
   };
 
   onSave(changes: RowChange<CamperPlaceType>[]) {
@@ -252,4 +278,3 @@ export class CamperPlaceTypeSettingsComponent {
   }
 
 }
-

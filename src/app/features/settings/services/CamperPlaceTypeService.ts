@@ -1,4 +1,3 @@
-// DDD Refactored
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable, shareReplay, switchMap, tap} from 'rxjs';

@@ -12,44 +12,52 @@
 
     <div formArrayName="rows" class="rowsContainer">
 
-      @for (row of rows.controls; track $index; let i = $index) {
+      @for (row of rows.controls; track row; let i = $index) {
         <div class="rowForm" [formGroupName]="i">
 
-          @for (f of formDeclaration; track f.columnDef) {
-            @switch (f.rowType) {
+          <div class="fieldsGrid">
+            @for (f of formDeclaration; track f.columnDef) {
+              @switch (f.rowType) {
 
-              @case ('select') {
-                <mat-form-field appearance="outline" class="field">
-                  <mat-label>{{ f.headerName }}</mat-label>
+                @case ('select') {
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ f.headerName }}</mat-label>
 
-                  <mat-select
-                    [formControlName]="f.columnDef"
-                    [compareWith]="f.compareFunc ?? defaultCompare">
+                    <mat-select
+                      [formControlName]="f.columnDef"
+                      [compareWith]="f.compareFunc ?? defaultCompare">
 
-                    @for (sd of f.selectData; track $index) {
-                      <mat-option [value]="sd">
-                        {{ f.displayKey ? sd[f.displayKey] : sd }}
-                      </mat-option>
-                    }
-                  </mat-select>
+                      @for (sd of f.selectData; track $index) {
+                        <mat-option [value]="sd">
+                          {{ f.displayKey ? sd[f.displayKey] : sd }}
+                        </mat-option>
+                      }
+                    </mat-select>
 
-                </mat-form-field>
+                  </mat-form-field>
+                }
+
+                <!-- INPUT -->
+                @default {
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ f.headerName }}</mat-label>
+                    <input matInput
+                           [type]="f.valueType"
+                           [formControlName]="f.columnDef">
+                  </mat-form-field>
+                }
+
               }
-
-              <!-- INPUT -->
-              @default {
-                <mat-form-field appearance="outline" class="field">
-                  <mat-label>{{ f.headerName }}</mat-label>
-                  <input matInput
-                         [type]="f.valueType"
-                         [formControlName]="f.columnDef">
-                </mat-form-field>
-              }
-
             }
-          }
+          </div>
 
+          @if (deleteFunc !== undefined) {
+            <div class="deleteActionContainer">
+              <i (click)="deleteFunc(row.value)" class="fa-regular fa-trash-can"></i>
+            </div>
+          }
         </div>
+
       }
 
     </div>

@@ -20,16 +20,38 @@ mat-expansion-panel {
 }
 
 .rowForm {
-  display: grid;
-
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 18px;
 
   border-radius: 14px;
   background: rgba(0,0,0,0.035);
   border: 1px solid rgba(0,0,0,0.08);
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.deleteActionContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.deleteActionContainer i {
+  cursor: pointer;
+  color: var(--status-error);
+  font-size: 1.1rem;
+  padding: 4px;
+  transition: opacity 0.2s;
+}
+
+.deleteActionContainer i:hover {
+  opacity: 0.8;
 }
 
 .field {

@@ -1,4 +1,4 @@
-import { Component, Input, inject, ViewChild } from '@angular/core';
+import { Component, Input, inject, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CamperPlaceForTable } from '@core/models/CamperPlaceForTable';
 import { CamperPlaceType } from '@core/models/CamperPlaceType';
 import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
@@ -20,18 +20,24 @@ import { PopupFormService } from '@core/services/PopupFormService';
       [data]="camperPlaces"
       [formName]="'Parcele'"
       [addNewFunc]="addNewFunc"
+      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `,
   styles: [``]
 })
 export class CamperPlaceSettingsComponent {
+
   @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceForTable>;
+
+  private readonly popupConfirmationService = inject(PopupConfirmationService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private _camperPlaces: CamperPlaceForTable[] | null = [];
   @Input() set camperPlaces(value: CamperPlaceForTable[] | null) {
     this._camperPlaces = value;
     this.updateFormDeclaration();
+    this.cdr.markForCheck();
   }
   get camperPlaces() {
     return this._camperPlaces;
@@ -54,10 +60,18 @@ export class CamperPlaceSettingsComponent {
     this.popupFormService.openCamperPlaceFormPopup();
   };
 
+  protected deleteFunc = (camperPlace: CamperPlaceForTable) => {
+    this.popupConfirmationService.openConfirmationPopup({
+      action: () => {
+        this.camperPlaceService.delete(camperPlace).pipe(take(1)).subscribe()
+      },
+      message: "Usunięcie parceli, spowoduje trwałe usunięcie wszystkich rezerwacji, które były na niej zrobione. Czy chcesz kontynuowć? (nie zalecane!)",
+    } as ConfirmationData)
+  };
+
   onSave(changes: RowChange<CamperPlaceForTable>[]) {
     const typeChanged = changes.some(c => c.original.type!.id !== c.updated.type!.id);
     const updatedRows = changes.map(c => c.updated);
-
     if (typeChanged) {
       this.popupService.openConfirmationPopup(this.typeChangeData(updatedRows));
     } else {

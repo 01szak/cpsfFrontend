@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Guest} from '@core/models/Guest';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {Reservation} from '@core/models/Reservation';
@@ -26,7 +26,7 @@ export class FormFactoryService {
       id: [''],
       firstname: [''],
       lastname: [''],
-      email: [''],
+      email: ['', Validators.email],
       phoneNumber: [''],
       carRegistration: [''],
     });
@@ -35,7 +35,7 @@ export class FormFactoryService {
   buildCamperPlaceForm() {
     return this.formBuilder.group({
       id: [null],
-      index: [''],
+      index: [null],
       type: [null],
       price: [0]
     });

@@ -377,3 +377,16 @@ mat-expansion-panel {
   border-top: 1px solid var(--border-color);
   padding: 16px 4px 4px 4px !important;
 }
+
+.deleteIcon i {
+  color: #ffffff !important;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.72);
+}
+.deleteIcon i:hover {
+  background: rgb(239, 68, 68);
+}
