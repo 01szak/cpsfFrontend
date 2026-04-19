@@ -1,13 +1,10 @@
 <main>
-  <h1>Parcele</h1>
   <mat-card class="primary">
       <app-camper-place-form
         [camperPlaces]="camperPlaces$ | async"
         [camperPlaceTypes]="camperPlaceTypes$ | async"
       />
   </mat-card>
-
-  <h1>Rodzaje Parcel</h1>
   <mat-card class="primary">
     <app-camper-place-type-form
       [camperPlaceTypes]="camperPlaceTypes$ | async"/>

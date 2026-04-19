@@ -1,37 +1,25 @@
-// DDD Refactored
-import {Injectable, inject} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, merge, shareReplay, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, Observable, shareReplay, switchMap, tap} from 'rxjs';
 import {CamperPlace} from '@core/models/CamperPlace';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {BackendService} from '@core/services/BackendService';
-import {CamperPlaceTypeService} from './CamperPlaceTypeService';
 
 @Injectable({providedIn: "root"})
 export class CamperPlaceService extends BackendService<CamperPlaceForTable>{
-
-  private typeService = inject(CamperPlaceTypeService);
 
   private camperPlaceSubject = new BehaviorSubject<CamperPlace[]>([]);
   private camperPlaceForTableSubject = new BehaviorSubject<CamperPlaceForTable[]>([]);
 
   public camperPlaces$: Observable<CamperPlace[]> = this.camperPlaceSubject.asObservable();
 
-  // Reaktywny strumień: odświeża się, gdy zmieni się Parcela LUB Typ Parceli
-  public camperPlacesForTable$ = merge(
-    this.refreshed$,             // Zmiany w parcelach
-    this.typeService.refreshed$  // Zmiany w typach (TUTAJ JEST MAGIA)
-  ).pipe(
+  public camperPlacesForTable$ = this.refreshed$.pipe(
     switchMap(() => this.getCamperPlacesForTable()),
     shareReplay(1)
   );
 
   constructor(http: HttpClient) {
     super('api/camperPlace', http, new BehaviorSubject<CamperPlaceForTable | null>(null));
-  }
-
-  getCamperPlaces(): Observable<CamperPlace[]> {
-    return this.http.get<CamperPlace[]>(this.api);
   }
 
   getCamperPlacesForTable(): Observable<CamperPlaceForTable[]> {

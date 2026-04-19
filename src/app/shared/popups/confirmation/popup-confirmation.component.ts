@@ -26,13 +26,15 @@ export class PopupConfirmationComponent {
     this.firstAction();
   }
 
+  protected defaultTittle: string = "Zatwierdź zmiany";
+
   close() {
     this.popupConfirmationRef.close();
   }
 }
 
 export interface ConfirmationData {
-  title?: string;
+  title?: string | 'Zatwierdź zmiany';
   message?: string;
   component?: Type<any>;
   componentData?: Record<string, any>;

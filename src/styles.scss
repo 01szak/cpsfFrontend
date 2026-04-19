@@ -37,7 +37,7 @@
   --mdc-outlined-text-field-disabled-outline-color: rgba(255, 255, 255, 0.4);
   --mdc-outlined-text-field-disabled-label-text-color: rgba(255, 255, 255, 0.4);
   --mdc-outlined-text-field-disabled-container-color: rgba(255, 255, 255, 0.15); /* Jaśniejszy od tła #000000 */
-  
+
   --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
   --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
@@ -83,6 +83,12 @@ html, body {
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 /* Custom Scrollbar */
@@ -260,4 +266,127 @@ mat-card,
 .mat-calendar-next-button,
 .mat-calendar-previous-button {
   color: black !important;
+}
+
+/* =========================================================
+   ANGULAR MATERIAL EXPANSION PANEL — FULL THEME INTEGRATION
+========================================================= */
+
+/* ---------- PANEL CONTAINER ---------- */
+mat-expansion-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.mat-expansion-panel:not([class*='mat-elevation-z']) {
+  box-shadow: none !important;
+}
+
+.mat-expansion-panel-header {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-md) !important;
+  min-height: 64px !important;
+  transition: background 0.15s ease;
+}
+
+.mat-expansion-panel-header:hover {
+  background: var(--bg-overlay) !important;
+}
+
+.mat-expanded .mat-expansion-panel-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mat-expansion-panel-header-title {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+.mat-expansion-indicator::after {
+  color: var(--text-primary) !important;
+}
+
+/* ---------- BODY ---------- */
+.mat-expansion-panel-body {
+  background: var(--bg-inner) !important;
+  padding: 16px 20px 20px 20px !important;
+}
+
+.rowsContainer {
+  max-height: 55vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rowsContainer::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(255,255,255,0.25);
+}
+
+/* =========================================================
+   ROWS (pseudo table rows)
+========================================================= */
+.rowForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+
+  padding: 18px;
+  border-radius: var(--radius-sm);
+
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-color);
+
+  transition: background 0.15s ease, border 0.15s ease, transform 0.1s ease;
+}
+
+/* hover — subtle primary glow */
+.rowForm:hover {
+  background: rgba(139, 92, 246, 0.06);
+  border-color: rgba(139, 92, 246, 0.35);
+}
+
+/* hover in light theme */
+.light-theme .rowForm:hover {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* form field fill grid cell */
+.field {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  margin-bottom: -1.25em;
+}
+
+
+/* =========================================================
+   ACTION ROW
+========================================================= */
+.mat-expansion-panel .mat-action-row {
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color);
+  padding: 16px 4px 4px 4px !important;
+}
+
+.deleteIcon i {
+  color: #ffffff !important;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.72);
+}
+.deleteIcon i:hover {
+  background: rgb(239, 68, 68);
 }

@@ -1,0 +1,76 @@
+<form [formGroup]="form" class="cpForm" *ngIf="data">
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{formName}}
+      </mat-panel-title>
+      <mat-panel-description class="headerActions">
+        <button mat-stroked-button color="primary" (click)="addNewFunc(); $event.stopPropagation()">Dodaj</button>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <div formArrayName="rows" class="rowsContainer">
+
+      @for (row of rows.controls; track row; let i = $index) {
+        <div class="rowForm" [formGroupName]="i">
+
+          <div class="fieldsGrid">
+            @for (f of formDeclaration; track f.columnDef) {
+              @switch (f.rowType) {
+
+                @case ('select') {
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ f.headerName }}</mat-label>
+
+                    <mat-select
+                      [formControlName]="f.columnDef"
+                      [compareWith]="f.compareFunc ?? defaultCompare">
+
+                      @for (sd of f.selectData; track $index) {
+                        <mat-option [value]="sd">
+                          {{ f.displayKey ? sd[f.displayKey] : sd }}
+                        </mat-option>
+                      }
+                    </mat-select>
+
+                  </mat-form-field>
+                }
+
+                <!-- INPUT -->
+                @default {
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ f.headerName }}</mat-label>
+                    <input matInput
+                           [type]="f.valueType"
+                           [formControlName]="f.columnDef">
+                  </mat-form-field>
+                }
+
+              }
+            }
+          </div>
+
+          @if (deleteFunc !== undefined) {
+            <div class="deleteActionContainer">
+              <i (click)="deleteFunc(row.value)" class="fa-regular fa-trash-can"></i>
+            </div>
+          }
+        </div>
+
+      }
+
+    </div>
+
+    <mat-action-row *ngIf="formChanged">
+      <app-form-buttons
+        [firstButtonText]="'Reset'"
+        [secondButtonText]="'Zapisz'"
+        [firstAction]="reset"
+        [secondAction]="onSaveClick">
+      </app-form-buttons>
+    </mat-action-row>
+
+  </mat-expansion-panel>
+
+</form>
