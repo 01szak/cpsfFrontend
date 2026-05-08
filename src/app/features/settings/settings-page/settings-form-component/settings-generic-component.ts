@@ -9,6 +9,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelActionRow, MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from '@angular/material/expansion';
+import {MatButton} from '@angular/material/button';
 
 export type FormFieldDeclaration =
   | {
@@ -44,14 +51,23 @@ export interface RowChange<T> {
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    FormButtonsComponent
+    FormButtonsComponent,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelActionRow,
+    MatExpansionPanelDescription,
+    MatButton
   ],
-  templateUrl: './settings-form.component.html',
-  styleUrl: './settings-form.component.css'
+  templateUrl: './settings-generic-component.html',
+  styleUrl: './settings-generic-component.css'
 })
-export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy {
+export class SettingsGenericComponent<T extends BackendEntity> implements OnDestroy {
 
   @Input() displayedColumns: string[] = [];
+  @Input() formName: string = '';
+  @Input() addNewFunc!: () => any;
+  @Input() deleteFunc?: (deleteObj: any) => any;
 
   private _formDeclaration: FormFieldDeclaration[] = [];
   @Input() set formDeclaration(f: FormFieldDeclaration[]) {
@@ -187,4 +203,5 @@ export class SettingsFormComponent<T extends BackendEntity> implements OnDestroy
       .filter((control) => control.dirty)
       .map((control) => control.value);
   }
+
 }

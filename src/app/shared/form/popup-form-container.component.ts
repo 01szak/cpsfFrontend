@@ -22,24 +22,14 @@ import { ReactiveFormsModule } from '@angular/forms';
     max-height: 60vh;
     color: #ffffff !important;
   }
+
   .deleteIcon {
     position: absolute;
     top: 1rem;
     right: 1rem;
     z-index: 10;
   }
-  .deleteIcon i {
-    color: #ffffff !important;
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    padding: 0.5rem;
-    border-radius: var(--radius-sm);
-    background: rgba(239, 68, 68, 0.72);
-  }
-  .deleteIcon i:hover {
-    background: rgb(239, 68, 68);
-  }
+
   h2[mat-dialog-title] {
     margin: 0;
     text-align: center;

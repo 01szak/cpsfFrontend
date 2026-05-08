@@ -7,7 +7,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
 import { UserService } from '@features/users/services/UserService';
 import { Guest } from '@core/models/Guest';
-import { FormFactoryService } from '@core/services/FormFactoryService';
+import { FormFactoryService } from '@shared/form/FormFactoryService';
 
 export type GuestFormData = { guest?: Guest };
 
@@ -22,13 +22,6 @@ export type GuestFormData = { guest?: Guest };
     NgTemplateOutlet,
   ],
   standalone: true,
-  styles: `
-    form {
-      color: var(--text-primary);
-      display: flex;
-      flex-direction: column;
-    }
-  `,
   template: `
     <ng-template #formFields>
       <form [formGroup]="formGroup">
