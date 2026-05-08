@@ -47,7 +47,6 @@ mat-expansion-panel {
   flex: 1;
 }
 
-/* sticky add button na dole listy */
 .addRowBottom {
   margin-top: 8px;
   padding: 14px;

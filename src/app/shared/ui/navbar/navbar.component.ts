@@ -22,7 +22,7 @@ import {MatMenu, MatMenuContent, MatMenuTrigger} from '@angular/material/menu';
 })
 export class NavbarComponent implements OnInit {
 
-  protected employee$: Observable<Employee>;
+  protected employee$: Observable<Employee | null>;
 
   constructor(private service: EmployeeService, private router: Router) {
     this.employee$ = service.employee$;

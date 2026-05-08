@@ -62,14 +62,16 @@ export class CalendarPage implements OnInit, OnDestroy {
     this.reservationService.fetchAllData().subscribe();
     this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
     this.sub = this.reservationService.calendarData$.subscribe(data => {
-      this.reservationMetadataWithSets = data.metadata || {};
-      this.paidReservationsWithSets = data.paid;
-      this.userPerReservation = data.users;
+      if (data) {
+        this.reservationMetadataWithSets = data.metadata || {};
+        this.paidReservationsWithSets = data.paid || {};
+        this.userPerReservation = data.users || {};
+      }
     });
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.sub?.unsubscribe();
   }
 
   changeMonth(event: number) {
@@ -199,7 +201,7 @@ export class CalendarPage implements OnInit, OnDestroy {
       return;
     }
 
-    let userMap: Map<string, string[]> = this.userPerReservation[cp.index];
+    let userMap: Record<string, string[]> = this.userPerReservation[cp.index] as any;
 
     if (!userMap) {
       return;
