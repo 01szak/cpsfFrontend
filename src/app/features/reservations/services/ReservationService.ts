@@ -1,7 +1,7 @@
 // DDD Refactored
-import {inject, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, forkJoin, from, map, Observable, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, forkJoin, map, Observable, Subscription, switchMap, tap} from 'rxjs';
 import {ReservationMetadata, ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
 import {Reservation} from '@core/models/Reservation';
 import {PaidReservations, PaidReservationsWithSets} from '@core/models/PaidReservations';
@@ -11,75 +11,61 @@ import {Page} from '@core/models/Page';
 import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
 import {Filter, Sort} from '@shared/ui/data-table/regular-table.component';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {Api} from '../../../api/api';
-import {findAll, create, update, delete$ as deleteReservationFn, getReservationMetadata, getPaidReservations, getUnPaidReservations, getUserPerReservation1, getUserPerReservation} from '../../../api';
-import {ReservationDto} from '../../../api/models/reservation-dto';
-import {NotificationService} from '@core/services/NotificationService';
+import {BackendService} from '@core/services/BackendService';
+import {BackendEntity} from '@core/models/BackendEntity';
 
 
 @Injectable({providedIn: "root"})
-export class ReservationService {
-  private api = inject(Api);
-  private http = inject(HttpClient);
-  private reservationHelper = inject(ReservationHelper);
-  private camperPlaceService = inject(CamperPlaceService);
-  private notification = inject(NotificationService);
+export class ReservationService extends BackendService<Reservation> {
 
-  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
-  public refreshed$ = this.refreshTrigger$.asObservable();
+  public calendarData$: Observable<ReservationData>;
 
-  private pageDataBs = new BehaviorSubject<Page<Reservation>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
-  public pageData$ = this.pageDataBs.asObservable();
-
-  private calendarDataBs = new BehaviorSubject<ReservationData | null>(null);
-  public calendarData$ = this.calendarDataBs.asObservable();
-
-  public notifyChange() {
-    this.refreshTrigger$.next();
+  constructor(
+    http: HttpClient,
+    private reservationHelper: ReservationHelper,
+    private camperPlaceService: CamperPlaceService,
+  ) {
+    super(
+      '/api/reservation',
+      http,
+      new BehaviorSubject<ReservationData | null>(null)
+    );
+    this.calendarData$ = this.allDataSubject.asObservable();
+    this.pageData$ = this.pageDataBs.asObservable();
   }
 
+
   public getReservationMetadata() {
-    return from(this.api.invoke(getReservationMetadata)).pipe(map(r => {
-      return this.reservationHelper.mapReservationMetadataToSets(r as Record<string, ReservationMetadata>)
+    return this.http.get<Record<string, ReservationMetadata>>(this.api + '/getReservationMetadata').pipe(map(r => {
+      return this.reservationHelper.mapReservationMetadataToSets(r)
     }));
   }
 
   public getPaidReservations() {
-    return from(this.api.invoke(getPaidReservations)).pipe(map(r => {
-      return this.reservationHelper.mapPaidReservationsToSets(r as Record<string, PaidReservations>)
+    return this.http.get<Record<string, PaidReservations>>(this.api + '/getPaidReservations').pipe(map(r => {
+      return this.reservationHelper.mapPaidReservationsToSets(r)
     }));
   }
 
   public getUnpaidReservations() {
-    return from(this.api.invoke(getUnPaidReservations)).pipe(map(r => {
-      return this.reservationHelper.mapPaidReservationsToSets(r as Record<string, PaidReservations>)
+    return this.http.get<Record<string, PaidReservations>>(this.api + '/getUnPaidReservations').pipe(map(r => {
+      return this.reservationHelper.mapPaidReservationsToSets(r)
     }));
   }
 
   public getUserPerReservation() {
-    return from(this.api.invoke(getUserPerReservation1)) as unknown as Observable<UserPerReservation>;
+    return this.http.get<UserPerReservation>(this.api + '/getUserPerReservation');
   }
 
-  public findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<Reservation>> {
-    const pageable = {
-      page: event ? event.pageIndex : (page || 0),
-      size: event ? event.pageSize : (size || 10),
-      sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
-    };
-
-    return from(this.api.invoke(findAll, {
-      pageable: pageable,
-      by: filter?.by,
-      value: filter?.value
-    })).pipe(
+  public override findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<Reservation>> {
+    return super.findAll(event, page, size, sort, filter).pipe(
       map(p => {
-        const page = p as unknown as Page<Reservation>;
-        const reservations = page.content;
+        const reservations = p.content
         reservations.forEach(r => {
           r.stringUser = r.guest ? (r.guest.firstname + " " + r.guest.lastname) : '';
           r.camperPlaceIndex = r.camperPlace.index;
         })
-        return page;
+        return p;
       }),
       tap(p => {
         this.pageDataBs.next(p);
@@ -88,79 +74,45 @@ export class ReservationService {
   }
 
   public deleteReservation(r: Reservation) {
-    return from(this.api.invoke(deleteReservationFn, { id: Number(r.id!) }))
-        .pipe(
-            tap({
-                next: (response: any) => {
-                    this.notification.success(response);
-                    this.notifyChange();
-                },
-                error: (error) => this.notification.error(error)
-            }),
-            switchMap(() => this.fetchAllData())
-        );
+    return super.delete(r).pipe(switchMap(() => this.fetchAllData()));
   }
 
-  public create(r: Reservation) {
-    return from(this.api.invoke(create, { body: r as unknown as ReservationDto }))
-      .pipe(
-        tap({
-          next: (response: any) => {
-            this.notification.success(response);
-            this.notifyChange();
-          },
-          error: (error) => {
-            this.notification.error(error);
-          }
-        }),
-        switchMap(() => this.fetchAllData())
-      );
+  public createReservation(r: Reservation) {
+    return super.create(r).pipe(switchMap(() => this.fetchAllData()));
   }
 
-  public update(r: Reservation) {
-    // Some basic formatting might be needed if dates are not strings yet
-    // But usually DateFormater handles it before calling service
-    return from(this.api.invoke(update, { body: r as unknown as ReservationDto }))
-      .pipe(
-        tap({
-            next: (response: any) => {
-              this.notification.success(response);
-              this.notifyChange();
-            },
-            error: (error) => {
-              this.notification.error(error);
-            }
-          }
-        ),
-        switchMap(() => this.fetchAllData())
-      );
+  public updateReservation(r: Reservation) {
+    r.checkin = this.reservationHelper.formatToStringDate(r.checkin);
+    r.checkout = this.reservationHelper.formatToStringDate(r.checkout);
+    return super.update(r).pipe(switchMap(() => this.fetchAllData()));
   }
 
-  public fetchAllData() {
+  public override fetchAllData() {
     this.camperPlaceService.getCamperPlacesAsync();
     return forkJoin({
-      reservations: this.findAll(undefined, 0, 10), // Default page
+      reservations: this.findAll(this.event, this.page, this.size, this.sort, this.filter),
       metadata: this.getReservationMetadata(),
       paid: this.getPaidReservations(),
       unpaid: this.getUnpaidReservations(),
       users: this.getUserPerReservation(),
     }).pipe(
       tap(result => {
-        this.calendarDataBs.next(result);
+        this.allDataSubject.next(result);
       })
     );
   }
 
   findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number): Observable<Reservation[]> {
-    return from(this.api.invoke(getUserPerReservation, { date, camperPlaceId })) as unknown as Observable<Reservation[]>;
+    return this.http.get<Reservation[]>(this.api + '/' + date + '/' + camperPlaceId)
   }
 
 }
 
-export type ReservationData = {
+type ReservationData = {
   metadata: Record<string, ReservationMetadataWithSets>,
   paid: Record<string, PaidReservationsWithSets>,
   unpaid: Record<string, PaidReservationsWithSets>,
   users: UserPerReservation,
   reservations: Page<Reservation>
 }
+

@@ -1,16 +1,14 @@
-import {Component, EventEmitter, inject, input, Output} from '@angular/core';
+import {Component, EventEmitter, input, Output} from '@angular/core';
 import {MatFormField, MatHint} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
+import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent} from '@angular/material/card';
+import {AuthenticatorRequest, LoginService} from '@core/services/LoginService';
 import {CommonModule} from '@angular/common';
-import {Router, RouterModule} from '@angular/router';
+import {Router, RouterLink, RouterModule} from '@angular/router';
 import {FormButtonsComponent} from '@shared/ui/buttons/form-buttons.component';
-import {Api} from '../../api/api';
-import {login} from '../../api/fn/auth-controller/login';
-import {LoginRequest} from '../../api/models/login-request';
-import {SessionService} from '@core/services/SessionService';
 
 @Component({
   selector: 'app-login',
@@ -31,12 +29,12 @@ import {SessionService} from '@core/services/SessionService';
   standalone: true
 })
 export class LoginComponent {
-  private api = inject(Api);
-  private sessionService = inject(SessionService);
-  private router = inject(Router);
 
   @Output() onSubmitLoginEvent = new EventEmitter();
   @Output() onSubmitRegisterEvent = new EventEmitter();
+
+  constructor(private loginService: LoginService, private router: Router) {
+  }
 
   active: string = "login";
   isLogged: boolean = false;
@@ -46,26 +44,24 @@ export class LoginComponent {
     this.active = 'login';
   }
 
-  request: LoginRequest = {
+  request: AuthenticatorRequest = {
     login: '',
     password: ''
   }
 
+
   login = () => {
     this.onSubmitLoginEvent.emit({"login": this.request.login, "password": this.request.password});
-    this.api.invoke(login, { body: this.request }).then(
-      (response: any) => {
-        if (response && response.token) {
-          this.sessionService.setToken(response.token);
-          this.isLogged = true;
-          this.router.navigate(["/admin-page/calendar"]);
-        }
+    this.loginService.login(this.request).subscribe({
+      next: (req) => {
+        this.isLogged = true;
+        this.router.navigate(["/admin-page/calendar"])
       },
-      (error) => {
-        this.errorMessage = "Wrong login or password";
-        console.error(error);
+      error: (error: Error) => {
+        this.errorMessage = "Wrong login or password"
+          console.error(error);
       }
-    );
+    });
   }
 
   onRegisterTab(): void {

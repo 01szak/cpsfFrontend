@@ -1,9 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
-import {debounceTime, distinctUntilChanged, filter, from, map, Observable, of, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap, take} from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 import {ReservationService} from '@features/reservations/services/ReservationService';
+import {UserService} from '@features/users/services/UserService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 import {Guest} from '@core/models/Guest';
 import {Reservation} from '@core/models/Reservation';
@@ -19,6 +20,7 @@ import {MatCheckbox} from '@angular/material/checkbox';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {AsyncPipe} from '@angular/common';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {Page} from '@core/models/Page';
 import {
   MatDatepicker,
   MatDatepickerInput,
@@ -31,8 +33,6 @@ import {
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
-import {Api} from '../../api/api';
-import {findAll1} from '../../api/fn/guest-controller/find-all-1';
 
 export type ReservationFormData = {
   reservation?: Reservation;
@@ -166,9 +166,9 @@ export type ReservationFormData = {
   `,
 })
 export class ReservationFormComponent implements OnInit {
-  private readonly api = inject(Api);
   private readonly factory = inject(FormFactoryService);
   private readonly reservationService = inject(ReservationService);
+  private readonly guestService = inject(UserService);
   private readonly camperPlaceService = inject(CamperPlaceService);
   private readonly confirmation = inject(PopupConfirmationService);
   private readonly dialogRef = inject(MatDialogRef<ReservationFormComponent>);
@@ -207,8 +207,8 @@ export class ReservationFormComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       filter((v): v is string => typeof v === 'string' && v.length > 1),
-      switchMap((v: string) => from(this.api.invoke(findAll1, { pageable: { page: 0, size: 50 }, by: 'fullName', value: v }))),
-      map((res: any) => (res.content || []).map((g: Guest) => ({ name: `${g.firstname} ${g.lastname}`, guest: g })))
+      switchMap((v: string) => this.guestService.findAll(undefined, 0, 50, undefined, { by: 'fullName', value: v })),
+      map((res: Page<Guest>) => (res.content || []).map((g: Guest) => ({ name: `${g.firstname} ${g.lastname}`, guest: g })))
     );
   }
 

@@ -5,14 +5,9 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { NgTemplateOutlet } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
+import { UserService } from '@features/users/services/UserService';
 import { Guest } from '@core/models/Guest';
-import { Api } from '../../api/api';
-import { NotificationService } from '@core/services/NotificationService';
-import { create1 } from '../../api/fn/guest-controller/create-1';
-import { update1 } from '../../api/fn/guest-controller/update-1';
-import { deleteGuest } from '../../api/fn/guest-controller/delete-guest';
-import { GuestDto } from '../../api/models/guest-dto';
-import {FormFactoryService} from '@shared/form/FormFactoryService';
+import { FormFactoryService } from '@shared/form/FormFactoryService';
 
 export type GuestFormData = { guest?: Guest };
 
@@ -74,8 +69,7 @@ export class GuestFormComponent implements OnInit {
   @Input() isDialog = true;
   @Input() formGroup!: FormGroup;
 
-  private readonly api = inject(Api);
-  private readonly notification = inject(NotificationService);
+  private readonly userService = inject(UserService);
   private readonly factory = inject(FormFactoryService);
   private readonly dialogRef = inject(MatDialogRef<GuestFormComponent>, { optional: true });
   private readonly fd: GuestFormData = inject<GuestFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
@@ -84,13 +78,7 @@ export class GuestFormComponent implements OnInit {
   protected formTitle = this.isUpdate ? 'Edytuj Gościa' : 'Nowy Gość';
 
   protected deleteAction = this.isUpdate ? () => {
-    this.api.invoke(deleteGuest, { id: Number(this.fd.guest!.id) }).then(
-      (res) => {
-        this.notification.success(res);
-        this.dialogRef?.close(true);
-      },
-      (err) => this.notification.error(err)
-    );
+    this.userService.delete(this.fd.guest!).subscribe(() => this.dialogRef?.close());
   } : null;
 
   ngOnInit() {
@@ -105,21 +93,13 @@ export class GuestFormComponent implements OnInit {
   protected onSave = () => {
     if (this.formGroup.invalid) return;
 
-    const payload = this.formGroup.value as GuestDto;
-    if (this.isUpdate) {
-      payload.id = Number(this.fd.guest!.id);
-    }
+    const payload = this.formGroup.value;
+    const action$ = this.isUpdate
+      ? this.userService.update(payload)
+      : this.userService.create(payload);
 
-    const promise = this.isUpdate
-      ? this.api.invoke(update1, { body: payload })
-      : this.api.invoke(create1, { body: payload });
-
-    promise.then(
-      (res) => {
-        this.notification.success(res);
-        this.dialogRef?.close(true);
-      },
-      (err) => this.notification.error(err)
-    );
+    action$.subscribe(() => {
+      this.dialogRef?.close(true);
+    });
   }
 }

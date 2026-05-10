@@ -1,23 +1,32 @@
-import {Injectable, inject} from '@angular/core';
+import {Injectable} from '@angular/core';
+import {BackendService} from './BackendService';
 import {Employee} from '@core/models/Employee';
-import {BehaviorSubject, from, Observable, tap} from 'rxjs';
-import {Api} from '../../api/api';
-import {getEmployee} from '../../api/fn/user-controller/get-employee';
+import {HttpClient} from '@angular/common/http';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 
 
 @Injectable({providedIn: "root"})
-export class EmployeeService {
-  private api = inject(Api);
+export class EmployeeService extends BackendService<Employee> {
 
-  private employeeBs = new BehaviorSubject<Employee | null>(null);
-  public employee$ = this.employeeBs.asObservable();
+  public employee$: Observable<Employee>;
 
-  public getEmployee(): Observable<Employee> {
-    return from(this.api.invoke(getEmployee)).pipe(
+  constructor(
+    http: HttpClient,
+  ) {
+    super(
+      '/api/user',
+      http,
+      new BehaviorSubject<Employee | null>(null)
+    );
+    this.employee$ = this.allDataSubject.asObservable();
+  }
+
+  public getEmployee() {
+    return this.http.get<Employee>(this.api).pipe(
       tap(e => {
-        this.employeeBs.next(e as Employee);
+        this.allDataSubject.next(e);
       })
-    ) as unknown as Observable<Employee>;
+    );
   }
 
 }

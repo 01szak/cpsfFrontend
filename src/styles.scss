@@ -247,7 +247,7 @@ mat-card,
 }
 
 .mat-mdc-option {
-  color: black !important;
+  color: var(--text-primary) !important;
 
   &:hover:not(.mdc-list-item--disabled) {
     background-color: rgba(255, 255, 255, 0.05) !important;
@@ -265,6 +265,48 @@ mat-card,
 .mat-calendar-period-button,
 .mat-calendar-next-button,
 .mat-calendar-previous-button {
+  color: black !important;
+}
+
+/* =========================================================
+   ANGULAR MATERIAL EXPANSION PANEL — FULL THEME INTEGRATION
+========================================================= */
+
+/* ---------- PANEL CONTAINER ---------- */
+mat-expansion-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.mat-expansion-panel:not([class*='mat-elevation-z']) {
+  box-shadow: none !important;
+}
+
+.mat-expansion-panel-header {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-md) !important;
+  min-height: 64px !important;
+  transition: background 0.15s ease;
+}
+
+.mat-expansion-panel-header:hover {
+  background: var(--bg-overlay) !important;
+}
+
+.mat-expanded .mat-expansion-panel-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mat-expansion-panel-header-title {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+.mat-expansion-indicator::after {
   color: var(--text-primary) !important;
 }
 
