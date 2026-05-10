@@ -11,7 +11,13 @@ export class BlobJsonInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       switchMap(event => {
-        if (event instanceof HttpResponse && event.body instanceof Blob && event.body.type === 'application/json') {
+        const contentType = event instanceof HttpResponse
+        && event.body instanceof Blob? (event.body.type || '').toLowerCase() : '';
+        if (
+          event instanceof HttpResponse
+          && event.body instanceof Blob
+          && (contentType.includes('application/json') || contentType.endsWith('+json'))
+        ) {
           return from(event.body.text()).pipe(
             map(text => {
                 try {

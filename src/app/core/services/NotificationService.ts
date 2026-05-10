@@ -4,6 +4,7 @@ import {SnackBarComponent} from '@shared/popups/snack-bar/snack-bar.component';
 
 @Injectable({providedIn: 'root'})
 export class NotificationService {
+
   private snackBar = inject(MatSnackBar);
 
   success(message: string | { success: string } | any): void {
@@ -18,7 +19,11 @@ export class NotificationService {
   }
 
   error(error: any): void {
-    const msg = error?.error || error?.message || 'Coś poszło nie tak';
+    const msg =
+      (typeof error?.error === 'string' && error.error)
+      || error?.message
+      || error?.error?.message
+      || 'Coś poszło nie tak';
     this.snackBar.openFromComponent(SnackBarComponent, {
       data: msg,
       panelClass: 'errorSnackBar',

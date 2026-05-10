@@ -1,5 +1,4 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable} from 'rxjs';
 import {BehaviorSubject, from, Observable, merge, shareReplay, switchMap, tap, map} from 'rxjs';
 import {CamperPlace} from '@core/models/CamperPlace';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
