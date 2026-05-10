@@ -5,9 +5,11 @@ import {routes} from './app.routes';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {AuthInterceptor} from '@core/interceptors/auth.interceptor';
+import {BlobJsonInterceptor} from '@core/interceptors/blob-to-json.interceptor';
 import moment from 'moment';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideApiConfiguration} from './api/api-configuration';
 
 moment.locale('pl');
 
@@ -30,7 +32,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi()),
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: BlobJsonInterceptor, multi: true},
     provideMomentDateAdapter(DATE_FORMATS),
     { provide: MAT_DATE_LOCALE, useValue: 'pl-PL' },
+    provideApiConfiguration('/api'),
   ]
 };
