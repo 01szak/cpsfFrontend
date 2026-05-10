@@ -1,11 +1,18 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, shareReplay, switchMap, tap} from 'rxjs';
-import {BackendService} from '@core/services/BackendService';
+import {inject, Injectable} from '@angular/core';
+import {BehaviorSubject, from, map, Observable, shareReplay, switchMap, tap} from 'rxjs';
 import {CamperPlaceType} from '@core/models/CamperPlaceType';
+import {Api} from '../../../api/api';
+import {getTypes, create3, update3, delete1} from '../../../api';
+import {CamperPlaceTypeDto} from '../../../api/models/camper-place-type-dto';
+import {NotificationService} from '@core/services/NotificationService';
 
 @Injectable({providedIn: "root"})
-export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {
+export class CamperPlaceTypeService {
+  private api = inject(Api);
+  private notification = inject(NotificationService);
+
+  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
+  public refreshed$ = this.refreshTrigger$.asObservable();
 
   private camperPlaceTypeSubject = new BehaviorSubject<CamperPlaceType[]>([]);
 
@@ -14,16 +21,61 @@ export class CamperPlaceTypeService extends BackendService<CamperPlaceType> {
     shareReplay(1)
   );
 
-  constructor(http: HttpClient) {
-    super('api/camperPlaceType', http, new BehaviorSubject<CamperPlaceType | null>(null));
+  public notifyChange() {
+    this.refreshTrigger$.next();
   }
 
   getCamperPlaceTypes(): Observable<CamperPlaceType[]> {
-    return this.http.get<CamperPlaceType[]>(this.api).pipe(
+    return from(this.api.invoke(getTypes)).pipe(
+      map(p => p as unknown as CamperPlaceType[]),
       tap(p => {
         this.camperPlaceTypeSubject.next(p)
       })
     );
+  }
+
+  public create(t: CamperPlaceType): Observable<any> {
+    return from(this.api.invoke(create3, { body: t as CamperPlaceTypeDto }))
+      .pipe(
+        tap({
+          next: (response: any) => {
+            this.notification.success(response);
+            this.notifyChange();
+          },
+          error: (error) => this.notification.error(error)
+        })
+      );
+  }
+
+  public update(t: CamperPlaceType | CamperPlaceType[], params?: any[]): Observable<any> {
+    const body = Array.isArray(t) ? t : [t];
+    return from(this.api.invoke(update3, {
+        body: body as CamperPlaceTypeDto[],
+        cpIdToOverride: params
+    }))
+      .pipe(
+        tap({
+            next: (response: any) => {
+              this.notification.success(response);
+              this.notifyChange();
+            },
+            error: (error) => this.notification.error(error)
+          }
+        )
+      );
+  }
+
+  public delete(t: CamperPlaceType): Observable<any> {
+    return from(this.api.invoke(delete1, { cpTypeId: Number(t.id!) }))
+        .pipe(
+          tap({
+            next: (response: any) => {
+              this.notification.success(response);
+              this.notifyChange();
+            },
+            error: (error) => this.notification.error(error)
+          })
+        )
   }
 
 }

@@ -1,11 +1,11 @@
 <app-regular-table
-  [page$]="pagedData"
+  [page$]="pagedData$"
   [tabColumns]="columns"
   [displayedColumns]="displayedColumns"
   [pageSize]="pageSize"
   [paginatorLength]="paginatorLength"
   [pageSizeOptions]="pageSizeOptions"
-  [serviceInstance]="userService"
+  [serviceInstance]="null"
   [fetchFunc]="fetchData.bind(this)"
   [onClickFunc]="openFormPopup.bind(this)"
   [createFunc]="openFormPopup.bind(this)"
