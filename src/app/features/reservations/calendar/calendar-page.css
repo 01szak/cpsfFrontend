@@ -17,11 +17,6 @@ table {
   overflow: hidden;
 }
 
-td {
-  align-content: start;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .data {
   display: flex;
   flex-direction: row;
@@ -128,3 +123,17 @@ app-new-date-picker {
   flex-direction: row;
 }
 
+app-reservation-cell {
+  position: absolute;
+  top: 50%;
+  height: 80%;
+  z-index: 10;
+  transform: translateY(-50%)
+}
+td {
+  padding: 0;
+  z-index: 0;
+  height: 40px;
+  border: 2px solid rgb(255 255 255 / 0.29);
+  position: relative;
+}

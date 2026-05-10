@@ -13,11 +13,12 @@ import {PaidReservationsWithSets} from '@core/models/PaidReservations';
 import {UserPerReservation} from '@core/models/UserPerReservation';
 import {MatTooltip} from '@angular/material/tooltip';
 import moment from 'moment';
-import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import {DateDelimiter, DateFormater, DateParams} from '@shared/helper/DateFormater';
 import {Reservation} from '@core/models/Reservation';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell/reservation-cell.component';
 
 @Component({
   selector: 'calendar',
@@ -27,6 +28,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NewDatePickerComponent,
     MatTooltip,
     AsyncPipe,
+    ReservationCellComponent,
+    ReservationCellComponent,
   ],
   templateUrl: './calendar-page.html',
   styleUrl: './calendar-page.css',
@@ -235,7 +238,18 @@ export class CalendarPage implements OnInit, OnDestroy {
 
   }
 
-}
+  reservationsDemo = [
+    {id: 1, days: 2, startsAt: 1} as ReservationDemo,
+    {id: 2, days: 5, startsAt: 3} as ReservationDemo,
+    {id: 3, days: 7, startsAt: 15} as ReservationDemo,
+    {id: 4, days: 3, startsAt: 22} as ReservationDemo,
+    {id: 4, days: 1, startsAt: 10} as ReservationDemo,
+  ]
 
+  protected getReservationCellWidth(days: number): string {
+    return `calc(${days * 100}% + ${days}px)`;
+  }
+}
+type ReservationDemo = {id: number, days: number, startsAt: number}
 // @ts-ignore
 type ReservationEventType = "checkin" | "checkout" | "middle";
