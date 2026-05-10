@@ -26,53 +26,16 @@
               <th>{{camperPlace.index}}</th>
               @for (day of days; track day) {
                 <td>
-                  <div
-                    #data
-                    matTooltip="{{ getUserFromMap(camperPlace, year, month + 1, day) }}"
-                    [ngClass]="{
-                'data': true,
-                'dataCheckin': isCheckin(year, month, day , camperPlace),
-                'dataCheckout': isCheckout(year, month, day, camperPlace),
-                }">
-                    <div #left
-                         [ngClass]="{
-                      'cell': true,
-                      'left': true,
-                      'weekend': isWeekend(year, month, day),
-                      'reserved':
-                        (isDayReserved(year, month , day, camperPlace)
-                        && isCheckin(year, month , day, camperPlace)
-                        && isCheckout(year, month, day, camperPlace))
-                        || (isDayReserved(year, month , day, camperPlace) && !isCheckin(year, month, day, camperPlace)),
-                      'nextToCheckin': isCheckin(year, month, day , camperPlace),
-                      'paid':
-                        isPaid(year, month, day, camperPlace)
-                        && isUnPaid(year, month, day, camperPlace)
-                        && isPaid(year, month, day - 1, camperPlace)
-                        || isPaid(year, month, day, camperPlace)
-                        && isPaid(year, month, day - 1, camperPlace)
-                    }" (click)="openFormPopup(year, month , day, camperPlace, $event)"></div>
-                    <div #right
-                         [ngClass]="{
-                      'cell': true,
-                      'right': true,
-                      'weekend': isWeekend(year, month, day),
-                      'reserved':
-                        (isCheckin(year, month, day , camperPlace)
-                         && isCheckout(year, month, day, camperPlace)
-                         && isDayReserved(year, month , day, camperPlace))
-                         || (!isCheckout(year, month, day, camperPlace) && isDayReserved(year, month , day, camperPlace)),
-                      'nextToCheckout': isCheckout(year, month, day, camperPlace),
-                      'paid':
-                        isPaid(year, month, day, camperPlace)
-                        && isUnPaid(year, month, day, camperPlace)
-                        && isPaid(year, month, day + 1, camperPlace)
-                        || isPaid(year, month, day, camperPlace)
-                        && isPaid(year, month, day + 1, camperPlace)
-                    }" (click)="openFormPopup(year, month, day, camperPlace, $event)"></div>
-                  </div>
+                    @for (res of reservationsDemo; track res.id) {
+                      @if (res.startsAt === day) {
+                        <app-reservation-cell
+                          [style.width]="getReservationCellWidth(res.days)"
+                          [style.left.%]="50"/>
+                      }
+                    }
                 </td>
               }
+
             </tr>
           }
         </tbody>
