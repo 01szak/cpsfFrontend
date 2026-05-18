@@ -3,13 +3,14 @@ import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
-import {Reservation} from '@core/models/Reservation';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
-import {RegularTableComponent, Filter, Sort} from '@shared/ui/data-table/regular-table.component';
+import {RegularTableComponent, Sort} from '@shared/ui/data-table/regular-table.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
+import {SearchCriteria} from '../../../api/models/search-criteria';
+import {ReservationDto} from '../../../api';
 
 @Component({
   selector: 'reservations',
@@ -29,7 +30,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   private reservationService = inject(ReservationService);
   private formService = inject(PopupFormService);
 
-  protected pagedData$ = new BehaviorSubject<Page<Reservation>>({
+  protected pagedData$ = new BehaviorSubject<Page<ReservationDto>>({
     content: [],
     number: 0,
     size: 0,
@@ -56,7 +57,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   private lastParams: {
     event?: PageEvent,
     sort?: Sort,
-    filter?: Filter
+    filter?: SearchCriteria
   } = {};
 
   ngOnInit() {
@@ -67,17 +68,17 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  protected fetchData(event?: PageEvent, sort?: Sort, filter?: Filter) {
+  protected fetchData(event?: PageEvent, sort?: Sort, filter?: SearchCriteria) {
     this.lastParams = { event: event || this.lastParams.event, sort: sort || this.lastParams.sort, filter: filter || this.lastParams.filter };
 
     this.sub?.unsubscribe();
-    this.sub = this.reservationService.findAll(
+    this.sub = this.reservationService.findBy(
       this.lastParams.event,
       undefined,
       undefined,
       this.lastParams.sort,
       this.lastParams.filter
-    ).subscribe(p => {
+    ).subscribe((p: Page<ReservationDto>) => {
       this.pagedData$.next(p);
       this.paginatorLength = p.totalElements;
     });
@@ -87,7 +88,7 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.fetchData(undefined, sort);
   }
 
-  protected getFilterInfo(filter: Filter) {
+  protected getFilterInfo(filter: SearchCriteria) {
     if (this.paginator) {
       this.paginator.firstPage();
     }
@@ -98,7 +99,7 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.paginator = paginator;
   }
 
-  protected openFormPopup(reservation?: Reservation) {
+  protected openFormPopup(reservation?: ReservationDto) {
     const reservationFd: ReservationFormData = {reservation: reservation};
     this.formService.openReservationFormPopup(reservationFd).afterClosed().subscribe(refreshed => {
       if (refreshed) {
@@ -107,7 +108,7 @@ export class ReservationPage implements OnInit, OnDestroy {
     });
   }
 
-  protected additionalFunc = (r: Reservation) => {
+  protected additionalFunc = (r: ReservationDto) => {
     let previousPaidStaus = r.paid;
     r.paid = !r.paid;
     this.reservationService.update(r).subscribe({

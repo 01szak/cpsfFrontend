@@ -1,19 +1,15 @@
-// DDD Refactored
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, forkJoin, from, map, Observable, switchMap, tap} from 'rxjs';
-import {ReservationMetadata, ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
-import {Reservation} from '@core/models/Reservation';
-import {PaidReservations, PaidReservationsWithSets} from '@core/models/PaidReservations';
-import {UserPerReservation} from '@core/models/UserPerReservation';
+import {BehaviorSubject, from, map, Observable, tap} from 'rxjs';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
 import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
-import {Filter, Sort} from '@shared/ui/data-table/regular-table.component';
+import {Sort} from '@shared/ui/data-table/regular-table.component';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {Api} from '../../../api/api';
-import {findAll, create, update, delete$ as deleteReservationFn, getReservationMetadata, getPaidReservations, getUnPaidReservations, getUserPerReservation1, getUserPerReservation} from '../../../api';
+import {findBy, create, update, delete$ as deleteReservationFn} from '../../../api';
 import {ReservationDto} from '../../../api/models/reservation-dto';
+import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
 
 
@@ -28,66 +24,39 @@ export class ReservationService {
   private refreshTrigger$ = new BehaviorSubject<void>(undefined);
   public refreshed$ = this.refreshTrigger$.asObservable();
 
-  private pageDataBs = new BehaviorSubject<Page<Reservation>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
-  public pageData$ = this.pageDataBs.asObservable();
-
-  private calendarDataBs = new BehaviorSubject<ReservationData | null>(null);
-  public calendarData$ = this.calendarDataBs.asObservable();
+  private reservationSubject = new BehaviorSubject<Page<ReservationDto>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
+  public reservationDtos$ = this.reservationSubject.asObservable();
 
   public notifyChange() {
     this.refreshTrigger$.next();
   }
 
-  public getReservationMetadata() {
-    return from(this.api.invoke(getReservationMetadata)).pipe(map(r => {
-      return this.reservationHelper.mapReservationMetadataToSets(r as Record<string, ReservationMetadata>)
-    }));
-  }
-
-  public getPaidReservations() {
-    return from(this.api.invoke(getPaidReservations)).pipe(map(r => {
-      return this.reservationHelper.mapPaidReservationsToSets(r as Record<string, PaidReservations>)
-    }));
-  }
-
-  public getUnpaidReservations() {
-    return from(this.api.invoke(getUnPaidReservations)).pipe(map(r => {
-      return this.reservationHelper.mapPaidReservationsToSets(r as Record<string, PaidReservations>)
-    }));
-  }
-
-  public getUserPerReservation() {
-    return from(this.api.invoke(getUserPerReservation1)) as unknown as Observable<UserPerReservation>;
-  }
-
-  public findAll(event?: PageEvent, page?: number, size?: number, sort?: Sort, filter?: Filter): Observable<Page<Reservation>> {
+  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
     const pageable = {
       page: event ? event.pageIndex : (page || 0),
       size: event ? event.pageSize : (size || 10),
       sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
     };
 
-    return from(this.api.invoke(findAll, {
+    return from(this.api.invoke(findBy, {
       pageable: pageable,
-      by: filter?.by,
-      value: filter?.value
+      searchCriteria: searchCriteria || { key: '', value: '' }
     })).pipe(
       map(p => {
-        const page = p as unknown as Page<Reservation>;
-        const reservations = page.content;
-        reservations.forEach(r => {
-          r.stringUser = r.guest ? (r.guest.firstname + " " + r.guest.lastname) : '';
-          r.camperPlaceIndex = r.camperPlace.index;
-        })
+        const page = p as unknown as Page<ReservationDto>;
         return page;
       }),
       tap(p => {
-        this.pageDataBs.next(p);
+        this.reservationSubject.next(p);
       })
     );
   }
 
-  public deleteReservation(r: Reservation) {
+  public findByUnpaged(searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+    return this.findBy(undefined, 0, 1000, undefined, searchCriteria);
+  }
+
+  public deleteReservation(r: ReservationDto) {
     return from(this.api.invoke(deleteReservationFn, { id: Number(r.id!) }))
         .pipe(
             tap({
@@ -96,12 +65,11 @@ export class ReservationService {
                     this.notifyChange();
                 },
                 error: (error) => this.notification.error(error)
-            }),
-            switchMap(() => this.fetchAllData())
+            })
         );
   }
 
-  public create(r: Reservation) {
+  public create(r: ReservationDto) {
     return from(this.api.invoke(create, { body: r as unknown as ReservationDto }))
       .pipe(
         tap({
@@ -112,14 +80,11 @@ export class ReservationService {
           error: (error) => {
             this.notification.error(error);
           }
-        }),
-        switchMap(() => this.fetchAllData())
+        })
       );
   }
 
-  public update(r: Reservation) {
-    // Some basic formatting might be needed if dates are not strings yet
-    // But usually DateFormater handles it before calling service
+  public update(r: ReservationDto) {
     return from(this.api.invoke(update, { body: r as unknown as ReservationDto }))
       .pipe(
         tap({
@@ -131,36 +96,12 @@ export class ReservationService {
               this.notification.error(error);
             }
           }
-        ),
-        switchMap(() => this.fetchAllData())
+        )
       );
   }
 
   public fetchAllData() {
     this.camperPlaceService.getCamperPlacesAsync();
-    return forkJoin({
-      reservations: this.findAll(undefined, 0, 10), // Default page
-      metadata: this.getReservationMetadata(),
-      paid: this.getPaidReservations(),
-      unpaid: this.getUnpaidReservations(),
-      users: this.getUserPerReservation(),
-    }).pipe(
-      tap(result => {
-        this.calendarDataBs.next(result);
-      })
-    );
+    return this.findBy(undefined, 0, 100);
   }
-
-  findByDateInBetweenAndCamperPlaceId(date: string, camperPlaceId: number): Observable<Reservation[]> {
-    return from(this.api.invoke(getUserPerReservation, { date, camperPlaceId })) as unknown as Observable<Reservation[]>;
-  }
-
-}
-
-export type ReservationData = {
-  metadata: Record<string, ReservationMetadataWithSets>,
-  paid: Record<string, PaidReservationsWithSets>,
-  unpaid: Record<string, PaidReservationsWithSets>,
-  users: UserPerReservation,
-  reservations: Page<Reservation>
 }

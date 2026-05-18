@@ -21,6 +21,7 @@ import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.comp
 import {fromEvent, Observable} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {BackendEntity} from '@core/models/BackendEntity';
+import {SearchCriteria} from '../../../api';
 
 
 @Component({
@@ -62,7 +63,7 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
   @Input() public additionalFunc?: (t:T) => any;
 
   @Output() public sortInfo = new EventEmitter<Sort>();
-  @Output() public filterInfo = new EventEmitter<Filter>();
+  @Output() public filterInfo = new EventEmitter<SearchCriteria>();
   @Output() paginatorReady = new EventEmitter<MatPaginator>();
 
   private readonly dialog = inject(MatDialog)
@@ -104,9 +105,8 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
     }
   }
 
-  protected sendFilterInfo(by: string, value: string) {
-    const filter: Filter = {by: by, value: value}
-    this.filterInfo.emit(filter);
+  protected sendFilterInfo(criteria: SearchCriteria) {
+    this.filterInfo.emit(criteria);
   }
 
   protected openSearchDialog(event: MouseEvent,label: string, by: string, type: string) {
@@ -127,7 +127,7 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
 
     const clickSub = fromEvent(document, 'click').subscribe((event: Event) => {
       const targetEl = event.target as HTMLElement;
-      
+
       // Sprawdzamy czy kliknięcie było wewnątrz dialogu, przycisku otwierającego lub kalendarza
       const isInsideDialog = !!targetEl.closest('.searchDialog');
       const isInsideDatePicker = !!targetEl.closest('.mat-datepicker-content') || !!targetEl.closest('.mat-calendar');
@@ -141,7 +141,12 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
     dialogRef.afterClosed().subscribe(result => {
       clickSub.unsubscribe();
       if (result) {
-        this.sendFilterInfo(result.by, result.value)
+        // Result already contains by/value which maps to key/value in SearchCriteria
+        this.sendFilterInfo({
+          key: result.by,
+          value: result.value,
+          operation: 'EQUALS' // Default operation
+        })
       }
     })
   }
@@ -149,4 +154,3 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
 }
 export type column = { type: string, field: string }
 export interface Sort {columnName: string, direction: 'asc' | 'desc' }
-export interface Filter {by: string,value: string}

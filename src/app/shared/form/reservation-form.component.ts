@@ -18,7 +18,6 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {AsyncPipe} from '@angular/common';
-import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
 import {
   MatDatepicker,
   MatDatepickerInput,
@@ -32,14 +31,15 @@ import {
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
 import {Api} from '../../api/api';
-import {findAll1} from '../../api/fn/guest-controller/find-all-1';
+import {findBy1, ReservationDto} from '../../api';
+import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 
 export type ReservationFormData = {
-  reservation?: Reservation;
+  reservation?: ReservationDto;
   year?: number;
   month?: number;
   day?: number;
-  camperPlace?: CamperPlaceForTable;
+  camperPlace?: CamperPlaceDto;
 };
 
 @Component({
@@ -82,9 +82,6 @@ export type ReservationFormData = {
       ])
     ])
   ],
-  styles: `
-
-  `,
   template: `
     <app-popup-form-container
       [formTitle]="formTitle"
@@ -92,7 +89,8 @@ export type ReservationFormData = {
       [isUpdate]="isUpdate"
       [proceedAction]="onSave">
 
-      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled">
+      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled"
+            style="display: flex; flex-direction: column; gap: 1rem;">
         <mat-form-field>
           <mat-label>Data Wjazdu</mat-label>
           <input matInput [matDatepicker]="checkin" formControlName="checkinDate">
@@ -117,7 +115,7 @@ export type ReservationFormData = {
             <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
           } @else {
             <mat-select formControlName="camperPlace" [compareWith]="compareFn">
-              @for (cp of camperPlaces$ | async; track cp.id) {
+              @for (cp of (camperPlaces$ | async); track cp.id) {
                 <mat-option [value]="cp">{{ cp.index }}</mat-option>
               }
             </mat-select>
@@ -182,7 +180,7 @@ export class ReservationFormComponent implements OnInit {
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
   protected GuestTittle = this.isUpdate ? 'Edycja Gościa' : 'Nowy Gość';
   protected isNewGuest = false;
-  protected camperPlaces$ = this.camperPlaceService.getCamperPlacesForTable();
+  protected camperPlaces$: Observable<CamperPlaceDto[]> = this.camperPlaceService.camperPlacesForTable$;
   protected guests$: Observable<{ name: string; guest: Guest }[]> = of([]);
   protected checkinCalendarStart: moment.Moment | null = null;
   protected checkoutCalendarStart: moment.Moment | null = null;
@@ -207,7 +205,7 @@ export class ReservationFormComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       filter((v): v is string => typeof v === 'string' && v.length > 1),
-      switchMap((v: string) => from(this.api.invoke(findAll1, { pageable: { page: 0, size: 50 }, by: 'fullName', value: v }))),
+      switchMap((v: string) => from(this.api.invoke(findBy1, { pageable: { page: 0, size: 50 }, searchCriteria: { key: 'fullName', value: v } }))),
       map((res: any) => (res.content || []).map((g: Guest) => ({ name: `${g.firstname} ${g.lastname}`, guest: g })))
     );
   }
@@ -263,7 +261,6 @@ export class ReservationFormComponent implements OnInit {
     });
   } : null;
 
-
   protected onSave = () => {
     const checkin = DateFormater.YYYYMMDD(this.formGroup.get('checkinDate')!.value, DateDelimiter.DASH);
     const checkout = DateFormater.YYYYMMDD(this.formGroup.get('checkoutDate')!.value, DateDelimiter.DASH);
@@ -271,7 +268,7 @@ export class ReservationFormComponent implements OnInit {
     const guest = this.formGroup.get('guest')!.value;
     const isPaid = this.formGroup.get('isPaid')!.value;
 
-    const payload: Reservation = {
+    const payload: ReservationDto = {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
@@ -296,7 +293,6 @@ export class ReservationFormComponent implements OnInit {
       this.formGroup.get('guestSearch')?.reset();
     }
   }
-
 
   get camperPlaceIndex() {
     return this.formGroup.get('camperPlace')?.value?.index;

@@ -2,14 +2,15 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {RegularTableComponent, Filter, Sort} from '@shared/ui/data-table/regular-table.component';
+import {RegularTableComponent, Sort} from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {Guest} from '@core/models/Guest';
 import {GuestFormData} from '@shared/form/guest-form.component';
 import {Api} from '../../../api/api';
-import {findAll1} from '../../../api/fn/guest-controller/find-all-1';
+import {findBy1} from '../../../api';
 import {BehaviorSubject, from, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
+import {SearchCriteria} from '../../../api/models/search-criteria';
 
 @Component({
   selector: 'users',
@@ -54,7 +55,7 @@ export class UserPage implements OnInit, OnDestroy {
   private lastParams: {
     event?: PageEvent,
     sort?: Sort,
-    filter?: Filter
+    filter?: SearchCriteria
   } = {};
 
   ngOnInit() {
@@ -65,7 +66,7 @@ export class UserPage implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  protected fetchData(event?: PageEvent, sort?: Sort, filter?: Filter) {
+  protected fetchData(event?: PageEvent, sort?: Sort, filter?: SearchCriteria) {
     this.lastParams = { event: event || this.lastParams.event, sort: sort || this.lastParams.sort, filter: filter || this.lastParams.filter };
     
     const pageable = {
@@ -75,10 +76,9 @@ export class UserPage implements OnInit, OnDestroy {
     };
 
     this.sub?.unsubscribe();
-    this.sub = from(this.api.invoke(findAll1, {
+    this.sub = from(this.api.invoke(findBy1, {
       pageable,
-      by: this.lastParams.filter?.by,
-      value: this.lastParams.filter?.value
+      searchCriteria: this.lastParams.filter || { key: '', value: '' }
     })).subscribe((res: any) => {
       this.pagedData$.next(res);
       this.paginatorLength = res.totalElements;
@@ -89,7 +89,7 @@ export class UserPage implements OnInit, OnDestroy {
     this.fetchData(undefined, sort);
   }
 
-  protected getFilterInfo(filter: Filter) {
+  protected getFilterInfo(filter: SearchCriteria) {
     if (this.paginator) {
       this.paginator.firstPage();
     }
