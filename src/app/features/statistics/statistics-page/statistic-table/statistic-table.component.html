@@ -2,15 +2,15 @@
   <h3>{{title}}</h3>
   <div class="header-actions">
     @if (showGraph) {
-      <i (click)="toggleGraphMode()" 
-         class="change-button fa-solid" 
+      <i (click)="toggleGraphMode()"
+         class="change-button fa-solid"
          [ngClass]="graphMode === 'revenue' ? 'fa-hashtag' : 'fa-dollar-sign'"
          style="margin-right: 12px; cursor: pointer;"
          [title]="graphMode === 'revenue' ? 'Pokaż ilość rezerwacji' : 'Pokaż obrót'">
       </i>
     }
-    <i (click)="toggleView()" 
-       class="change-button fa-solid" 
+    <i (click)="toggleView()"
+       class="change-button fa-solid"
        [ngClass]="showGraph ? 'fa-table' : 'fa-chart-column'"
        style="cursor: pointer;">
     </i>
@@ -19,7 +19,7 @@
 
 <mat-card class="container-card">
   <div class="content-wrapper">
-    <div class="table primary" [style.display]="showGraph ? 'none' : 'block'">
+    <div class="table content" [style.display]="showGraph ? 'none' : 'block'">
       <table mat-table [dataSource]="displayData || []">
 
         <ng-container matColumnDef="camperPlaceNumber">

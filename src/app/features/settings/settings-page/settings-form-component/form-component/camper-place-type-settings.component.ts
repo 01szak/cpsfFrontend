@@ -1,14 +1,13 @@
-import {ChangeDetectorRef, Component, inject, Input, ViewChild} from '@angular/core';
-import { CamperPlaceType } from '@core/models/CamperPlaceType';
+import {Component, inject, Input, ViewChild} from '@angular/core';
+import { CamperPlaceTypeDto } from '../../../../../api/models/camper-place-type-dto';
 import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
 import {forkJoin, map, Observable, take} from 'rxjs';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
-import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
+import {CamperPlaceDto} from '../../../../../api/models/camper-place-dto';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {PopupFormService} from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-price-change-details',
@@ -49,8 +48,8 @@ import {PopupFormService} from '@core/services/PopupFormService';
               @for (item of e[1]; track item.id) {
                 <div style="display: flex; align-items: center; gap: 8px; padding: 2px 0 2px 52px;">
                   <mat-checkbox
-                    (change)="addId(item.id, $event.checked)"
-                    [checked]="selectedIds.includes(item.id)" />
+                    (change)="addId(item.id!, $event.checked)"
+                    [checked]="selectedIds.includes(item.id!)" />
                   <span style="font-size: 0.9rem; color: var(--text-primary)">
                     Indeks: <strong>{{ item.index }}</strong>
                     <span style="font-size: 0.8rem; color: var(--text-secondary); margin-left: 8px;">
@@ -67,29 +66,29 @@ import {PopupFormService} from '@core/services/PopupFormService';
   `
 })
 export class CamperPlacesWithUniquePricesComponent {
-  private _rows: Record<number, CamperPlaceForTable[]> | null = null;
-  @Input() set rows(val: Record<number, CamperPlaceForTable[]> | null) {
+  private _rows: Record<number, CamperPlaceDto[]> | null = null;
+  @Input() set rows(val: Record<number, CamperPlaceDto[]> | null) {
     this._rows = val;
     this.rowsEntries = Object.entries(val || {}).map(([key, value]) => [Number(key), value]);
   }
   get rows() { return this._rows; }
 
   @Input() selectedIds: number[] = [];
-  @Input() updatedTypes: CamperPlaceType[] = [];
+  @Input() updatedTypes: CamperPlaceTypeDto[] = [];
 
-  protected rowsEntries: [number, CamperPlaceForTable[]][] = [];
+  protected rowsEntries: [number, CamperPlaceDto[]][] = [];
 
   protected getNewPrice(typeId: number): number {
     return this.updatedTypes.find(t => t.id === typeId)?.price ?? 0;
   }
 
   private getAllIds(): number[] {
-    return this.rowsEntries.flatMap(([_, items]) => items.map(i => i.id));
+    return this.rowsEntries.flatMap(([_, items]) => items.map(i => i.id!));
   }
 
   private getTypeIds(typeId: number): number[] {
     const entry = this.rowsEntries.find(([id]) => id === typeId);
-    return entry ? entry[1].map(i => i.id) : [];
+    return entry ? entry[1].map(i => i.id!) : [];
   }
 
   protected isAllSelected(): boolean {
@@ -159,65 +158,50 @@ export class CamperPlacesWithUniquePricesComponent {
   template: `
     <app-settings-form-component
       #settingsForm
+      [formName]="'Rodzaje Parcel'"
+      [addNewFunc]="addNewFunc"
       [displayedColumns]="dispColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaceTypes"
-      [formName]="'Typy Parcel'"
-      [addNewFunc]="addNewFunc"
-      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `
 })
 export class CamperPlaceTypeSettingsComponent {
 
-  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceType>;
+  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceTypeDto>;
+  @Input() camperPlaceTypes: CamperPlaceTypeDto[] | null = [];
 
-  private _camperPlaceTypes: CamperPlaceType[] | null = [];
-  @Input() set camperPlaceTypes(value: CamperPlaceType[] | null) {
-    this._camperPlaceTypes = value;
-    this.updateFormDeclaration();
-    this.cdr.markForCheck();
-  }
-  get camperPlaceTypes() {
-    return this._camperPlaceTypes;
-  }
+  protected formFieldsDeclaration: FormFieldDeclaration[] = [
+    { columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
+    { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
+  ];
 
-  private readonly popupConfirmationService = inject(PopupConfirmationService);
-  private readonly cdr = inject(ChangeDetectorRef);
-
-  protected formFieldsDeclaration: FormFieldDeclaration[] = [];
-
-  private updateFormDeclaration() {
-    this.formFieldsDeclaration = [
-      { columnDef: 'typeName', headerName: 'Nazwa', rowType: 'input', valueType: 'text' },
-      { columnDef: 'price', headerName: 'Cena', rowType: 'input', valueType: 'number' },
-    ];
-  }
-
-  protected dispColumns = ['typeName', 'price'];
+  protected dispColumns = [...this.formFieldsDeclaration.map((f) => f.columnDef), 'actions'];
   protected popupService = inject(PopupConfirmationService);
-  protected popupFormService = inject(PopupFormService);
   protected camperPlaceTypeService = inject(CamperPlaceTypeService);
   protected camperPlaceService = inject(CamperPlaceService);
 
   protected addNewFunc = () => {
-     this.popupFormService.openCamperPlaceTypeFormPopup();
-  };
+    const newRow: CamperPlaceTypeDto = {
+        typeName: '',
+        price: 0
+    };
+    this.camperPlaceTypeService.create(newRow).subscribe();
+  }
 
-  protected deleteFunc = (cpType: CamperPlaceType) => {
-    this.popupConfirmationService.openConfirmationPopup({
-      action: () => {
-        this.camperPlaceTypeService.delete(cpType).pipe(take(1)).subscribe()
-      },
-      message: "Wybrany typ parceli zostanie usunięty. Czy chcesz kontynuować?",
-    } as ConfirmationData)
-  };
+  protected deleteFunc = (row: CamperPlaceTypeDto) => {
+    this.popupService.openConfirmationPopup({
+        title: 'Usuwanie',
+        message: 'Czy na pewno usunąć ten typ parceli?',
+        action: () => this.camperPlaceTypeService.delete(row).pipe(take(1)).subscribe()
+    });
+  }
 
-  onSave(changes: RowChange<CamperPlaceType>[]) {
+  onSave(changes: RowChange<CamperPlaceTypeDto>[]) {
     const priceChanged: number[] = changes
       .filter(c => c.original.price !== c.updated.price)
-      .map(c => c.updated.id);
+      .map(c => c.updated.id!);
 
     const updatedRows = changes.map(c => c.updated);
 
@@ -230,7 +214,7 @@ export class CamperPlaceTypeSettingsComponent {
     }
   }
 
-  private priceChangedData(updatedRows: CamperPlaceType[], priceChangedIds: number[]): Observable<ConfirmationData> {
+  private priceChangedData(updatedRows: CamperPlaceTypeDto[], priceChangedIds: number[]): Observable<ConfirmationData> {
     const selectedIds: number[] = [];
 
     return forkJoin(
@@ -243,7 +227,7 @@ export class CamperPlaceTypeSettingsComponent {
       )
     ).pipe(
       map(results => {
-        const camperPlacesPerType: Record<number, CamperPlaceForTable[]> = {};
+        const camperPlacesPerType: Record<number, CamperPlaceDto[]> = {};
         results.forEach(r => camperPlacesPerType[r.id] = r.cp);
 
         return {
@@ -265,7 +249,7 @@ export class CamperPlaceTypeSettingsComponent {
     );
   }
 
-  private defaultChangeData (updatedRows: CamperPlaceType[]): ConfirmationData {
+  private defaultChangeData (updatedRows: CamperPlaceTypeDto[]): ConfirmationData {
     return {
       title: 'Zmiana Nazwy',
       message: 'Zmiana nazwy spowoduje zmianę dla wszystkich parcel przypisanych do tego typu. Czy chcesz kontynuować?',
