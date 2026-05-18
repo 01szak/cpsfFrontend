@@ -1,11 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, from, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, from, map, Observable, switchMap, tap} from 'rxjs';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
-import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
 import {Sort} from '@shared/ui/data-table/regular-table.component';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {Api} from '../../../api/api';
 import {findBy, create, update, delete$ as deleteReservationFn} from '../../../api';
 import {ReservationDto} from '../../../api/models/reservation-dto';
@@ -16,22 +14,28 @@ import {NotificationService} from '@core/services/NotificationService';
 @Injectable({providedIn: "root"})
 export class ReservationService {
   private api = inject(Api);
-  private http = inject(HttpClient);
-  private reservationHelper = inject(ReservationHelper);
-  private camperPlaceService = inject(CamperPlaceService);
   private notification = inject(NotificationService);
-
-  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
-  public refreshed$ = this.refreshTrigger$.asObservable();
 
   private reservationSubject = new BehaviorSubject<Page<ReservationDto>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
   public reservationDtos$ = this.reservationSubject.asObservable();
 
-  public notifyChange() {
-    this.refreshTrigger$.next();
-  }
+  private lastQueryParams: {
+    event?: PageEvent,
+    page?: number,
+    size?: number,
+    sort?: Sort,
+    searchCriteria?: SearchCriteria
+  } = {};
 
   public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+    this.lastQueryParams = {
+      event: event,
+      page: page,
+      size: size,
+      sort: sort,
+      searchCriteria: searchCriteria
+    }
+
     const pageable = {
       page: event ? event.pageIndex : (page || 0),
       size: event ? event.pageSize : (size || 10),
@@ -58,29 +62,23 @@ export class ReservationService {
 
   public deleteReservation(r: ReservationDto) {
     return from(this.api.invoke(deleteReservationFn, { id: Number(r.id!) }))
-        .pipe(
-            tap({
-                next: (response: any) => {
-                    this.notification.success(response);
-                    this.notifyChange();
-                },
-                error: (error) => this.notification.error(error)
-            })
-        );
+      .pipe(
+        tap({
+          next: (response: any) => this.notification.success(response),
+          error: (error) => this.notification.error(error)
+        }),
+        switchMap(() => this.refreshData())
+      );
   }
 
   public create(r: ReservationDto) {
     return from(this.api.invoke(create, { body: r as unknown as ReservationDto }))
       .pipe(
         tap({
-          next: (response: any) => {
-            this.notification.success(response);
-            this.notifyChange();
-          },
-          error: (error) => {
-            this.notification.error(error);
-          }
-        })
+          next: (response: any) => this.notification.success(response),
+          error: (error) => this.notification.error(error)
+        }),
+        switchMap(() => this.refreshData())
       );
   }
 
@@ -88,20 +86,16 @@ export class ReservationService {
     return from(this.api.invoke(update, { body: r as unknown as ReservationDto }))
       .pipe(
         tap({
-            next: (response: any) => {
-              this.notification.success(response);
-              this.notifyChange();
-            },
-            error: (error) => {
-              this.notification.error(error);
-            }
-          }
-        )
+          next: (response: any) => this.notification.success(response),
+          error: (error) => this.notification.error(error)
+        }),
+        switchMap(() => this.refreshData())
       );
   }
 
-  public fetchAllData() {
-    this.camperPlaceService.getCamperPlacesAsync();
-    return this.findBy(undefined, 0, 100);
+  private refreshData(): Observable<Page<ReservationDto>> {
+    const { event, page, size, sort, searchCriteria } = this.lastQueryParams;
+    return this.findBy(event, page, size, sort, searchCriteria);
   }
+
 }
