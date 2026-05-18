@@ -43,7 +43,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
             @for (camperPlace of camperPlaces$ | async; track camperPlace.id) {
               <div class="row" [style.--days]="days.length">
 
-                <div class="cell camperPlaceIndex">{{ camperPlace.index }}</div>
+                <div class="cell camperPlaceIndex"><p>{{ camperPlace.index }}</p></div>
 
                 @for (day of days; track day) {
                   <div [ngClass]="
@@ -91,7 +91,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 
     .header-cell,
     .cell {
-      border: 1px solid rgba(255,255,255,.2);
+      border: var(--calendar-border);
       box-sizing: border-box;
     }
 
@@ -106,7 +106,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
       display: grid;
       grid-template-columns: 80px repeat(var(--days), 1fr);
       position: relative;
-      height: 50px;
+      height: 40px;
     }
 
     app-reservation-cell {
@@ -126,10 +126,11 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
     }
 
     .camperPlaceIndex {
+      display: flex;
       flex-shrink: 0;
       background-color: var(--bg-card);
       z-index: 200;
-      border-right: 1px solid rgba(255,255,255,.2) !important;
+      text-align: center;
     }
 
     .weekday {
@@ -143,6 +144,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
       white-space: nowrap;
       text-overflow: ellipsis;
       margin: 2px 0;
+      justify-self: center;
     }
 
     .weekend {
