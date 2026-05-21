@@ -20,7 +20,6 @@ import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.component';
 import {fromEvent, Observable} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {BackendEntity} from '@core/models/BackendEntity';
 import {SearchCriteria} from '../../../api';
 
 
@@ -43,24 +42,213 @@ import {SearchCriteria} from '../../../api';
     NgClass,
     AsyncPipe,
   ],
-  templateUrl: './regular-table.component.html',
-  styleUrl: './regular-table.component.css',
-})
-export class RegularTableComponent<T extends BackendEntity> implements AfterViewInit {
+  template: `
+    @if ((page$ | async)?.content; as content) {
+      <div class="tableDiv">
+        <div class="tableContent">
+          <table class="content" mat-table [dataSource]="content">
+            <ng-container matColumnDef="no">
+              <th mat-header-cell *matHeaderCellDef> Nr.</th>
+              <td mat-cell *matCellDef="let column; let i = index">
+                {{ i + 1 }}
+              </td>
+            </ng-container>
 
+            @for (column of tabColumns; track column) {
+
+              <ng-container [matColumnDef]="column.field">
+                <th mat-header-cell *matHeaderCellDef (click)="openSearchDialog($event, displayedColumns[$index], column.field, column.type)">
+                  <div class="headerDiv">
+                    <i class="fa-regular fa-circle-up"
+                       [ngClass]="{
+                        'ascArrow' : isArrowAsc,
+                        'descArrow' : !isArrowAsc,
+                        'arrowClicked' : isClicked && clickedColumn === column.field
+                        }"
+                       (click)="click(column.field);$event.stopPropagation()"></i>
+                    <p class="sortingButton">{{displayedColumns[$index]}}</p>
+                  </div>
+                </th>
+                <td mat-cell *matCellDef="let element">
+
+                  @if (column.type === 'checkbox' ) {
+                    <mat-checkbox (change)=" additionalFunc?.(element.dto)" [checked]="element.dto[column.field]" (click)="$event.stopPropagation()"></mat-checkbox>
+                  } @else if (column.type === 'status') {
+                    <app-status [status]="element.displayData[column.field]"></app-status>
+                  } @else {
+                    {{element.displayData[column.field]}}
+                  }
+                </td>
+              </ng-container>
+            }
+            <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+            <tr mat-row
+                (click)="onClickFunc(row.dto)"
+                [ngClass]="{
+            'row': true
+            }"
+                *matRowDef="let row; let i = index; columns: columnFields">
+            </tr>
+
+          </table>
+        </div>
+
+        <div class="tableFooter">
+          <i class="fa-solid fa-plus addIcon" (click)="createFunc()"></i>
+          <mat-paginator
+            [length]="paginatorLength"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="fetchFunc($event)">
+          </mat-paginator>
+        </div>
+
+      </div>
+    }`,
+  styles: `
+    .tableDiv {
+      margin: 1rem auto;
+      width: calc(100% - 2rem);
+      max-width: 1400px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td, th {
+      padding: 0 1.5rem !important;
+      height: 50px;
+      text-align: left;
+      color: var(--text-primary);
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    th:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .headerDiv {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .sortingButton {
+      margin: 0;
+    }
+
+    .row {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .row:hover {
+      background: rgba(139, 92, 246, 0.05) !important;
+    }
+
+    /* Scrollbar specific to table body */
+    .tableDiv {
+      height: 56vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tableContent {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .tableFooter {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .addIcon {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-md);
+    }
+
+    .addIcon:hover {
+      background: var(--primary-hover);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    }
+
+    /* Arrows */
+    .ascArrow, .descArrow {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .arrowClicked {
+      color: var(--primary);
+    }
+
+    .descArrow {
+      transform: rotate(180deg);
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+  `,
+})
+export class RegularTableComponent implements AfterViewInit {
+  // TODO made this more generic lots of duplicted code in reservation and guest page
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  @Input() public page$!: Observable<Page<T>>;
-  @Input() public tabColumns: column[] = [];
+  @Input() public page$!: Observable<Page<DtoDisplayDataMap>>;
+  @Input() public tabColumns: Column[] = [];
   @Input() public displayedColumns: string[] = [];
   @Input() public pageSize: number = 0;
   @Input() public pageSizeOptions: number[] = [];
   @Input() public serviceInstance: any = {};
   @Input() public paginatorLength: number = 0;
   @Input() public fetchFunc!: ($event: PageEvent) => any;
-  @Input() public onClickFunc!: (t:T) => any;
+  @Input() public onClickFunc!: (t: any) => any;
   @Input() public createFunc!: () => any;
-  @Input() public additionalFunc?: (t:T) => any;
+  @Input() public additionalFunc?: (t: any) => any;
 
   @Output() public sortInfo = new EventEmitter<Sort>();
   @Output() public filterInfo = new EventEmitter<SearchCriteria>();
@@ -75,6 +263,7 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
 
   ngAfterViewInit(): void {
     this.paginatorReady.emit(this.paginator);
+    console.log(this.tabColumns)
   }
 
   protected get columnFields(): string[] {
@@ -109,26 +298,28 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
     this.filterInfo.emit(criteria);
   }
 
-  protected openSearchDialog(event: MouseEvent,label: string, by: string, type: string) {
+  protected openSearchDialog(event: MouseEvent, label: string, by: string, type: string) {
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const service = this.serviceInstance;
 
-    const dialogRef =
-      this.dialog.open(SearchByPopupComponent, {
-          position: {
-          top: `${rect.bottom + window.scrollY}px`,
-          left: `${rect.left + window.scrollX}px`
-        },
-        panelClass: 'searchDialog',
-        hasBackdrop: false,
-        data: {label, by, type, service},
-      });
+    const dialogRef = this.dialog.open(SearchByPopupComponent, {
+      position: {
+        top: `${rect.bottom + window.scrollY}px`,
+        left: `${rect.left + window.scrollX}px`
+      },
+      panelClass: 'searchDialog',
+      hasBackdrop: false,
+      data: { label, by, type, service },
+    });
+
+    const popupSub = dialogRef.componentInstance.criteriaEmitter.subscribe((criteria: SearchCriteria) => {
+      this.sendFilterInfo(criteria);
+    });
 
     const clickSub = fromEvent(document, 'click').subscribe((event: Event) => {
       const targetEl = event.target as HTMLElement;
 
-      // Sprawdzamy czy kliknięcie było wewnątrz dialogu, przycisku otwierającego lub kalendarza
       const isInsideDialog = !!targetEl.closest('.searchDialog');
       const isInsideDatePicker = !!targetEl.closest('.mat-datepicker-content') || !!targetEl.closest('.mat-calendar');
       const isInsideOrigin = target.contains(targetEl);
@@ -137,20 +328,13 @@ export class RegularTableComponent<T extends BackendEntity> implements AfterView
         dialogRef.close();
       }
     });
-
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       clickSub.unsubscribe();
-      if (result) {
-        // Result already contains by/value which maps to key/value in SearchCriteria
-        this.sendFilterInfo({
-          key: result.by,
-          value: result.value,
-          operation: 'EQUALS' // Default operation
-        })
-      }
-    })
+      popupSub.unsubscribe();
+    });
   }
 
 }
-export type column = { type: string, field: string }
+export type DtoDisplayDataMap = {dto: {}, displayData: {}}
+export type Column = { type: string, field: string }
 export interface Sort {columnName: string, direction: 'asc' | 'desc' }

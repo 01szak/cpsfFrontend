@@ -205,7 +205,7 @@ export class ReservationFormComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       filter((v): v is string => typeof v === 'string' && v.length > 1),
-      switchMap((v: string) => from(this.api.invoke(findBy1, { pageable: { page: 0, size: 50 }, searchCriteria: { key: 'fullName', value: v } }))),
+      switchMap((v: string) => from(this.api.invoke(findBy1, { pageable: { page: 0, size: 50 }, searchCriteria: { key: 'lastname', value: v, operation: 'LIKE' } }))),
       map((res: any) => (res.content || []).map((g: Guest) => ({ name: `${g.firstname} ${g.lastname}`, guest: g })))
     );
   }

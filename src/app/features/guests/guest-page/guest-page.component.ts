@@ -1,29 +1,27 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
-import {ReservationService} from '@features/reservations/services/ReservationService';
-import {PopupFormService} from '@core/services/PopupFormService';
 import {DtoDisplayDataMap, RegularTableComponent, Sort} from '@shared/ui/data-table/regular-table.component';
-import {ReservationFormData} from '@shared/form/reservation-form.component';
-import {BehaviorSubject, Subscription} from 'rxjs';
+import {PopupFormService} from '@core/services/PopupFormService';
+import {Guest} from '@core/models/Guest';
+import {GuestFormData} from '@shared/form/guest-form.component';
+import {Api} from '../../../api/api';
+import {GuestDto} from '../../../api';
+import {BehaviorSubject,Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {SearchCriteria} from '../../../api/models/search-criteria';
-import {ReservationDto} from '../../../api';
+import {GuestService} from '@features/guests/services/GuestService';
 
 @Component({
-  selector: 'reservations',
+  selector: 'users',
   imports: [
     CommonModule,
     MatPaginatorModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatNativeDateModule,
     RegularTableComponent,
-    RegularTableComponent,
   ],
-  template: `
+  template:  `
     <app-regular-table
       [page$]="pagedData$"
       [tabColumns]="columns"
@@ -35,18 +33,18 @@ import {ReservationDto} from '../../../api';
       [fetchFunc]="fetchData.bind(this)"
       [onClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
-      [additionalFunc]="additionalFunc"
       (sortInfo)="getSortInfo($event)"
       (filterInfo)="getFilterInfo($event)"
       (paginatorReady)="getPaginator($event)">
     </app-regular-table>
   `,
-  styles: ``,
-  standalone: true,
+  styles:  ``,
+  standalone: true
 })
-export class ReservationPage implements OnInit, OnDestroy {
-  private reservationService = inject(ReservationService);
+export class GuestPage implements OnInit, OnDestroy {
   private formService = inject(PopupFormService);
+  private guestService = inject(GuestService);
+
   protected pagedData$ = new BehaviorSubject<Page<DtoDisplayDataMap>>({
     content: [],
     number: 0,
@@ -56,14 +54,13 @@ export class ReservationPage implements OnInit, OnDestroy {
   });
 
   protected columns = [
-    {type: 'date', field: 'checkin'},
-    {type: 'date', field: 'checkout'},
-    {type: 'text', field: 'stringUser'},
-    {type: 'text', field: 'camperPlaceIndex'},
-    {type: 'status', field: 'reservationStatus'},
-    {type: 'checkbox', field: 'paid'}
+    {type: 'text', field: 'firstname'},
+    {type: 'text', field: 'lastname'},
+    {type: 'text', field: 'email'},
+    {type: 'text', field: 'phoneNumber'},
+    {type: 'text', field: 'carRegistration'},
   ];
-  protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
+  protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja'];
 
   protected paginatorLength = 0;
   protected pageSize = 10;
@@ -71,6 +68,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   protected paginator?: MatPaginator;
 
   private sub?: Subscription;
+
   private lastParams: {
     event?: PageEvent,
     sort?: Sort,
@@ -93,31 +91,31 @@ export class ReservationPage implements OnInit, OnDestroy {
 
 
     this.sub?.unsubscribe();
-    this.sub = this.reservationService.findBy(
+    this.sub = this.guestService.findBy(
       this.lastParams.event,
       page,
       size,
       this.lastParams.sort,
       this.lastParams.searchCriteria
-    ).subscribe((p: Page<ReservationDto>) => {
+    ).subscribe((p: Page<GuestDto>) => {
 
-      const mapDtoToDisplayData = (res: ReservationDto): ReservationDisplayData => {
+      const mapDtoToDisplayData = (dto: GuestDto) => {
         return {
-          checkin: res.checkin,
-          checkout: res.checkout,
-          stringUser: `${res.guest?.firstname || ''} ${res.guest?.lastname || ''}`.trim(),
-          camperPlaceIndex: res.camperPlace?.index ?? '',
-          reservationStatus: res.reservationStatus!,
-          paid: res.paid
-        } as ReservationDisplayData;
+          carRegistration: dto.carRegistration,
+          email: dto.email,
+          firstname: dto.firstname,
+          lastname: dto.lastname,
+          phoneNumber: dto.phoneNumber,
+        } as GuestDisplayData
       }
 
-      const mappedContent: DtoDisplayDataMap[] = p.content.map(res => ({ dto: res, displayData: mapDtoToDisplayData(res) } as DtoDisplayDataMap));
+      const mappedContent: DtoDisplayDataMap[] = p.content.map(g => ({ dto: g, displayData: mapDtoToDisplayData(g) } as DtoDisplayDataMap));
 
       const displayPage: Page<DtoDisplayDataMap> = {
         ...p,
         content: mappedContent
       };
+
       this.pagedData$.next(displayPage);
       this.paginatorLength = displayPage.totalElements;
     });
@@ -127,40 +125,32 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.fetchData(undefined, sort);
   }
 
-  protected getFilterInfo(filter: SearchCriteria) {
+  protected getFilterInfo(searchCriteria: SearchCriteria) {
     if (this.paginator) {
       this.paginator.firstPage();
     }
-    this.fetchData(undefined, undefined, filter);
+    console.log(searchCriteria)
+    this.fetchData(undefined, undefined, searchCriteria);
   }
 
   protected getPaginator(paginator: MatPaginator) {
     this.paginator = paginator;
   }
 
-  protected openFormPopup(reservation?: ReservationDto) {
-    const reservationFd: ReservationFormData = {reservation: reservation};
-    this.formService.openReservationFormPopup(reservationFd).afterClosed().subscribe(refreshed => {
+  protected openFormPopup(guest?: Guest) {
+    const guestFd: GuestFormData = {guest: guest};
+    this.formService.openGuestFormPopup(guestFd).afterClosed().subscribe(refreshed => {
       if (refreshed) {
         this.fetchData();
       }
     });
   }
-
-  protected additionalFunc = (r: ReservationDto) => {
-    let previousPaidStaus = r.paid;
-    r.paid = !r.paid;
-    this.reservationService.update(r).subscribe({
-      error: () => r.paid = previousPaidStaus
-    });
-  };
 }
-export type ReservationDisplayData = {
-  id: number,
-  checkin: string,
-  checkout: string,
-  stringUser: string,
-  camperPlaceIndex: string,
-  reservationStatus: string,
-  paid: boolean
+
+export type GuestDisplayData ={
+  carRegistration: string;
+  email: string;
+  firstname: string;
+  lastname: string;
+  phoneNumber: string;
 }
