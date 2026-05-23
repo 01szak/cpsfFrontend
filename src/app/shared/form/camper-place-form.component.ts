@@ -3,52 +3,61 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatSelect, MatOption } from '@angular/material/select';
-import { NgTemplateOutlet, AsyncPipe } from '@angular/common';
+import { NgTemplateOutlet, CommonModule } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
 import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
-import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
-import { CamperPlaceForTable } from '@core/models/CamperPlaceForTable';
 import { FormFactoryService } from '@shared/form/FormFactoryService';
-import { CamperPlaceType } from '@core/models/CamperPlaceType';
-import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
+import { CamperPlaceDto } from '../../api/models/camper-place-dto';
+import { MatSelectModule } from '@angular/material/select';
+import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
 
-export type CamperPlaceFormData = { camperPlace?: CamperPlaceForTable };
+export type CamperPlaceFormData = { camperPlace?: CamperPlaceDto };
 
 @Component({
-  selector: 'app-camper-place-form-popup',
+  selector: 'app-camper-place-form',
   imports: [
     PopupFormContainer,
     MatFormField,
     ReactiveFormsModule,
     MatLabel,
     MatInput,
-    MatSelect,
-    MatOption,
     NgTemplateOutlet,
-    AsyncPipe
+    MatSelectModule,
+    CommonModule
   ],
   standalone: true,
+  styles: `
+    form {
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+  `,
   template: `
     <ng-template #formFields>
       <form [formGroup]="formGroup">
         <mat-form-field>
           <mat-label>Indeks</mat-label>
-          <input type="text" matInput formControlName="index" [placeholder]="'Ustaw domyślny'">
+          <input type="text" matInput formControlName="index">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Rodzaj</mat-label>
           <mat-select formControlName="type" [compareWith]="compareFn">
-            @for (type of (camperPlaceTypes$ | async); track type.id) {
+            @for (type of camperPlaceTypes$ | async; track type.id) {
               <mat-option [value]="type">{{ type.typeName }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
+        <mat-form-field>
+          <mat-label>Cena</mat-label>
+          <input type="number" matInput formControlName="price">
+        </mat-form-field>
       </form>
     </ng-template>
 
+    @if (isDialog) {
       <app-popup-form-container
         [formTitle]="formTitle"
         [deleteAction]="deleteAction"
@@ -56,9 +65,13 @@ export type CamperPlaceFormData = { camperPlace?: CamperPlaceForTable };
         [proceedAction]="onSave">
         <ng-container *ngTemplateOutlet="formFields"></ng-container>
       </app-popup-form-container>
+    } @else {
+      <ng-container *ngTemplateOutlet="formFields"></ng-container>
+    }
   `,
 })
 export class CamperPlaceFormComponent implements OnInit {
+  @Input() isDialog = true;
   @Input() formGroup!: FormGroup;
 
   private readonly camperPlaceService = inject(CamperPlaceService);
@@ -66,15 +79,13 @@ export class CamperPlaceFormComponent implements OnInit {
   private readonly factory = inject(FormFactoryService);
   private readonly dialogRef = inject(MatDialogRef<CamperPlaceFormComponent>, { optional: true });
   private readonly fd: CamperPlaceFormData = inject<CamperPlaceFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
-  private readonly confirmation = inject(PopupConfirmationService);
 
+  protected camperPlaceTypes$ = this.camperPlaceTypeService.camperPlaceType$;
   protected isUpdate = !!this.fd?.camperPlace;
   protected formTitle = this.isUpdate ? 'Edytuj Parcelę' : 'Nowa Parcela';
 
-  protected camperPlaceTypes$ = this.camperPlaceTypeService.getCamperPlaceTypes();
-
   protected deleteAction = this.isUpdate ? () => {
-    this.camperPlaceService.delete(this.fd.camperPlace!).subscribe(() => this.dialogRef?.close());
+    this.camperPlaceService.delete(this.fd.camperPlace!).subscribe(() => this.dialogRef?.close(true));
   } : null;
 
   ngOnInit() {
@@ -84,13 +95,6 @@ export class CamperPlaceFormComponent implements OnInit {
         this.formGroup.patchValue(this.fd.camperPlace);
       }
     }
-
-    this.formGroup.get('type')?.valueChanges.subscribe((newType: CamperPlaceType) => {
-      if (newType && 'price' in newType) {
-        this.formGroup.get('price')?.setValue(newType.price, { emitEvent: false });
-        this.formGroup.markAsDirty();
-      }
-    });
   }
 
   protected compareFn(o1: any, o2: any): boolean {
@@ -100,14 +104,17 @@ export class CamperPlaceFormComponent implements OnInit {
   protected onSave = () => {
     if (this.formGroup.invalid) return;
 
-    const payload = this.formGroup.value;
-    const action$ = this.camperPlaceService.create(payload);
+    const payload = this.formGroup.value as CamperPlaceDto;
+    if (this.isUpdate) {
+        payload.id = this.fd.camperPlace?.id;
+    }
 
-    this.confirmation.openConfirmationPopup({
-      title: 'Zapisywanie',
-      message: 'Czy chcesz zapisać zmiany?',
-      action: () => (action$.subscribe(() => {this.dialogRef?.close()}))
+    const action$ = this.isUpdate
+      ? this.camperPlaceService.update(payload)
+      : this.camperPlaceService.create(payload);
+
+    action$.subscribe(() => {
+      this.dialogRef?.close(true);
     });
-
   }
 }

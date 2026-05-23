@@ -9,19 +9,18 @@ import { RequestBuilder } from '../../request-builder';
 
 import { Pageable } from '../../models/pageable';
 import { PageGuestDto } from '../../models/page-guest-dto';
+import { SearchCriteria } from '../../models/search-criteria';
 
-export interface FindAll1$Params {
+export interface FindBy1$Params {
   pageable: Pageable;
-  by?: string;
-  value?: string;
+  searchCriteria: SearchCriteria;
 }
 
-export function findAll1(http: HttpClient, rootUrl: string, params: FindAll1$Params, context?: HttpContext): Observable<StrictHttpResponse<PageGuestDto>> {
-  const rb = new RequestBuilder(rootUrl, findAll1.PATH, 'get');
+export function findBy1(http: HttpClient, rootUrl: string, params: FindBy1$Params, context?: HttpContext): Observable<StrictHttpResponse<PageGuestDto>> {
+  const rb = new RequestBuilder(rootUrl, findBy1.PATH, 'get');
   if (params) {
     rb.query('pageable', params.pageable, {});
-    rb.query('by', params.by, {});
-    rb.query('value', params.value, {});
+    rb.query('searchCriteria', params.searchCriteria, {});
   }
 
   return http.request(
@@ -34,4 +33,4 @@ export function findAll1(http: HttpClient, rootUrl: string, params: FindAll1$Par
   );
 }
 
-findAll1.PATH = '/guest';
+findBy1.PATH = '/guest';

@@ -1,35 +1,255 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {map, Observable, Subscription, take} from 'rxjs';
+import {ChangeDetectionStrategy, Component, HostListener, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {map, Observable, Subscription, of} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
-import {ReservationHelper} from '@features/reservations/services/ReservationHelper';
-import {ReservationMetadataWithSets} from '@core/models/ReservationMetadata';
-import {CamperPlace} from '@core/models/CamperPlace';
 import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.component';
-import {PaidReservationsWithSets} from '@core/models/PaidReservations';
-import {UserPerReservation} from '@core/models/UserPerReservation';
-import {MatTooltip} from '@angular/material/tooltip';
-import moment from 'moment';
-import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
-import {Reservation} from '@core/models/Reservation';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
-import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {CamperPlaceDto, ReservationDto, SearchCriteria} from '../../../api';
+import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell.component';
+import {ReservationService} from '@features/reservations/services/ReservationService';
+import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import moment from 'moment';
+import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
+import {MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'calendar',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatCard,
-    NgClass,
     NewDatePickerComponent,
-    MatTooltip,
     AsyncPipe,
+    ReservationCellComponent,
+    NgClass,
+    MatMenu,
+    MatMenuTrigger,
+    MatIconButton,
   ],
-  templateUrl: './calendar-page.html',
-  styleUrl: './calendar-page.css',
+  template: `
+    <mat-card class="content">
+      <div class="widget-header">
+        <app-new-date-picker (month)="changeMonth($event)" (year)="changeYear($event)"/>
+
+        <div class="spacer"></div>
+
+        <button mat-icon-button
+                [matMenuTriggerFor]="menu"
+                #menuTrigger="matMenuTrigger"
+                (mouseenter)="menuTrigger.openMenu()"
+                (mousedown)="menuTrigger.closeMenu()"
+                class="help-button">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <div class="legend-menu" (mouseleave)="menuTrigger.closeMenu()">
+            <div class="menuEl">
+              <div class="res-info-circle res-active"></div>
+              <p class="description">Aktywna / Opłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-active blink"></div>
+              <p class="description">Aktywna / Nieopłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-coming"></div>
+              <p class="description">Nadchodząca</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-expired"></div>
+              <p class="description">Zakończona / Opłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-unpaid"></div>
+              <p class="description" >Zakończona / Nieopłacona</p>
+            </div>
+          </div>
+        </mat-menu>
+      </div>
+
+      <div class="header-row" [style.--days]="days.length">
+        <div class="header-cell camperPlaceIndex"></div>
+
+        @for (day of days; track day) {
+          <div class="header-cell">
+            <p>{{ day }}</p>
+            <div class="weekday">
+              <p>{{ findWeekDay(year, month, day) }}</p>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="tableContainer">
+        @if (camperPlaces$) {
+          <div class="table">
+            @for (camperPlace of camperPlaces$ | async; track camperPlace.id) {
+              <div class="row" [style.--days]="days.length">
+
+                <div class="cell camperPlaceIndex"><p>{{ camperPlace.index }}</p></div>
+
+                @for (day of days; track day) {
+                  <div [ngClass]="
+                  {
+                    'cell': true,
+                    'weekend': this.isWeekend(year, month, day)
+                  }"
+                       (click)="$event.stopPropagation(); openReservationFormPopup(camperPlace, undefined, day)">
+                  </div>
+                }
+
+                @for (res of (reservations$ | async); track res.id) {
+                  @if (res.camperPlace.id === camperPlace.id && isResInCurrentMonth(res)) {
+                    <app-reservation-cell
+                      [reservation]="res"
+                      [onlyCheckoutDisplay]="isOnlyCheckoutDisplayed(DateFormater.MOMENT(res.checkin), DateFormater.MOMENT(res.checkout))"
+                      [displayedLength]="getDisplayedLength(DateFormater.MOMENT(res.checkin), DateFormater.MOMENT(res.checkout))"
+                      [style.grid-column]="calcResCellLength(res)"
+                      [style.left.%]="calcResPlacement(res)"
+                      (click)="$event.stopPropagation(); openReservationFormPopup(camperPlace, res)"
+                    />
+                  }
+                }
+
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </mat-card>
+  `,
+  styles: `
+    mat-card.content {
+      padding: 25px;
+      width: 100%;
+      max-width: 1850px;
+      justify-self: center;
+      background-color: var(--bg-card) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-md) !important;
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .help-button {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .help-button:hover {
+      color: var(--primary);
+    }
+
+    .legend-menu {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 200px;
+    }
+
+    .menuEl {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menuEl p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .header-row,
+    .row {
+      display: grid;
+      grid-template-columns: 80px repeat(var(--days), minmax(0, 1fr));
+    }
+
+    .header-cell,
+    .cell {
+      border: var(--calendar-border);
+      box-sizing: border-box;
+      justify-items: center;
+    }
+
+    .table {
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 80px repeat(var(--days), 1fr);
+      position: relative;
+      height: 40px;
+    }
+
+    app-reservation-cell {
+      height: 80%;
+      width: 100%;
+      z-index: 100;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    app-new-date-picker {
+      display: block;
+      z-index: 200;
+      background: transparent;
+    }
+
+    .camperPlaceIndex {
+      display: flex;
+      flex-shrink: 0;
+      background-color: var(--bg-card);
+      z-index: 200;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .weekday {
+      width: 100%;
+      font-size: xx-small;
+      color: var(--text-secondary);
+    }
+
+    p {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin: 2px 0;
+    }
+
+    .weekend {
+      background-color: var(--calendar-weekend);
+    }
+
+    .description {
+      color: black !important;
+    }
+  `,
   standalone: true,
 })
 export class CalendarPage implements OnInit, OnDestroy {
@@ -38,149 +258,72 @@ export class CalendarPage implements OnInit, OnDestroy {
 
   weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
   days: (number)[] = [];
-  sub!: Subscription;
+  private sub = new Subscription();
 
-  protected camperPlaces$!: Observable<CamperPlace[]>;
+  protected camperPlaces$!: Observable<CamperPlaceDto[]>;
+  protected reservations$: Observable<ReservationDto[]> = of([]);
 
-  protected reservationMetadataWithSets: Record<string, ReservationMetadataWithSets> = {};
-  private paidReservationsWithSets: Record<string, PaidReservationsWithSets> = {};
-  private userPerReservation: UserPerReservation = {};
+  private popupFormService = inject(PopupFormService);
+  private camperPlaceService = inject(CamperPlaceService);
+  private reservationService = inject(ReservationService);
 
-  constructor(
-    private camperPlaceService: CamperPlaceService,
-    private reservationService: ReservationService,
-    private reservationHelper: ReservationHelper,
-    protected popupFormService: PopupFormService,
-  ) {
-    this.reservationService.refreshed$.pipe(takeUntilDestroyed())
-      .subscribe(() => {this.reservationService.fetchAllData().subscribe()})
+  constructor() {
+    this.camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
+    this.reservations$ = this.reservationService.reservationDtos$.pipe(
+      map(page => page.content || [])
+    );
   }
-
 
   ngOnInit(): void {
     this.generateDays();
-    this.reservationService.fetchAllData().subscribe();
-    this.camperPlaces$ = this.camperPlaceService.camperPlaces$;
-    this.sub = this.reservationService.calendarData$.subscribe(data => {
-      if (data) {
-        this.reservationMetadataWithSets = data.metadata || {};
-        this.paidReservationsWithSets = data.paid || {};
-        this.userPerReservation = data.users || {};
-      }
-    });
+    this.fetchData();
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.sub.unsubscribe();
+  }
+
+  private fetchData() {
+    this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
+
+    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).startOf('month');
+    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).endOf('month');
+
+    this.sub.add(this.reservationService.findByUnpaged({
+      key: 'checkin',
+      operation: 'BETWEEN',
+      value: DateFormater.YYYYMMDD(startOfMonth, DateDelimiter.DASH),
+      secondValue: DateFormater.YYYYMMDD(endOfMonth, DateDelimiter.DASH)
+    } as SearchCriteria).subscribe());
   }
 
   changeMonth(event: number) {
     this.month = event;
-    this.generateDays()
+    this.generateDays();
+    this.fetchData();
   }
 
   changeYear(event: number) {
     this.year = event;
-    this.generateDays()
+    this.generateDays();
+    this.fetchData();
   }
 
   generateDays() {
-    const daysInMonth = moment({year: this.year, month: this.month}).daysInMonth();
+    const daysInMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).daysInMonth();
     this.days = Array.from({length: daysInMonth}, (_, i) => i + 1);
   }
 
-  isDayReserved(year: number, month: number, day: number, camperPlace: CamperPlace) {
-    const dateStr = this.formatDate(year, month, day);
-    return this.reservationMetadataWithSets[camperPlace.index]?.reserved.has(dateStr);
-  }
+  protected openReservationFormPopup(cp: CamperPlaceDto, res?: ReservationDto, day?: number) {
+    const fd = {
+      reservation: res,
+      camperPlace: cp,
+      year: this.year,
+      month: this.month,
+      day: day,
+    } as ReservationFormData
 
-  isCheckin(year: number, month: number, day: number, camperPlace: CamperPlace) {
-    const dateStr: string = this.formatDate(year, month, day);
-    return this.reservationMetadataWithSets[camperPlace.index]?.checkin.has(dateStr);
-  }
-
-  isCheckout(year: number, month: number, day: number, camperPlace: CamperPlace) {
-    const dateStr = this.formatDate(year, month, day);
-    return this.reservationMetadataWithSets[camperPlace.index]?.checkout.has(dateStr);
-  }
-
-  isPaid(year: number, month: number, day: number, camperPlace: CamperPlace) {
-    const dateStr = this.formatDate(year, month, day);
-    return this.paidReservationsWithSets[camperPlace.index]?.paidDates.has(dateStr);
-  }
-
-  isUnPaid(year: number, month: number, day: number, camperPlace: CamperPlace) {
-    const dateStr = this.formatDate(year, month, day);
-    return !this.paidReservationsWithSets[camperPlace.index]?.paidDates.has(dateStr);
-  }
-
-  formatDate(year: number, month: number, day: number): string {
-    return new Date(Date.UTC(year, month, day)).toISOString().slice(0, 10);
-  }
-
-  openFormPopup(year: number, month: number, day: number, camperPlace: CamperPlace, event: MouseEvent) {
-    if (!camperPlace) return;
-
-    const target = event.target as HTMLElement;
-    const date = DateFormater.MOMENT({year: year, month: month,day: day});
-
-    const isLeft = target.classList.contains('left');
-    const isRight = target.classList.contains('right');
-    const formatedCp: CamperPlaceForTable = {id: camperPlace.id, index: camperPlace.index, price: 0}
-    const openPopup = (reservationToUpdate?: Reservation) => {
-        this.popupFormService.openReservationFormPopup({
-          reservation: reservationToUpdate,
-          year: year,
-          month: month,
-          day: day,
-          camperPlace: formatedCp
-        } as ReservationFormData);
-    };
-
-    if (isLeft) {
-      this.reservationService
-        .findByDateInBetweenAndCamperPlaceId(
-          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
-          camperPlace.id
-        )
-        .pipe(
-          map(reservations => {
-            if (reservations.length === 0 || reservations.length > 2) return undefined;
-            const r = reservations[0];
-
-            const checkin = DateFormater.MOMENT(r.checkin);
-            const checkout = DateFormater.MOMENT(r.checkout);
-
-            const isInside = date.isBefore(checkin.subtract(1, "day")) || date.isBefore(checkout.add(1, "day"));
-
-            return isInside ? r : undefined;
-          }),
-          take(1)
-        )
-        .subscribe(openPopup);
-    }
-    else if (isRight) {
-      this.reservationService
-        .findByDateInBetweenAndCamperPlaceId(
-          DateFormater.YYYYMMDD(date, DateDelimiter.DASH),
-          camperPlace.id
-        )
-        .pipe(
-          map(reservations => {
-            if (reservations.length === 0 || reservations.length > 2) return undefined;
-            const r = reservations.length > 1 ? reservations[1] : reservations[0];
-
-            const checkin = DateFormater.MOMENT(r.checkin);
-            const checkout = DateFormater.MOMENT(r.checkout);
-
-            const isInside = date.isBefore(checkout);
-
-            return isInside ? r : undefined;
-          }),
-          take(1)
-        )
-        .subscribe(openPopup);
-    }
+    this.popupFormService.openReservationFormPopup(fd);
   }
 
   findWeekDay(year: number, month: number, day: number) {
@@ -192,52 +335,52 @@ export class CalendarPage implements OnInit, OnDestroy {
     return weekDay == 0 || weekDay == 6;
   }
 
-  getUserFromMap(cp: CamperPlace, year: number, month: number, day: number) {
-
-    const dateStr = this.reservationHelper.mapDateToString(year, month, day);
-
-
-    if (cp === undefined || !this.userPerReservation[cp.index]) {
-      return;
+  protected calcResCellLength(res: ReservationDto): string {
+    const checkin = DateFormater.MOMENT(res.checkin);
+    const checkout = DateFormater.MOMENT(res.checkout);
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
+        return '1 / span ' +  checkout.date();
     }
-
-    let userMap: Record<string, string[]> = this.userPerReservation[cp.index] as any;
-
-    if (!userMap) {
-      return;
-    }
-
-    const matchingUsers: { user: string; type: ReservationEventType }[] = [];
-    for (const [user, dates] of Object.entries(userMap)) {
-      for (const dateWithTag of dates) {
-        // Rozbijamy np. "2025-09-15 in" → ["2025-09-15", "in"]
-        const [date, tag] = dateWithTag.split(' ');
-        if (date === dateStr) {
-          const type: ReservationEventType = tag === "in"
-            ? "checkin"
-            : tag === "out"
-              ? "checkout"
-              : "middle";
-          matchingUsers.push({user, type});
-        }
-      }
-    }
-    const order: Record<ReservationEventType, number> = {
-      checkout: 0,
-      checkin: 1,
-      middle: 2,
-    };
-
-    matchingUsers.sort((a, b) => order[a.type] - order[b.type]);
-    if (matchingUsers.length > 1) {
-      return matchingUsers[0].user + ' / ' + matchingUsers[1].user
-    } else {
-      return matchingUsers[0]?.user;
-    }
-
+    return (checkin.date() + 1) + ' / span ' + this.getResLength(res);
   }
 
-}
+  protected calcResPlacement(res: ReservationDto): string {
+    const checkin = DateFormater.MOMENT(res.checkin);
+    const checkout = DateFormater.MOMENT(res.checkout);
 
-// @ts-ignore
-type ReservationEventType = "checkin" | "checkout" | "middle";
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
+      return (35 / checkout.date()).toString();
+    }
+    return this.getResLength(res) > 0 ? (50 / this.getResLength(res)).toString() : '0';
+  }
+
+  protected isOnlyCheckoutDisplayed(checkin: moment.Moment, checkout: moment.Moment) {
+    return checkin.month() < checkout.month() && checkin.month() != this.month;
+  }
+
+  protected getDisplayedLength(checkin: moment.Moment, checkout: moment.Moment) {
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
+      return checkout.date();
+    }
+    return this.days.length - checkin.date();
+  }
+
+  private getResLength(res: ReservationDto) {
+    const checkin = DateFormater.MOMENT(res.checkin);
+    const checkout = DateFormater.MOMENT(res.checkout);
+    let length = 0;
+    if (checkin.month() < checkout.month()) {
+      let daysToEOM = checkin.daysInMonth() - checkin.date();
+      length = daysToEOM + checkout.date();
+    } else {
+      length = checkout.date() - checkin.date();
+    }
+    return length;
+  }
+
+  protected isResInCurrentMonth(res: ReservationDto) {
+    return DateFormater.MOMENT(res.checkin).month() === this.month || DateFormater.MOMENT(res.checkout).month() === this.month;
+  }
+
+  protected readonly DateFormater = DateFormater;
+}

@@ -1,23 +1,22 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, from, map, Observable, switchMap, tap} from 'rxjs';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
 import {Sort} from '@shared/ui/data-table/regular-table.component';
 import {Api} from '../../../api/api';
-import {findBy, create, update, delete$ as deleteReservationFn} from '../../../api';
-import {ReservationDto} from '../../../api/models/reservation-dto';
+import {GuestDto} from '../../../api/models/guest-dto';
 import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
+import {create1, deleteGuest, findBy1, update1} from '../../../api';
 
-
+// TODO meaby there is a way to have one facade for all dtos? eventually override if needed
 @Injectable({providedIn: "root"})
-export class ReservationService {
+export class GuestService {
   private api = inject(Api);
   private notification = inject(NotificationService);
 
-  private reservationSubject = new BehaviorSubject<Page<ReservationDto>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
-  public reservationDtos$ = this.reservationSubject.asObservable();
+  private guestSubject = new BehaviorSubject<Page<GuestDto>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
+  public guestDtos$ = this.guestSubject.asObservable();
 
   private lastQueryParams: {
     event?: PageEvent,
@@ -27,7 +26,7 @@ export class ReservationService {
     searchCriteria?: SearchCriteria
   } = {};
 
-  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<GuestDto>> {
     this.lastQueryParams = {
       event: event,
       page: page,
@@ -42,26 +41,26 @@ export class ReservationService {
       sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
     };
 
-    return from(this.api.invoke(findBy, {
+    return from(this.api.invoke(findBy1, {
       pageable: pageable,
       searchCriteria: searchCriteria || { key: '', value: '' }
     })).pipe(
       map(p => {
-        const page = p as unknown as Page<ReservationDto>;
+        const page = p as unknown as Page<GuestDto>;
         return page;
       }),
       tap(p => {
-        this.reservationSubject.next(p);
+        this.guestSubject.next(p);
       })
     );
   }
 
-  public findByUnpaged(searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+  public findByUnpaged(searchCriteria?: SearchCriteria): Observable<Page<GuestDto>> {
     return this.findBy(undefined, 0, 1000, undefined, searchCriteria);
   }
 
-  public deleteReservation(r: ReservationDto) {
-    return from(this.api.invoke(deleteReservationFn, { id: Number(r.id!) }))
+  public delete(g: GuestDto) {
+    return from(this.api.invoke(deleteGuest, { id: Number(g.id!) }))
       .pipe(
         tap({
           next: (response: any) => this.notification.success(response),
@@ -71,8 +70,8 @@ export class ReservationService {
       );
   }
 
-  public create(r: ReservationDto) {
-    return from(this.api.invoke(create, { body: r as unknown as ReservationDto }))
+  public create(g: GuestDto) {
+    return from(this.api.invoke(create1, { body: g as unknown as GuestDto }))
       .pipe(
         tap({
           next: (response: any) => this.notification.success(response),
@@ -82,8 +81,8 @@ export class ReservationService {
       );
   }
 
-  public update(r: ReservationDto) {
-    return from(this.api.invoke(update, { body: r as unknown as ReservationDto }))
+  public update(g: GuestDto) {
+    return from(this.api.invoke(update1, { body: g as unknown as GuestDto }))
       .pipe(
         tap({
           next: (response: any) => this.notification.success(response),
@@ -93,7 +92,7 @@ export class ReservationService {
       );
   }
 
-  private refreshData(): Observable<Page<ReservationDto>> {
+  private refreshData(): Observable<Page<GuestDto>> {
     const { event, page, size, sort, searchCriteria } = this.lastQueryParams;
     return this.findBy(event, page, size, sort, searchCriteria);
   }

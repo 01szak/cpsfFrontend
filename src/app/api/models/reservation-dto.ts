@@ -10,5 +10,5 @@ export interface ReservationDto {
   guest: GuestDto;
   id?: number;
   paid: boolean;
-  reservationStatus?: string;
+  reservationStatus?: 'EXPIRED' | 'ACTIVE' | 'COMING';
 }

@@ -6,14 +6,13 @@ import { MatInput } from '@angular/material/input';
 import { NgTemplateOutlet } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
 import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
-import { CamperPlaceType } from '@core/models/CamperPlaceType';
+import { CamperPlaceTypeDto } from '../../api/models/camper-place-type-dto';
 import { FormFactoryService } from '@shared/form/FormFactoryService';
-import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 
-export type CamperPlaceTypeFormData = { camperPlaceType?: CamperPlaceType };
+export type CamperPlaceTypeFormData = { camperPlaceType?: CamperPlaceTypeDto };
 
 @Component({
-  selector: 'app-camper-place-type-form-popup',
+  selector: 'app-camper-place-type-form',
   imports: [
     PopupFormContainer,
     MatFormField,
@@ -23,11 +22,18 @@ export type CamperPlaceTypeFormData = { camperPlaceType?: CamperPlaceType };
     NgTemplateOutlet,
   ],
   standalone: true,
+  styles: `
+    form {
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+  `,
   template: `
     <ng-template #formFields>
       <form [formGroup]="formGroup">
         <mat-form-field>
-          <mat-label>Nazwa</mat-label>
+          <mat-label>Nazwa Typu</mat-label>
           <input type="text" matInput formControlName="typeName">
         </mat-form-field>
 
@@ -38,6 +44,7 @@ export type CamperPlaceTypeFormData = { camperPlaceType?: CamperPlaceType };
       </form>
     </ng-template>
 
+    @if (isDialog) {
       <app-popup-form-container
         [formTitle]="formTitle"
         [deleteAction]="deleteAction"
@@ -45,19 +52,22 @@ export type CamperPlaceTypeFormData = { camperPlaceType?: CamperPlaceType };
         [proceedAction]="onSave">
         <ng-container *ngTemplateOutlet="formFields"></ng-container>
       </app-popup-form-container>
+    } @else {
+      <ng-container *ngTemplateOutlet="formFields"></ng-container>
+    }
   `,
 })
 export class CamperPlaceTypeFormComponent implements OnInit {
+  @Input() isDialog = true;
   @Input() formGroup!: FormGroup;
 
   private readonly camperPlaceTypeService = inject(CamperPlaceTypeService);
   private readonly factory = inject(FormFactoryService);
   private readonly dialogRef = inject(MatDialogRef<CamperPlaceTypeFormComponent>, { optional: true });
   private readonly fd: CamperPlaceTypeFormData = inject<CamperPlaceTypeFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
-  private readonly confirmation = inject(PopupConfirmationService);
 
   protected isUpdate = !!this.fd?.camperPlaceType;
-  protected formTitle = this.isUpdate ? 'Edytuj Rodzaj' : 'Nowy Rodzaj';
+  protected formTitle = this.isUpdate ? 'Edytuj Typ' : 'Nowy Typ';
 
   protected deleteAction = this.isUpdate ? () => {
     this.camperPlaceTypeService.delete(this.fd.camperPlaceType!).subscribe(() => this.dialogRef?.close());
@@ -75,14 +85,17 @@ export class CamperPlaceTypeFormComponent implements OnInit {
   protected onSave = () => {
     if (this.formGroup.invalid) return;
 
-    const payload = this.formGroup.value;
-    const action$ = this.camperPlaceTypeService.create(payload);
+    const payload = this.formGroup.value as CamperPlaceTypeDto;
+    if (this.isUpdate) {
+        payload.id = this.fd.camperPlaceType?.id;
+    }
 
-    console.log(payload)
-    this.confirmation.openConfirmationPopup({
-      title: 'Zapisywanie',
-      message: 'Czy chcesz zapisać zmiany?',
-      action: () => (action$.subscribe(() => {this.dialogRef?.close()}))
+    const action$ = this.isUpdate
+      ? this.camperPlaceTypeService.update(payload)
+      : this.camperPlaceTypeService.create(payload);
+
+    action$.subscribe(() => {
+      this.dialogRef?.close(true);
     });
   }
 }

@@ -1,12 +1,11 @@
-import { Component, Input, inject, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { CamperPlaceForTable } from '@core/models/CamperPlaceForTable';
-import { CamperPlaceType } from '@core/models/CamperPlaceType';
+import { Component, Input, inject, ViewChild } from '@angular/core';
+import { CamperPlaceDto } from '../../../../../api/models/camper-place-dto';
+import { CamperPlaceTypeDto } from '../../../../../api/models/camper-place-type-dto';
 import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
 import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { PopupConfirmationService } from '@core/services/PopupConfirmationService';
 import { take } from 'rxjs';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
-import { PopupFormService } from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-camper-place-form',
@@ -15,63 +14,61 @@ import { PopupFormService } from '@core/services/PopupFormService';
   template: `
     <app-settings-form-component
       #settingsForm
+      [formName]="'Parcele'"
+      [addNewFunc]="addNewFunc"
       [displayedColumns]="displayedColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaces"
-      [formName]="'Parcele'"
-      [addNewFunc]="addNewFunc"
-      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `,
   styles: [``]
 })
 export class CamperPlaceSettingsComponent {
+  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceDto>;
 
-  @ViewChild('settingsForm') settingsForm!: SettingsGenericComponent<CamperPlaceForTable>;
-
-  private readonly popupConfirmationService = inject(PopupConfirmationService);
-  private readonly cdr = inject(ChangeDetectorRef);
-
-  private _camperPlaces: CamperPlaceForTable[] | null = [];
-  @Input() set camperPlaces(value: CamperPlaceForTable[] | null) {
+  private _camperPlaces: CamperPlaceDto[] | null = [];
+  @Input() set camperPlaces(value: CamperPlaceDto[] | null) {
     this._camperPlaces = value;
     this.updateFormDeclaration();
-    this.cdr.markForCheck();
   }
   get camperPlaces() {
     return this._camperPlaces;
   }
 
-  private _camperPlaceTypes: CamperPlaceType[] | null = [];
-  @Input() set camperPlaceTypes(value: CamperPlaceType[] | null) {
+  private _camperPlaceTypes: CamperPlaceTypeDto[] | null = [];
+  @Input() set camperPlaceTypes(value: CamperPlaceTypeDto[] | null) {
     this._camperPlaceTypes = value;
     this.updateFormDeclaration();
   }
 
   protected camperPlaceService = inject(CamperPlaceService);
   protected popupService = inject(PopupConfirmationService);
-  protected popupFormService = inject(PopupFormService);
 
-  protected displayedColumns = ['index', 'type', 'price'];
+  protected displayedColumns = ['index', 'type', 'price', 'actions'];
   protected formFieldsDeclaration: FormFieldDeclaration[] = [];
 
   protected addNewFunc = () => {
-    this.popupFormService.openCamperPlaceFormPopup();
-  };
+    const newRow: CamperPlaceDto = {
+        index: '',
+        price: 0,
+        type: this._camperPlaceTypes && this._camperPlaceTypes.length > 0 ? this._camperPlaceTypes[0] : { price: 0, typeName: '' }
+    };
+    this.camperPlaceService.create(newRow).subscribe();
+  }
 
-  protected deleteFunc = (camperPlace: CamperPlaceForTable) => {
-    this.popupConfirmationService.openConfirmationPopup({
-      action: () => {
-        this.camperPlaceService.delete(camperPlace).pipe(take(1)).subscribe()
-      },
-      message: "Usunięcie parceli, spowoduje trwałe usunięcie wszystkich rezerwacji, które były na niej zrobione. Czy chcesz kontynuowć? (nie zalecane!)",
-    } as ConfirmationData)
-  };
+  protected deleteFunc = (camperPlace: CamperPlaceDto) => {
+    this.popupService.openConfirmationPopup({
+        title: 'Usuwanie',
+        message: 'Czy na pewno usunąć tę parcelę?',
+        action: () => this.camperPlaceService.delete(camperPlace).pipe(take(1)).subscribe()
+    });
+  }
 
-  onSave(changes: RowChange<CamperPlaceForTable>[]) {
+  onSave(changes: RowChange<CamperPlaceDto>[]) {
     const typeChanged = changes.some(c => c.original.type!.id !== c.updated.type!.id);
     const updatedRows = changes.map(c => c.updated);
+
     if (typeChanged) {
       this.popupService.openConfirmationPopup(this.typeChangeData(updatedRows));
     } else {
@@ -79,7 +76,7 @@ export class CamperPlaceSettingsComponent {
     }
   }
 
-  private typeChangeData(updatedRows: CamperPlaceForTable[]): ConfirmationData {
+  private typeChangeData(updatedRows: CamperPlaceDto[]): ConfirmationData {
     return {
       title: 'Zmiana Typu Parceli',
       message: 'Zmiana typu parceli spowoduje automatyczne nadpisanie jej ceny na cenę domyślną nowego typu. Czy na pewno chcesz kontynuować?',
@@ -91,7 +88,7 @@ export class CamperPlaceSettingsComponent {
     };
   }
 
-  private defaultChangeData(updatedRows: CamperPlaceForTable[]): ConfirmationData {
+  private defaultChangeData(updatedRows: CamperPlaceDto[]): ConfirmationData {
     return {
       title: 'Zapisywanie Zmian',
       message: `Czy na pewno chcesz zapisać zmiany?`,
@@ -111,7 +108,7 @@ export class CamperPlaceSettingsComponent {
         rowType: 'select',
         selectData: this._camperPlaceTypes,
         displayKey: 'typeName',
-        onValueChange: (newType: CamperPlaceType, group) => {
+        onValueChange: (newType: CamperPlaceTypeDto, group) => {
           if (newType && 'price' in newType) {
             group.get('price')?.setValue(newType.price, { emitEvent: false });
             group.markAsDirty();
