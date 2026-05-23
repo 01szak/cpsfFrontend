@@ -116,7 +116,7 @@ import {SearchCriteria} from '../../../api';
       margin: 1rem auto;
       width: calc(100% - 2rem);
       max-width: 1400px;
-      background: var(--bg-surface);
+      background: var(--bg-main) !important;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-lg);
@@ -128,6 +128,7 @@ import {SearchCriteria} from '../../../api';
     table {
       width: 100%;
       border-collapse: collapse;
+      background: transparent;
     }
 
     td, th {
@@ -137,10 +138,11 @@ import {SearchCriteria} from '../../../api';
       color: var(--text-primary);
       white-space: nowrap;
       vertical-align: middle;
+      border-bottom: 1px solid var(--border-color);
     }
 
     th {
-      background: rgba(255, 255, 255, 0.02);
+      background: transparent;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -167,10 +169,27 @@ import {SearchCriteria} from '../../../api';
     .row {
       transition: all 0.2s ease;
       cursor: pointer;
+      background-color: var(--bg-inner) !important;
     }
 
     .row:hover {
-      background: rgba(139, 92, 246, 0.05) !important;
+      background: rgba(139, 92, 246, 0.1) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 5;
+    }
+
+    :host-context(.light-theme) {
+      .tableDiv {
+        background: var(--bg-inner) !important;
+      }
+      .row {
+        background-color: var(--bg-card) !important;
+      }
+      .tableFooter {
+        background: var(--bg-inner) !important;
+      }
     }
 
     /* Scrollbar specific to table body */
@@ -192,7 +211,7 @@ import {SearchCriteria} from '../../../api';
       justify-content: space-between;
       align-items: center;
       padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--bg-main);
       border-top: 1px solid var(--border-color);
     }
 

@@ -164,6 +164,7 @@ mat-card,
 }
 
 .mat-mdc-paginator-container {
+  flex-direction: row !important;
   background-color: var(--bg-inner) !important;
   color: var(--text-primary) !important;
 }
