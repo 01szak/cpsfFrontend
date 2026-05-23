@@ -10,6 +10,7 @@ import {CamperPlaceDto, ReservationDto, SearchCriteria} from '../../../api';
 import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell.component';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import moment from 'moment';
 
 @Component({
   selector: 'calendar',
@@ -59,6 +60,8 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
                   @if (res.camperPlace.id === camperPlace.id && isResInCurrentMonth(res)) {
                     <app-reservation-cell
                       [reservation]="res"
+                      [onlyCheckoutDisplay]="isOnlyCheckoutDisplayed(DateFormater.MOMENT(res.checkin), DateFormater.MOMENT(res.checkout))"
+                      [displayedLength]="getDisplayedLength(DateFormater.MOMENT(res.checkin), DateFormater.MOMENT(res.checkout))"
                       [style.grid-column]="calcResCellLength(res)"
                       [style.left.%]="calcResPlacement(res)"
                       (click)="$event.stopPropagation(); openReservationFormPopup(camperPlace, res)"
@@ -249,7 +252,7 @@ export class CalendarPage implements OnInit, OnDestroy {
   protected calcResCellLength(res: ReservationDto): string {
     const checkin = DateFormater.MOMENT(res.checkin);
     const checkout = DateFormater.MOMENT(res.checkout);
-    if (checkin.month() < checkout.month() && checkin.month() != this.month) {
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
         return '1 / span ' +  checkout.date();
     }
     return (checkin.date() + 1) + ' / span ' + this.getResLength(res);
@@ -258,10 +261,22 @@ export class CalendarPage implements OnInit, OnDestroy {
   protected calcResPlacement(res: ReservationDto): string {
     const checkin = DateFormater.MOMENT(res.checkin);
     const checkout = DateFormater.MOMENT(res.checkout);
-    if (checkin.month() < checkout.month() && checkin.month() != this.month) {
+
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
       return (35 / checkout.date()).toString();
     }
     return this.getResLength(res) > 0 ? (50 / this.getResLength(res)).toString() : '0';
+  }
+
+  protected isOnlyCheckoutDisplayed(checkin: moment.Moment, checkout: moment.Moment) {
+    return checkin.month() < checkout.month() && checkin.month() != this.month;
+  }
+
+  protected getDisplayedLength(checkin: moment.Moment, checkout: moment.Moment) {
+    if (this.isOnlyCheckoutDisplayed(checkin, checkout)) {
+      return checkout.date();
+    }
+    return this.days.length - checkin.date();
   }
 
   private getResLength(res: ReservationDto) {
@@ -280,5 +295,7 @@ export class CalendarPage implements OnInit, OnDestroy {
   protected isResInCurrentMonth(res: ReservationDto) {
     return DateFormater.MOMENT(res.checkin).month() === this.month || DateFormater.MOMENT(res.checkout).month() === this.month;
   }
+
+  protected readonly DateFormater = DateFormater;
 }
 
