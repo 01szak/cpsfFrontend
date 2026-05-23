@@ -1,16 +1,14 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {DtoDisplayDataMap, RegularTableComponent, Sort} from '@shared/ui/data-table/regular-table.component';
+import {DtoDisplayDataMap, FetchParams, RegularTableComponent} from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {Guest} from '@core/models/Guest';
 import {GuestFormData} from '@shared/form/guest-form.component';
-import {Api} from '../../../api/api';
 import {GuestDto} from '../../../api';
-import {BehaviorSubject,Subscription} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {SearchCriteria} from '../../../api/models/search-criteria';
 import {GuestService} from '@features/guests/services/GuestService';
 
 @Component({
@@ -33,8 +31,6 @@ import {GuestService} from '@features/guests/services/GuestService';
       [fetchFunc]="fetchData.bind(this)"
       [onClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
-      (sortInfo)="getSortInfo($event)"
-      (filterInfo)="getFilterInfo($event)"
       (paginatorReady)="getPaginator($event)">
     </app-regular-table>
   `,
@@ -69,22 +65,18 @@ export class GuestPage implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  private lastParams: {
-    event?: PageEvent,
-    sort?: Sort,
-    searchCriteria?: SearchCriteria
-  } = {};
+  private lastParams = {} as FetchParams;
 
   ngOnInit() {
-    this.fetchData();
+    this.fetchData({});
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
   }
 
-  protected fetchData(event?: PageEvent, sort?: Sort, searchCriteria?: SearchCriteria) {
-    this.lastParams = { event: event || this.lastParams.event, sort: sort || this.lastParams.sort, searchCriteria: searchCriteria || this.lastParams.searchCriteria };
+  protected fetchData(params: FetchParams) {
+    this.lastParams = { ...this.lastParams, ...params };
 
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
@@ -121,18 +113,6 @@ export class GuestPage implements OnInit, OnDestroy {
     });
   }
 
-  protected getSortInfo(sort: Sort) {
-    this.fetchData(undefined, sort);
-  }
-
-  protected getFilterInfo(searchCriteria: SearchCriteria) {
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    console.log(searchCriteria)
-    this.fetchData(undefined, undefined, searchCriteria);
-  }
-
   protected getPaginator(paginator: MatPaginator) {
     this.paginator = paginator;
   }
@@ -141,7 +121,7 @@ export class GuestPage implements OnInit, OnDestroy {
     const guestFd: GuestFormData = {guest: guest};
     this.formService.openGuestFormPopup(guestFd).afterClosed().subscribe(refreshed => {
       if (refreshed) {
-        this.fetchData();
+        this.fetchData({});
       }
     });
   }
