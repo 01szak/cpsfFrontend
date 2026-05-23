@@ -14,7 +14,8 @@ export type ColorConfig = {bgr: string, border: string}
     NgClass
   ],
   template: `
-    <div [ngClass]="{'content': true, 'blink': isActiveUnpaid()}" [style]="setColor()"><p><strong>{{getGuestName()}}</strong></p></div>
+    <div [ngClass]="{'content': true, 'blink': isActiveUnpaid()}" [style]="setColor() + setParagraphPlacing()"><p>
+      <strong>{{ getGuestName() }} </strong></p></div>
   `,
   styles: `
     .content {
@@ -22,19 +23,17 @@ export type ColorConfig = {bgr: string, border: string}
       width: 100%;
       height: 100%;
       border-radius: 10px;
-
       display: flex;
       align-items: center;
-      justify-content: flex-start;
       padding: 0 5px;
-
       overflow: hidden;
       white-space: nowrap;
     }
 
     p {
-      width: 100%;
+      margin: 0;
     }
+
     .blink {
       animation: blink 1s ease-in-out infinite;
     }
@@ -50,6 +49,8 @@ export type ColorConfig = {bgr: string, border: string}
 })
 export class ReservationCellComponent {
   @Input() reservation!: ReservationDto;
+  @Input() onlyCheckoutDisplay!: boolean;
+  @Input() displayedLength!: number;
 
   private colorMap: ResColor[] = [
     {name: 'active', colours: {border: 'rgb(0 211 218)', bgr: 'rgb(0 247 255 / 0.6)'}},
@@ -63,7 +64,7 @@ export class ReservationCellComponent {
     let lName = '';
     let delimeter = ' ';
 
-    if (this.getResLength() <= 1) {
+    if (this.getResLength() <= 1 || this.displayedLength <= 1) {
       fName = this.reservation.guest.firstname?.substring(0, 1) ?? '';
       lName = this.reservation.guest.lastname?.substring(0, 1) ?? '';
       delimeter = '.'
@@ -106,5 +107,9 @@ export class ReservationCellComponent {
 
   protected isActiveUnpaid() {
     return this.reservation.reservationStatus === 'ACTIVE' && !this.reservation.paid;
+  }
+
+  protected setParagraphPlacing() {
+    return `justify-content: flex-${!this.onlyCheckoutDisplay ? 'start' : 'end'} !important;`;
   }
 }
