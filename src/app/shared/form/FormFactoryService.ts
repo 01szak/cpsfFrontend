@@ -36,11 +36,11 @@ export class FormFactoryService {
   public patchGuest(form: FormGroup, guest: any) {
     form.get('guest')?.patchValue({
       id: guest.id,
-      firstname: guest.firstname,
-      lastname: guest.lastname,
-      email: guest.email,
-      phoneNumber: guest.phoneNumber,
-      carRegistration: guest.carRegistration,
+      firstname: guest.firstname || '',
+      lastname: guest.lastname || '',
+      email: guest.email || '',
+      phoneNumber: guest.phoneNumber || '',
+      carRegistration: guest.carRegistration || '',
     });
   }
 
