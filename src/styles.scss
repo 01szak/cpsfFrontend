@@ -41,7 +41,39 @@
   --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
   --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
+
+  /* --- Reservation Status Colors --- */
+  --res-active-border: rgb(0 211 218);
+  --res-active-bg: rgb(0 247 255 / 0.6);
+  --res-coming-border: rgb(190 206 0);
+  --res-coming-bg: rgb(238 255 0 / 0.6);
+  --res-expired-border: rgb(112 112 112);
+  --res-expired-bg: rgb(112 112 112 / 0.6);
+  --res-unpaid-border: rgb(225 30 0);
+  --res-unpaid-bg: rgb(255 38 0 / 0.6);
 }
+
+/* --- Reservation Animations --- */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
+.res-info-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.res-active { background-color: var(--res-active-bg); border: 2px solid var(--res-active-border); }
+.res-coming { background-color: var(--res-coming-bg); border: 2px solid var(--res-coming-border); }
+.res-expired { background-color: var(--res-expired-bg); border: 2px solid var(--res-expired-border); }
+.res-unpaid { background-color: var(--res-unpaid-bg); border: 2px solid var(--res-unpaid-border); }
 
 /* Light Theme Overrides */
 .light-theme {

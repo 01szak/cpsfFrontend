@@ -1,4 +1,4 @@
-import {Component, HostListener, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {map, Observable, Subscription, of} from 'rxjs';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
@@ -11,21 +11,64 @@ import {ReservationCellComponent} from '@features/reservations/calendar/reservat
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import moment from 'moment';
+import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
+import {MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'calendar',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatCard,
     NewDatePickerComponent,
     AsyncPipe,
     ReservationCellComponent,
     NgClass,
+    MatMenu,
+    MatMenuTrigger,
+    MatIconButton,
   ],
   template: `
     <mat-card class="content">
-      <mat-card class="widget-header">
+      <div class="widget-header">
         <app-new-date-picker (month)="changeMonth($event)" (year)="changeYear($event)"/>
-      </mat-card>
+
+        <div class="spacer"></div>
+
+        <button mat-icon-button
+                [matMenuTriggerFor]="menu"
+                #menuTrigger="matMenuTrigger"
+                (mouseenter)="menuTrigger.openMenu()"
+                (mousedown)="menuTrigger.closeMenu()"
+                class="help-button">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <div class="legend-menu" (mouseleave)="menuTrigger.closeMenu()">
+            <div class="menuEl">
+              <div class="res-info-circle res-active"></div>
+              <p class="description">Aktywna / Opłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-active blink"></div>
+              <p class="description">Aktywna / Nieopłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-coming"></div>
+              <p class="description">Nadchodząca</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-expired"></div>
+              <p class="description">Zakończona / Opłacona</p>
+            </div>
+            <div class="menuEl">
+              <div class="res-info-circle res-unpaid"></div>
+              <p class="description" >Zakończona / Nieopłacona</p>
+            </div>
+          </div>
+        </mat-menu>
+      </div>
+
       <div class="header-row" [style.--days]="days.length">
         <div class="header-cell camperPlaceIndex"></div>
 
@@ -77,7 +120,7 @@ import moment from 'moment';
     </mat-card>
   `,
   styles: `
-    mat-card {
+    mat-card.content {
       padding: 25px;
       width: 100%;
       max-width: 1850px;
@@ -86,6 +129,54 @@ import moment from 'moment';
       border: 1px solid var(--border-color) !important;
       border-radius: var(--radius-md) !important;
     }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .help-button {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .help-button:hover {
+      color: var(--primary);
+    }
+
+    .legend-menu {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 200px;
+    }
+
+    .menuEl {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menuEl p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
     .header-row,
     .row {
       display: grid;
@@ -96,6 +187,7 @@ import moment from 'moment';
     .cell {
       border: var(--calendar-border);
       box-sizing: border-box;
+      justify-items: center;
     }
 
     .table {
@@ -123,7 +215,6 @@ import moment from 'moment';
 
     app-new-date-picker {
       display: block;
-      padding: 10px;
       z-index: 200;
       background: transparent;
     }
@@ -134,6 +225,8 @@ import moment from 'moment';
       background-color: var(--bg-card);
       z-index: 200;
       text-align: center;
+      align-items: center;
+      justify-content: center;
     }
 
     .weekday {
@@ -147,21 +240,15 @@ import moment from 'moment';
       white-space: nowrap;
       text-overflow: ellipsis;
       margin: 2px 0;
-      justify-self: center;
     }
 
     .weekend {
       background-color: var(--calendar-weekend);
     }
 
-    .widget-header {
-      padding: 0;
-      box-shadow: none;
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: row;
+    .description {
+      color: black !important;
     }
-
   `,
   standalone: true,
 })
@@ -175,7 +262,6 @@ export class CalendarPage implements OnInit, OnDestroy {
 
   protected camperPlaces$!: Observable<CamperPlaceDto[]>;
   protected reservations$: Observable<ReservationDto[]> = of([]);
-  protected reservations: ReservationDto[] = [];
 
   private popupFormService = inject(PopupFormService);
   private camperPlaceService = inject(CamperPlaceService);
@@ -200,8 +286,8 @@ export class CalendarPage implements OnInit, OnDestroy {
   private fetchData() {
     this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
 
-    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month - 1, day: 1}).startOf('month');
-    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month + 1, day: 1}).endOf('month');
+    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).startOf('month');
+    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).endOf('month');
 
     this.sub.add(this.reservationService.findByUnpaged({
       key: 'checkin',
@@ -298,4 +384,3 @@ export class CalendarPage implements OnInit, OnDestroy {
 
   protected readonly DateFormater = DateFormater;
 }
-
