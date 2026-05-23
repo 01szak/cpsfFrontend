@@ -15,7 +15,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 
 import {MatCheckbox} from '@angular/material/checkbox';
 import {StatusComponent} from '@shared/ui/data-table/status/status.component';
-import {AsyncPipe, NgClass} from '@angular/common';
+import {AsyncPipe, NgClass, CommonModule} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.component';
 import {fromEvent, Observable} from 'rxjs';
@@ -26,6 +26,7 @@ import {SearchCriteria} from '../../../api';
 @Component({
   selector: 'app-regular-table',
   imports: [
+    CommonModule,
     MatTable,
     MatColumnDef,
     MatCell,
@@ -57,7 +58,8 @@ import {SearchCriteria} from '../../../api';
             @for (column of tabColumns; track column) {
 
               <ng-container [matColumnDef]="column.field">
-                <th mat-header-cell *matHeaderCellDef (click)="openSearchDialog($event, displayedColumns[$index], column.field, column.type)">
+                <th mat-header-cell *matHeaderCellDef
+                    (click)="openSearchDialog($event, displayedColumns[$index], column.field, column.type)">
                   <div class="headerDiv">
                     <i class="fa-regular fa-circle-up"
                        [ngClass]="{
@@ -66,17 +68,18 @@ import {SearchCriteria} from '../../../api';
                         'arrowClicked' : isClicked && clickedColumn === column.field
                         }"
                        (click)="click(column.field);$event.stopPropagation()"></i>
-                    <p class="sortingButton">{{displayedColumns[$index]}}</p>
+                    <p class="sortingButton">{{ displayedColumns[$index] }}</p>
                   </div>
                 </th>
                 <td mat-cell *matCellDef="let element">
 
-                  @if (column.type === 'checkbox' ) {
-                    <mat-checkbox (change)=" additionalFunc?.(element.dto)" [checked]="element.dto[column.field]" (click)="$event.stopPropagation()"></mat-checkbox>
+                  @if (column.type === 'checkbox') {
+                    <mat-checkbox (change)=" additionalFunc?.(element.dto)" [checked]="element.dto[column.field]"
+                                  (click)="$event.stopPropagation()"></mat-checkbox>
                   } @else if (column.type === 'status') {
                     <app-status [status]="element.displayData[column.field]"></app-status>
                   } @else {
-                    {{element.displayData[column.field]}}
+                    {{ element.displayData[column.field] }}
                   }
                 </td>
               </ng-container>
@@ -94,12 +97,15 @@ import {SearchCriteria} from '../../../api';
         </div>
 
         <div class="tableFooter">
-          <i class="fa-solid fa-plus addIcon" (click)="createFunc()"></i>
+          <div class="funcButtons">
+            <i class="fa-solid fa-plus funcIcon" (click)="createFunc()"></i>
+            <i class="fa-solid fa-arrow-rotate-left funcIcon" (click)="reset()"></i>
+          </div>
           <mat-paginator
             [length]="paginatorLength"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
-            (page)="fetchFunc($event)">
+            (page)="fetchFuncWithEvent($event)">
           </mat-paginator>
         </div>
 
@@ -190,7 +196,7 @@ import {SearchCriteria} from '../../../api';
       border-top: 1px solid var(--border-color);
     }
 
-    .addIcon {
+    .funcIcon {
       width: 42px;
       height: 42px;
       display: flex;
@@ -205,7 +211,7 @@ import {SearchCriteria} from '../../../api';
       box-shadow: var(--shadow-md);
     }
 
-    .addIcon:hover {
+    .funcIcon:hover {
       background: var(--primary-hover);
       transform: scale(1.05);
       box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
@@ -222,20 +228,24 @@ import {SearchCriteria} from '../../../api';
       color: var(--primary);
     }
 
-    .descArrow {
-      transform: rotate(180deg);
-    }
-
     th {
       position: sticky;
       top: 0;
       z-index: 10;
       backdrop-filter: blur(8px);
     }
+
+    .funcButtons {
+      width: 100%;
+      justify-content: start;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+    }
+
   `,
 })
 export class RegularTableComponent implements AfterViewInit {
-  // TODO made this more generic lots of duplicted code in reservation and guest page
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   @Input() public page$!: Observable<Page<DtoDisplayDataMap>>;
@@ -245,7 +255,7 @@ export class RegularTableComponent implements AfterViewInit {
   @Input() public pageSizeOptions: number[] = [];
   @Input() public serviceInstance: any = {};
   @Input() public paginatorLength: number = 0;
-  @Input() public fetchFunc!: ($event: PageEvent) => any;
+  @Input() public fetchFunc!: (params: FetchParams) => any;
   @Input() public onClickFunc!: (t: any) => any;
   @Input() public createFunc!: () => any;
   @Input() public additionalFunc?: (t: any) => any;
@@ -263,7 +273,10 @@ export class RegularTableComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.paginatorReady.emit(this.paginator);
-    console.log(this.tabColumns)
+  }
+
+  protected fetchFuncWithEvent(event: PageEvent) {
+    this.fetchFunc({event})
   }
 
   protected get columnFields(): string[] {
@@ -288,14 +301,20 @@ export class RegularTableComponent implements AfterViewInit {
   protected sendSortInfo(columnName?: string, directionB?: boolean) {
     if (columnName === undefined || directionB === undefined) {
       this.sortInfo.emit();
+      this.fetchFunc({sort: undefined});
     } else {
       const sort: Sort = {columnName: columnName, direction: directionB ? 'asc' : 'desc'}
       this.sortInfo.emit(sort);
+      this.fetchFunc({sort});
     }
   }
 
-  protected sendFilterInfo(criteria: SearchCriteria) {
+  protected sendFilterInfo(criteria?: SearchCriteria) {
     this.filterInfo.emit(criteria);
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.fetchFunc({searchCriteria: criteria});
   }
 
   protected openSearchDialog(event: MouseEvent, label: string, by: string, type: string) {
@@ -334,7 +353,18 @@ export class RegularTableComponent implements AfterViewInit {
     });
   }
 
+  protected reset() {
+    this.isArrowAsc = false;
+    this.isClicked = false;
+    this.clickCount = 0;
+    this.clickedColumn = '';
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
+    this.fetchFunc({event: undefined, sort: undefined, searchCriteria: undefined});
+  }
 }
-export type DtoDisplayDataMap = {dto: {}, displayData: {}}
+export type DtoDisplayDataMap = {dto: any, displayData: any}
 export type Column = { type: string, field: string }
 export interface Sort {columnName: string, direction: 'asc' | 'desc' }
+export type FetchParams = {event?: PageEvent, sort?: Sort, searchCriteria?: SearchCriteria}

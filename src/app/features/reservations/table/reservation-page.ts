@@ -5,11 +5,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
-import {DtoDisplayDataMap, RegularTableComponent, Sort} from '@shared/ui/data-table/regular-table.component';
+import {
+  DtoDisplayDataMap,
+  FetchParams,
+  RegularTableComponent,
+} from '@shared/ui/data-table/regular-table.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {SearchCriteria} from '../../../api/models/search-criteria';
 import {ReservationDto} from '../../../api';
 
 @Component({
@@ -20,7 +23,6 @@ import {ReservationDto} from '../../../api';
     FormsModule,
     ReactiveFormsModule,
     MatNativeDateModule,
-    RegularTableComponent,
     RegularTableComponent,
   ],
   template: `
@@ -36,8 +38,6 @@ import {ReservationDto} from '../../../api';
       [onClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
       [additionalFunc]="additionalFunc"
-      (sortInfo)="getSortInfo($event)"
-      (filterInfo)="getFilterInfo($event)"
       (paginatorReady)="getPaginator($event)">
     </app-regular-table>
   `,
@@ -71,22 +71,18 @@ export class ReservationPage implements OnInit, OnDestroy {
   protected paginator?: MatPaginator;
 
   private sub?: Subscription;
-  private lastParams: {
-    event?: PageEvent,
-    sort?: Sort,
-    searchCriteria?: SearchCriteria
-  } = {};
+  private lastParams = {} as FetchParams
 
   ngOnInit() {
-    this.fetchData();
+    this.fetchData({});
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
   }
 
-  protected fetchData(event?: PageEvent, sort?: Sort, searchCriteria?: SearchCriteria) {
-    this.lastParams = { event: event || this.lastParams.event, sort: sort || this.lastParams.sort, searchCriteria: searchCriteria || this.lastParams.searchCriteria };
+  protected fetchData(params: FetchParams) {
+    this.lastParams = { ...this.lastParams, ...params };
 
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
@@ -123,17 +119,6 @@ export class ReservationPage implements OnInit, OnDestroy {
     });
   }
 
-  protected getSortInfo(sort: Sort) {
-    this.fetchData(undefined, sort);
-  }
-
-  protected getFilterInfo(filter: SearchCriteria) {
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.fetchData(undefined, undefined, filter);
-  }
-
   protected getPaginator(paginator: MatPaginator) {
     this.paginator = paginator;
   }
@@ -142,7 +127,7 @@ export class ReservationPage implements OnInit, OnDestroy {
     const reservationFd: ReservationFormData = {reservation: reservation};
     this.formService.openReservationFormPopup(reservationFd).afterClosed().subscribe(refreshed => {
       if (refreshed) {
-        this.fetchData();
+        this.fetchData({});
       }
     });
   }
@@ -156,7 +141,6 @@ export class ReservationPage implements OnInit, OnDestroy {
   };
 }
 export type ReservationDisplayData = {
-  id: number,
   checkin: string,
   checkout: string,
   stringUser: string,
