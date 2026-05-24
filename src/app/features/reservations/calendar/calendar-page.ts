@@ -286,8 +286,8 @@ export class CalendarPage implements OnInit, OnDestroy {
   private fetchData() {
     this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
 
-    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).startOf('month');
-    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1}).endOf('month');
+    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month - 1, day: 1}).startOf('month');
+    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month + 1, day: 1}).endOf('month');
 
     this.sub.add(this.reservationService.findByUnpaged({
       key: 'checkin',

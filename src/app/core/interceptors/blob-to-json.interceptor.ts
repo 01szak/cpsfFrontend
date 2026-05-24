@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
-import { from, Observable, of, switchMap } from 'rxjs';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
+import {catchError, from, Observable, of, switchMap, throwError} from 'rxjs';
 import { map } from 'rxjs/operators';
 
 /**
@@ -29,6 +36,31 @@ export class BlobJsonInterceptor implements HttpInterceptor {
           );
         }
         return of(event);
+      }),
+      catchError((error: any) => {
+        if (error instanceof HttpErrorResponse && error.error instanceof Blob) {
+          return from(error.error.text()).pipe(
+            switchMap(text => {
+              let parsedError = text;
+              try {
+                parsedError = JSON.parse(text);
+              } catch (e) {
+              }
+
+              const clonedError = new HttpErrorResponse({
+                error: parsedError,
+                headers: error.headers,
+                status: error.status,
+                statusText: error.statusText,
+                url: error.url || undefined
+              });
+
+              return throwError(() => clonedError);
+            })
+          );
+        }
+
+        return throwError(() => error);
       })
     );
   }

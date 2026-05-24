@@ -19,6 +19,7 @@ import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.c
       [displayedColumns]="displayedColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaces"
+      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `,
@@ -49,12 +50,7 @@ export class CamperPlaceSettingsComponent {
   protected formFieldsDeclaration: FormFieldDeclaration[] = [];
 
   protected addNewFunc = () => {
-    const newRow: CamperPlaceDto = {
-        index: '',
-        price: 0,
-        type: this._camperPlaceTypes && this._camperPlaceTypes.length > 0 ? this._camperPlaceTypes[0] : { price: 0, typeName: '' }
-    };
-    this.camperPlaceService.create(newRow).subscribe();
+    this.popupFormService.openCamperPlaceFormPopup();
   }
 
   protected deleteFunc = (camperPlace: CamperPlaceDto) => {

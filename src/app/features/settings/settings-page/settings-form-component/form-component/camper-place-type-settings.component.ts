@@ -183,11 +183,7 @@ export class CamperPlaceTypeSettingsComponent {
   protected camperPlaceService = inject(CamperPlaceService);
 
   protected addNewFunc = () => {
-    const newRow: CamperPlaceTypeDto = {
-        typeName: '',
-        price: 0
-    };
-    this.camperPlaceTypeService.create(newRow).subscribe();
+    this.popupFormService.openCamperPlaceTypeFormPopup();
   }
 
   protected deleteFunc = (row: CamperPlaceTypeDto) => {
