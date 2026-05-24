@@ -1,12 +1,12 @@
-<main>
-  <mat-card class="primary">
+<div class="content">
+  <mat-card>
       <app-camper-place-form
         [camperPlaces]="camperPlaces$ | async"
         [camperPlaceTypes]="camperPlaceTypes$ | async"
       />
   </mat-card>
-  <mat-card class="primary">
+  <mat-card>
     <app-camper-place-type-form
       [camperPlaceTypes]="camperPlaceTypes$ | async"/>
   </mat-card>
-</main>
+</div>

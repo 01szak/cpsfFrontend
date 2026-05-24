@@ -1,4 +1,4 @@
-main {
+.content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -25,3 +25,4 @@ mat-card {
   width: 100%;
   max-width: 800px;
 }
+

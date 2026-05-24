@@ -1,37 +1,47 @@
-node {
-  env.NODEJS_HOME = "${tool 'nodejs'}"
-  // on linux / mac
-  env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
-  // on windows
-  env.PATH="${env.NODEJS_HOME};${env.PATH}"
-}
-
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Checkout') {
-      steps {
-        // Checkout the code from the repository
-        checkout scm
-      }
+    tools {
+        nodejs 'nodejs'
     }
 
-    stage('Build') {
-      steps {
-        nodejs(nodeJSInstallationName: 'nodejs') {
-          sh 'npm config ls'
-          sh 'npm install'
-          sh 'npm run build'
+    parameters {
+        choice(name: 'env', choices: ['stage', 'prod'], description: 'Wybierz środowisko')
+    }
+
+    environment {
+       TARGET_DIR = "/var/www/html/parceo/${params.env}"
+    }
+
+    // Dodano brakującą sekcję 'stages'
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                    npm install
+                    npm run build
+                '''
+            }
         }
-      }
+
+        stage('Deploy') {
+            steps {
+                sh """
+                    mkdir -p ${TARGET_DIR}
+                    rm -rf ${TARGET_DIR}/*
+                    cp -r dist/browser/* ${TARGET_DIR}/
+                """
+            }
+        }
     }
 
-  }
-
-  post {
-    always {
-      cleanWs()  // Clean workspace after each build
+    post {
+        always {
+            cleanWs()
+            echo "Czyszczenie przestrzeni roboczej zakończone."
+        }
+        success {
+            echo "✅ Frontend pomyślnie wdrożony na środowisko: ${params.env}"
+        }
     }
-  }
 }

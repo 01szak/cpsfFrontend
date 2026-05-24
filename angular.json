@@ -5,7 +5,14 @@
   "projects": {
     "untitled": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "skipTests": true,
+          "inlineStyle": true,
+          "inlineTemplate": true,
+          "standalone": true
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",

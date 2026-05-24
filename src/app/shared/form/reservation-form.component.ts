@@ -1,13 +1,11 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
-import {debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap, take} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, from, map, Observable, of, switchMap} from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 import {ReservationService} from '@features/reservations/services/ReservationService';
-import {UserService} from '@features/users/services/UserService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 import {Guest} from '@core/models/Guest';
-import {Reservation} from '@core/models/Reservation';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {PopupFormContainer} from './popup-form-container.component';
@@ -19,8 +17,6 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {AsyncPipe} from '@angular/common';
-import {CamperPlaceForTable} from '@core/models/CamperPlaceForTable';
-import {Page} from '@core/models/Page';
 import {
   MatDatepicker,
   MatDatepickerInput,
@@ -33,13 +29,18 @@ import {
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
+import {Api} from '../../api/api';
+import {findBy1, GuestDto, ReservationDto} from '../../api';
+import {CamperPlaceDto} from '../../api/models/camper-place-dto';
+import {GuestService} from '@features/guests/services/GuestService';
+import {Page} from '@core/models/Page';
 
 export type ReservationFormData = {
-  reservation?: Reservation;
+  reservation?: ReservationDto;
   year?: number;
   month?: number;
   day?: number;
-  camperPlace?: CamperPlaceForTable;
+  camperPlace?: CamperPlaceDto;
 };
 
 @Component({
@@ -82,9 +83,6 @@ export type ReservationFormData = {
       ])
     ])
   ],
-  styles: `
-
-  `,
   template: `
     <app-popup-form-container
       [formTitle]="formTitle"
@@ -92,7 +90,8 @@ export type ReservationFormData = {
       [isUpdate]="isUpdate"
       [proceedAction]="onSave">
 
-      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled">
+      <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled"
+            style="display: flex; flex-direction: column; gap: 1rem;">
         <mat-form-field>
           <mat-label>Data Wjazdu</mat-label>
           <input matInput [matDatepicker]="checkin" formControlName="checkinDate">
@@ -117,7 +116,7 @@ export type ReservationFormData = {
             <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
           } @else {
             <mat-select formControlName="camperPlace" [compareWith]="compareFn">
-              @for (cp of camperPlaces$ | async; track cp.id) {
+              @for (cp of (camperPlaces$ | async); track cp.id) {
                 <mat-option [value]="cp">{{ cp.index }}</mat-option>
               }
             </mat-select>
@@ -166,10 +165,11 @@ export type ReservationFormData = {
   `,
 })
 export class ReservationFormComponent implements OnInit {
+  private readonly api = inject(Api);
   private readonly factory = inject(FormFactoryService);
   private readonly reservationService = inject(ReservationService);
-  private readonly guestService = inject(UserService);
   private readonly camperPlaceService = inject(CamperPlaceService);
+  private readonly guestService = inject(GuestService);
   private readonly confirmation = inject(PopupConfirmationService);
   private readonly dialogRef = inject(MatDialogRef<ReservationFormComponent>);
   private readonly fd: ReservationFormData = inject(MAT_DIALOG_DATA);
@@ -182,8 +182,8 @@ export class ReservationFormComponent implements OnInit {
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
   protected GuestTittle = this.isUpdate ? 'Edycja Gościa' : 'Nowy Gość';
   protected isNewGuest = false;
-  protected camperPlaces$ = this.camperPlaceService.getCamperPlacesForTable();
-  protected guests$: Observable<{ name: string; guest: Guest }[]> = of([]);
+  protected camperPlaces$: Observable<CamperPlaceDto[]> = this.camperPlaceService.camperPlacesForTable$;
+  protected guests$: Observable<{ name: string; guest: GuestDto }[]> = of([]);
   protected checkinCalendarStart: moment.Moment | null = null;
   protected checkoutCalendarStart: moment.Moment | null = null;
   protected animationsEnabled = false;
@@ -207,8 +207,11 @@ export class ReservationFormComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       filter((v): v is string => typeof v === 'string' && v.length > 1),
-      switchMap((v: string) => this.guestService.findAll(undefined, 0, 50, undefined, { by: 'fullName', value: v })),
-      map((res: Page<Guest>) => (res.content || []).map((g: Guest) => ({ name: `${g.firstname} ${g.lastname}`, guest: g })))
+      switchMap((v: string) => this.guestService.findBy(
+        undefined, 0, 50, undefined,
+        { key: 'lastname', value: v, operation: 'LIKE' }
+      )),
+      map((res: Page<GuestDto>) => (res.content || []).map((g: GuestDto) => ({ name: `${g.firstname || ''} ${g.lastname || ''}`.trim(), guest: g })))
     );
   }
 
@@ -223,7 +226,7 @@ export class ReservationFormComponent implements OnInit {
 
       if (this.fd.reservation.guest) {
         const g = this.fd.reservation.guest;
-        this.formGroup.get('guestSearch')?.setValue(`${g.firstname} ${g.lastname}`);
+        this.formGroup.get('guestSearch')?.setValue(`${g.firstname || ''} ${g.lastname || ''}`.trim());
       }
 
       if (this.fd?.reservation.camperPlace) {
@@ -263,7 +266,6 @@ export class ReservationFormComponent implements OnInit {
     });
   } : null;
 
-
   protected onSave = () => {
     const checkin = DateFormater.YYYYMMDD(this.formGroup.get('checkinDate')!.value, DateDelimiter.DASH);
     const checkout = DateFormater.YYYYMMDD(this.formGroup.get('checkoutDate')!.value, DateDelimiter.DASH);
@@ -271,7 +273,7 @@ export class ReservationFormComponent implements OnInit {
     const guest = this.formGroup.get('guest')!.value;
     const isPaid = this.formGroup.get('isPaid')!.value;
 
-    const payload: Reservation = {
+    const payload: ReservationDto = {
       id: this.fd.reservation?.id,
       checkin: checkin,
       checkout: checkout,
@@ -296,7 +298,6 @@ export class ReservationFormComponent implements OnInit {
       this.formGroup.get('guestSearch')?.reset();
     }
   }
-
 
   get camperPlaceIndex() {
     return this.formGroup.get('camperPlace')?.value?.index;

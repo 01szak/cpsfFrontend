@@ -20,8 +20,8 @@
   --glass: rgba(0, 0, 0, 0.4);
 
   /* Calendar theme */
-  --calendar-border: 1px solid rgba(255, 255, 255, 0.1);
-  --calendar-weekend: rgba(255, 255, 255, 0.03);
+  --calendar-border: 1px solid rgb(255 255 255 / 0.19);
+  --calendar-weekend: rgb(255 255 255 / 0.1);
 
   /* Status Colors */
   --status-success: #059669;
@@ -41,7 +41,39 @@
   --mat-sys-primary: var(--primary);
   --mat-select-trigger-text-color: #ffffff;
   --mat-sys-on-surface-variant: rgba(255, 255, 255, 0.84);
+
+  /* --- Reservation Status Colors --- */
+  --res-active-border: rgb(0 211 218);
+  --res-active-bg: rgb(0 247 255 / 0.6);
+  --res-coming-border: rgb(190 206 0);
+  --res-coming-bg: rgb(238 255 0 / 0.6);
+  --res-expired-border: rgb(112 112 112);
+  --res-expired-bg: rgb(112 112 112 / 0.6);
+  --res-unpaid-border: rgb(225 30 0);
+  --res-unpaid-bg: rgb(255 38 0 / 0.6);
 }
+
+/* --- Reservation Animations --- */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
+.res-info-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.res-active { background-color: var(--res-active-bg); border: 2px solid var(--res-active-border); }
+.res-coming { background-color: var(--res-coming-bg); border: 2px solid var(--res-coming-border); }
+.res-expired { background-color: var(--res-expired-bg); border: 2px solid var(--res-expired-border); }
+.res-unpaid { background-color: var(--res-unpaid-bg); border: 2px solid var(--res-unpaid-border); }
 
 /* Light Theme Overrides */
 .light-theme {
@@ -127,19 +159,23 @@ input, .mat-mdc-input-element {
 }
 
 /* --- Cards & Dialogs --- */
-.primary,
 mat-card,
 .mat-mdc-dialog-container .mdc-dialog__surface {
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md) !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-title {
   color: var(--text-primary) !important;
 }
 
-/* Custom Dialog Animation */
+
+  /* Custom Dialog Animation */
 .mat-mdc-dialog-container .mdc-dialog__surface {
   animation: dialog-fast-enter 0.15s cubic-bezier(0, 0, 0.2, 1) forwards !important;
 }
+
 
 @keyframes dialog-fast-enter {
   from {
@@ -165,6 +201,7 @@ mat-card,
 }
 
 .mat-mdc-paginator-container {
+  flex-direction: row !important;
   background-color: var(--bg-inner) !important;
   color: var(--text-primary) !important;
 }
@@ -247,7 +284,7 @@ mat-card,
 }
 
 .mat-mdc-option {
-  color: var(--text-primary) !important;
+  color: black !important;
 
   &:hover:not(.mdc-list-item--disabled) {
     background-color: rgba(255, 255, 255, 0.05) !important;
@@ -268,52 +305,26 @@ mat-card,
   color: black !important;
 }
 
-/* =========================================================
-   ANGULAR MATERIAL EXPANSION PANEL — FULL THEME INTEGRATION
-========================================================= */
-
-/* ---------- PANEL CONTAINER ---------- */
-mat-expansion-panel {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-md) !important;
-  box-shadow: none !important;
-  overflow: hidden;
+.mat-mdc-button:not(:disabled) {
+  color: black !important;
 }
-
-.mat-expansion-panel:not([class*='mat-elevation-z']) {
-  box-shadow: none !important;
-}
-
-.mat-expansion-panel-header {
-  background: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  border-radius: var(--radius-md) !important;
-  min-height: 64px !important;
-  transition: background 0.15s ease;
-}
-
-.mat-expansion-panel-header:hover {
-  background: var(--bg-overlay) !important;
-}
-
-.mat-expanded .mat-expansion-panel-header {
-  border-bottom: 1px solid var(--border-color);
-}
-
-.mat-expansion-panel-header-title {
-  color: var(--text-primary) !important;
-  font-weight: 600;
-}
-
-.mat-expansion-indicator::after {
-  color: var(--text-primary) !important;
+.mat-calendar-arrow {
+  fill: black !important;
 }
 
 /* ---------- BODY ---------- */
 .mat-expansion-panel-body {
   background: var(--bg-inner) !important;
   padding: 16px 20px 20px 20px !important;
+}
+
+.mat-expansion-panel {
+  background: var(--bg-card) !important;
+  padding: 5px !important;
+}
+
+.mat-expansion-panel-header-title {
+  color: var(--text-primary) !important;
 }
 
 .rowsContainer {
