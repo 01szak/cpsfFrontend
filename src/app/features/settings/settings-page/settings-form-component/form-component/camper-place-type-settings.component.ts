@@ -8,6 +8,7 @@ import {CamperPlaceDto} from '../../../../../api/models/camper-place-dto';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {PopupFormService} from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-price-change-details',
@@ -163,6 +164,7 @@ export class CamperPlacesWithUniquePricesComponent {
       [displayedColumns]="dispColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaceTypes"
+      [deleteFunc]="deleteFunc"
       (saveRequest)="onSave($any($event))"
     />
   `
@@ -179,6 +181,7 @@ export class CamperPlaceTypeSettingsComponent {
 
   protected dispColumns = [...this.formFieldsDeclaration.map((f) => f.columnDef), 'actions'];
   protected popupService = inject(PopupConfirmationService);
+  protected popupFormService = inject(PopupFormService);
   protected camperPlaceTypeService = inject(CamperPlaceTypeService);
   protected camperPlaceService = inject(CamperPlaceService);
 

@@ -6,6 +6,7 @@ import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../se
 import { PopupConfirmationService } from '@core/services/PopupConfirmationService';
 import { take } from 'rxjs';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
+import {PopupFormService} from '@core/services/PopupFormService';
 
 @Component({
   selector: 'app-camper-place-form',
@@ -45,6 +46,7 @@ export class CamperPlaceSettingsComponent {
 
   protected camperPlaceService = inject(CamperPlaceService);
   protected popupService = inject(PopupConfirmationService);
+  protected popupFormService = inject(PopupFormService);
 
   protected displayedColumns = ['index', 'type', 'price', 'actions'];
   protected formFieldsDeclaration: FormFieldDeclaration[] = [];
