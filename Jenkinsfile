@@ -10,7 +10,7 @@ pipeline {
     }
 
     environment {
-        TARGET_DIR = "/var/www/html/${params.env}"
+       TARGET_DIR = "/var/www/html/parceo/${params.env}"
     }
 
     // Dodano brakującą sekcję 'stages'
