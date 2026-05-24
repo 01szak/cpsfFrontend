@@ -41,4 +41,3 @@ pipeline {
             echo "✅ Frontend pomyślnie wdrożony na środowisko: ${params.env}"
         }
     }
-}
