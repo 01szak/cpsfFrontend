@@ -12,6 +12,9 @@ pipeline {
     environment {
         TARGET_DIR = "/var/www/html/${params.env}"
     }
+
+    // Dodano brakującą sekcję 'stages'
+    stages {
         stage('Build') {
             steps {
                 sh '''
@@ -41,3 +44,4 @@ pipeline {
             echo "✅ Frontend pomyślnie wdrożony na środowisko: ${params.env}"
         }
     }
+}
