@@ -5,6 +5,8 @@ import {Statistic} from '@core/models/Statistic';
 import {Revenue} from '@core/models/Revenue';
 import {Api} from '../../../api/api';
 import {getRevenue} from '../../../api/fn/statistics-controller/get-revenue';
+import {getUserPerCountry} from '../../../api/fn/statistics-controller/get-user-per-country';
+import {CountryDistribution} from '../../../api/models/country-distribution';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,12 @@ export class StatisticsService {
     })) as unknown as Observable<Revenue[][]>;
   }
 
+  getUserPerCountry(month: number, year: number): Observable<CountryDistribution[]> {
+    return from(this.apiService.invoke(getUserPerCountry, {
+        month: month + 1,
+        year: year
+    })) as unknown as Observable<CountryDistribution[]>;
+  }
 
   getReservationCount(month: number, year: number): Observable<Statistic[]> {
     return this.http.get<Statistic[]>(

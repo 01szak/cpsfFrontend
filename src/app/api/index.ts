@@ -7,6 +7,7 @@ export type { StrictHttpResponse } from './strict-http-response';
 export { Api } from './api';
 export type { CamperPlaceDto } from './models/camper-place-dto';
 export type { CamperPlaceTypeDto } from './models/camper-place-type-dto';
+export type { CountryDistribution } from './models/country-distribution';
 export type { GuestDto } from './models/guest-dto';
 export type { LoginRequest } from './models/login-request';
 export type { Pageable } from './models/pageable';
@@ -61,3 +62,5 @@ export type { GetEmployee$Params as GetEmployee$Params } from './fn/user-control
 export { getEmployee as getEmployee } from './fn/user-controller/get-employee';
 export type { GetRevenue$Params as GetRevenue$Params } from './fn/statistics-controller/get-revenue';
 export { getRevenue as getRevenue } from './fn/statistics-controller/get-revenue';
+export type { GetUserPerCountry$Params as GetUserPerCountry$Params } from './fn/statistics-controller/get-user-per-country';
+export { getUserPerCountry as getUserPerCountry } from './fn/statistics-controller/get-user-per-country';

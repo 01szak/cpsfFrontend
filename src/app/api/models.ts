@@ -3,6 +3,7 @@
 
 export type { CamperPlaceDto } from './models/camper-place-dto';
 export type { CamperPlaceTypeDto } from './models/camper-place-type-dto';
+export type { CountryDistribution } from './models/country-distribution';
 export type { GuestDto } from './models/guest-dto';
 export type { LoginRequest } from './models/login-request';
 export type { Pageable } from './models/pageable';

@@ -43,3 +43,5 @@ export type { GetEmployee$Params as GetEmployee$Params } from './fn/user-control
 export { getEmployee as getEmployee } from './fn/user-controller/get-employee';
 export type { GetRevenue$Params as GetRevenue$Params } from './fn/statistics-controller/get-revenue';
 export { getRevenue as getRevenue } from './fn/statistics-controller/get-revenue';
+export type { GetUserPerCountry$Params as GetUserPerCountry$Params } from './fn/statistics-controller/get-user-per-country';
+export { getUserPerCountry as getUserPerCountry } from './fn/statistics-controller/get-user-per-country';

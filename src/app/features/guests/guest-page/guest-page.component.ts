@@ -4,12 +4,12 @@ import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import {DtoDisplayDataMap, FetchParams, RegularTableComponent} from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
-import {Guest} from '@core/models/Guest';
 import {GuestFormData} from '@shared/form/guest-form.component';
 import {GuestDto} from '../../../api';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {GuestService} from '@features/guests/services/GuestService';
+import {COUNTRIES} from '@shared/constants/COUNTRIES';
 
 @Component({
   selector: 'users',
@@ -55,24 +55,28 @@ export class GuestPage implements OnInit, OnDestroy {
     {type: 'text', field: 'email'},
     {type: 'text', field: 'phoneNumber'},
     {type: 'text', field: 'carRegistration'},
+    {type: 'text', field: 'country'},
   ];
-  protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja'];
+  protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja', 'Narodowość'];
 
   protected paginatorLength = 0;
   protected pageSize = 10;
   protected pageSizeOptions = [10, 20, 50, 100];
   protected paginator?: MatPaginator;
 
-  private sub?: Subscription;
-
+  private dataSub?: Subscription;
   private lastParams = {} as FetchParams;
 
   ngOnInit() {
+    this.dataSub = this.guestService.guestDtos$.subscribe((p: Page<GuestDto>) => {
+      this.mapAndPushData(p);
+    });
+
     this.fetchData({});
   }
 
   ngOnDestroy() {
-    this.sub?.unsubscribe();
+    this.dataSub?.unsubscribe();
   }
 
   protected fetchData(params: FetchParams) {
@@ -81,49 +85,46 @@ export class GuestPage implements OnInit, OnDestroy {
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
 
-
-    this.sub?.unsubscribe();
-    this.sub = this.guestService.findBy(
+    this.guestService.findBy(
       this.lastParams.event,
       page,
       size,
       this.lastParams.sort,
       this.lastParams.searchCriteria
-    ).subscribe((p: Page<GuestDto>) => {
+    ).subscribe();
+  }
 
-      const mapDtoToDisplayData = (dto: GuestDto) => {
-        return {
-          carRegistration: dto.carRegistration,
-          email: dto.email,
-          firstname: dto.firstname,
-          lastname: dto.lastname,
-          phoneNumber: dto.phoneNumber,
-        } as GuestDisplayData
-      }
+  private mapAndPushData(p: Page<GuestDto>) {
+    const mapDtoToDisplayData = (dto: GuestDto) => ({
+      carRegistration: dto.carRegistration || '',
+      email: dto.email || '',
+      firstname: dto.firstname || '',
+      lastname: dto.lastname || '',
+      phoneNumber: dto.phoneNumber || '',
+      country: COUNTRIES.find(c => c.isoCode.toLowerCase() === (dto.country?.toLowerCase() || ''))?.name || '',
+    } as GuestDisplayData);
 
-      const mappedContent: DtoDisplayDataMap[] = p.content.map(g => ({ dto: g, displayData: mapDtoToDisplayData(g) } as DtoDisplayDataMap));
+    const mappedContent: DtoDisplayDataMap[] = p.content.map(g => ({
+      dto: g,
+      displayData: mapDtoToDisplayData(g)
+    } as DtoDisplayDataMap));
 
-      const displayPage: Page<DtoDisplayDataMap> = {
-        ...p,
-        content: mappedContent
-      };
+    const displayPage: Page<DtoDisplayDataMap> = {
+      ...p,
+      content: mappedContent
+    };
 
-      this.pagedData$.next(displayPage);
-      this.paginatorLength = displayPage.totalElements;
-    });
+    this.pagedData$.next(displayPage);
+    this.paginatorLength = displayPage.totalElements;
   }
 
   protected getPaginator(paginator: MatPaginator) {
     this.paginator = paginator;
   }
 
-  protected openFormPopup(guest?: Guest) {
+  protected openFormPopup(guest?: GuestDto) {
     const guestFd: GuestFormData = {guest: guest};
-    this.formService.openGuestFormPopup(guestFd).afterClosed().subscribe(refreshed => {
-      if (refreshed) {
-        this.fetchData({});
-      }
-    });
+    this.formService.openGuestFormPopup(guestFd);
   }
 }
 
@@ -133,4 +134,5 @@ export type GuestDisplayData ={
   firstname: string;
   lastname: string;
   phoneNumber: string;
+  country: string;
 }

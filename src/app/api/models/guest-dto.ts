@@ -3,6 +3,7 @@
 
 export interface GuestDto {
   carRegistration?: string;
+  country?: string;
   email?: string;
   firstname?: string;
   id?: number;
