@@ -13,7 +13,7 @@ import { SearchCriteria } from '../../models/search-criteria';
 
 export interface FindBy$Params {
   pageable: Pageable;
-  searchCriteria?: SearchCriteria;
+  searchCriteria: SearchCriteria;
 }
 
 export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params, context?: HttpContext): Observable<StrictHttpResponse<PageReservationDto>> {
