@@ -66,7 +66,7 @@ export type GuestFormData = { guest?: GuestDto };
             @for (c of filteredCountries | async; track c.isoCode) {
               <mat-option [value]="c">
                 <div style="display: flex; flex-direction: row; gap: 5px" >
-                  <span [class]="'fi fi-' + c.isoCode"></span>
+                  <span [class]="'fi fi-' + c.isoCode.toLowerCase()"></span>
                   <span>{{ c.name }}</span>
                 </div>
               </mat-option>
@@ -129,17 +129,21 @@ export class GuestFormComponent implements OnInit {
   protected onSave = () => {
     if (this.formGroup.invalid) return;
 
+    const rawCountry = this.formGroup.value.country as Country | string | null | undefined;
+    const countryIso = typeof rawCountry === 'string' ? rawCountry : rawCountry?.isoCode;
+
     const payload: GuestDto = {
       ...this.formGroup.value,
-      country: this.formGroup.value.country.isoCode
+      country: countryIso
     };
 
     const action = () => this.isUpdate ? this.guestService.update(payload).subscribe(() => {this.dialogRef.close()}) : this.guestService.create(payload).subscribe(() => {this.dialogRef.close()});
     this.confirmationService.openConfirmationPopup({action: action} as ConfirmationData)
   }
+
   protected countryDisplayFunc(c: Country | string): string {
     if (typeof c === 'string') {
-      return COUNTRIES.find(country => c.toLowerCase() === country.isoCode!.toLowerCase())!.name;3
+      return COUNTRIES.find(country => c.toLowerCase() === country.isoCode!.toLowerCase())!.name;
     } else  {
       return c?.name || '';
     }
