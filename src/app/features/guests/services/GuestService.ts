@@ -59,8 +59,8 @@ export class GuestService {
     return this.findBy(undefined, 0, 1000, undefined, searchCriteria);
   }
 
-  public delete(g: GuestDto) {
-    return from(this.api.invoke(deleteGuest, { id: Number(g.id!) }))
+  public delete(id: number) {
+    return from(this.api.invoke(deleteGuest, { id: id }))
       .pipe(
         tap({
           next: (response: any) => this.notification.success(response),

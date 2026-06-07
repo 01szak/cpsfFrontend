@@ -13,7 +13,7 @@ import {
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {ReservationDto} from '../../../api';
+import {GuestDto, ReservationDto} from '../../../api';
 
 @Component({
   selector: 'reservations',
@@ -74,8 +74,9 @@ export class ReservationPage implements OnInit, OnDestroy {
   private lastParams = {} as FetchParams
 
   ngOnInit() {
+    this.sub = this.reservationService.reservationDtos$.subscribe();
     this.fetchData({});
-  }
+}
 
   ngOnDestroy() {
     this.sub?.unsubscribe();

@@ -3,18 +3,18 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { NgTemplateOutlet } from '@angular/common';
+import {AsyncPipe, NgTemplateOutlet} from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
-import { Guest } from '@core/models/Guest';
-import { Api } from '../../api/api';
-import { NotificationService } from '@core/services/NotificationService';
-import { create1 } from '../../api/fn/guest-controller/create-1';
-import { update1 } from '../../api/fn/guest-controller/update-1';
-import { deleteGuest } from '../../api/fn/guest-controller/delete-guest';
 import { GuestDto } from '../../api/models/guest-dto';
 import {FormFactoryService} from '@shared/form/FormFactoryService';
+import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from '@angular/material/autocomplete';
+import {map, Observable, startWith} from 'rxjs';
+import { COUNTRIES, Country } from '@shared/constants/COUNTRIES';
+import {GuestService} from '@features/guests/services/GuestService';
+import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
+import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 
-export type GuestFormData = { guest?: Guest };
+export type GuestFormData = { guest?: GuestDto };
 
 @Component({
   selector: 'app-guest-form',
@@ -25,6 +25,10 @@ export type GuestFormData = { guest?: Guest };
     MatLabel,
     MatInput,
     NgTemplateOutlet,
+    MatAutocomplete,
+    MatAutocompleteTrigger,
+    MatOption,
+    AsyncPipe,
   ],
   standalone: true,
   template: `
@@ -54,6 +58,21 @@ export type GuestFormData = { guest?: Guest };
           <mat-label>Rejestracja</mat-label>
           <input type="text" matInput formControlName="carRegistration">
         </mat-form-field>
+
+        <mat-form-field style="width: 100%">
+          <mat-label>Kraj</mat-label>
+          <input type="text" matInput formControlName="country" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="countryDisplayFunc">
+            @for (c of filteredCountries | async; track c.isoCode) {
+              <mat-option [value]="c">
+                <div style="display: flex; flex-direction: row; gap: 5px" >
+                  <span [class]="'fi fi-' + c.isoCode.toLowerCase()"></span>
+                  <span>{{ c.name }}</span>
+                </div>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
       </form>
     </ng-template>
 
@@ -74,52 +93,60 @@ export class GuestFormComponent implements OnInit {
   @Input() isDialog = true;
   @Input() formGroup!: FormGroup;
 
-  private readonly api = inject(Api);
-  private readonly notification = inject(NotificationService);
+  private readonly guestService = inject(GuestService);
   private readonly factory = inject(FormFactoryService);
-  private readonly dialogRef = inject(MatDialogRef<GuestFormComponent>, { optional: true });
   private readonly fd: GuestFormData = inject<GuestFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
+  private readonly confirmationService = inject(PopupConfirmationService);
+  private readonly dialogRef = inject(MatDialogRef<GuestFormComponent>);
 
+  protected filteredCountries!: Observable<Country[]>;
   protected isUpdate = !!this.fd?.guest;
   protected formTitle = this.isUpdate ? 'Edytuj Gościa' : 'Nowy Gość';
+  protected deleteAction = () =>  this.guestService.delete(this.fd.guest!.id!).subscribe(() => {this.dialogRef.close()});
 
-  protected deleteAction = this.isUpdate ? () => {
-    this.api.invoke(deleteGuest, { id: Number(this.fd.guest!.id) }).then(
-      (res) => {
-        this.notification.success(res);
-        this.dialogRef?.close(true);
-      },
-      (err) => this.notification.error(err)
+  private _filter(value: string | Country): Country[] {
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase();
+    return COUNTRIES.filter(c =>
+      c.name.toLowerCase().includes(filterValue)
     );
-  } : null;
+  }
 
   ngOnInit() {
     if (!this.formGroup) {
       this.formGroup = this.factory.buildGuestForm();
       if (this.fd?.guest) {
+        console.log(this.fd.guest.country)
         this.formGroup.patchValue(this.fd.guest);
       }
     }
+
+    this.filteredCountries = this.formGroup.get('country')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
   }
 
   protected onSave = () => {
     if (this.formGroup.invalid) return;
 
-    const payload = this.formGroup.value as GuestDto;
-    if (this.isUpdate) {
-      payload.id = Number(this.fd.guest!.id);
-    }
+    const rawCountry = this.formGroup.value.country as Country | string | null | undefined;
+    const countryIso = typeof rawCountry === 'string' ? rawCountry : rawCountry?.isoCode;
 
-    const promise = this.isUpdate
-      ? this.api.invoke(update1, { body: payload })
-      : this.api.invoke(create1, { body: payload });
+    const payload: GuestDto = {
+      ...this.formGroup.value,
+      country: countryIso
+    };
 
-    promise.then(
-      (res) => {
-        this.notification.success(res);
-        this.dialogRef?.close(true);
-      },
-      (err) => this.notification.error(err)
-    );
+    const action = () => this.isUpdate ? this.guestService.update(payload).subscribe(() => {this.dialogRef.close()}) : this.guestService.create(payload).subscribe(() => {this.dialogRef.close()});
+    this.confirmationService.openConfirmationPopup({action: action} as ConfirmationData)
   }
+
+  protected countryDisplayFunc(c: Country | string): string {
+    if (typeof c === 'string') {
+      return COUNTRIES.find(country => c.toLowerCase() === country.isoCode!.toLowerCase())!.name;
+    } else  {
+      return c?.name || '';
+    }
+  }
+
 }

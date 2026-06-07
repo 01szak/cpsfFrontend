@@ -1,10 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators, FormBuilder} from '@angular/forms';
-import {Reservation} from '@core/models/Reservation';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 import {CamperPlaceTypeDto} from '../../api/models/camper-place-type-dto';
 import {DateFormater} from '@shared/helper/DateFormater';
-import {ReservationDto} from '../../api';
+import {GuestDto, ReservationDto} from '../../api';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +32,7 @@ export class FormFactoryService {
     this.patchGuest(form, reservation.guest!);
   }
 
-  public patchGuest(form: FormGroup, guest: any) {
+  public patchGuest(form: FormGroup, guest: GuestDto) {
     form.get('guest')?.patchValue({
       id: guest.id,
       firstname: guest.firstname || '',
@@ -41,6 +40,7 @@ export class FormFactoryService {
       email: guest.email || '',
       phoneNumber: guest.phoneNumber || '',
       carRegistration: guest.carRegistration || '',
+      country: guest.country || '',
     });
   }
 
@@ -52,6 +52,7 @@ export class FormFactoryService {
       email: new FormControl<string>('', [Validators.email]),
       phoneNumber: new FormControl<string>(''),
       carRegistration: new FormControl<string>(''),
+      country: new FormControl<string>(''),
     });
   }
 

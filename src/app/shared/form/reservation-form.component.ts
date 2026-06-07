@@ -5,7 +5,6 @@ import {debounceTime, distinctUntilChanged, filter, from, map, Observable, of, s
 import { trigger, style, transition, animate } from '@angular/animations';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
-import {Guest} from '@core/models/Guest';
 import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {PopupFormContainer} from './popup-form-container.component';
@@ -30,10 +29,11 @@ import {
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
 import {Api} from '../../api/api';
-import {findBy1, GuestDto, ReservationDto} from '../../api';
+import {GuestDto, ReservationDto} from '../../api';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 import {GuestService} from '@features/guests/services/GuestService';
 import {Page} from '@core/models/Page';
+import {COUNTRIES, Country} from '@shared/constants/COUNTRIES';
 
 export type ReservationFormData = {
   reservation?: ReservationDto;
@@ -272,6 +272,14 @@ export class ReservationFormComponent implements OnInit {
     const camperPlace = this.formGroup.get('camperPlace')!.value;
     const guest = this.formGroup.get('guest')!.value;
     const isPaid = this.formGroup.get('isPaid')!.value;
+
+    if (guest.country !== null) {
+      const rawCountry = guest.country as Country | string | null | undefined;
+      guest.country = typeof rawCountry === 'string'
+      ? rawCountry
+      : (rawCountry?.isoCode || undefined);
+      guest.country = guest.country.isoCode as Country;
+    }
 
     const payload: ReservationDto = {
       id: this.fd.reservation?.id,
