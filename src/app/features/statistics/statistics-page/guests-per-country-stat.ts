@@ -40,7 +40,7 @@ export class GuestsPerCountryStat implements OnChanges {
 
   private mapDataForTable() {
     this.displayData = this.data.map(item => {
-      const countryObj = COUNTRIES.find(c => c.isoCode.toLowerCase() === item.countryIsoCode!.toLowerCase());
+      const countryObj = COUNTRIES.find(c => c.isoCode === item.countryIsoCode!);
       return {
         country: countryObj?.name || item.countryIsoCode || 'Nieznany',
         isoCode: item.countryIsoCode?.toUpperCase() || '??',
