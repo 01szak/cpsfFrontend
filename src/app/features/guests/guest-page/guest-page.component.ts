@@ -85,6 +85,13 @@ export class GuestPage implements OnInit, OnDestroy {
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
 
+    if (this.lastParams.searchCriteria?.key === 'country') {
+      let v = this.lastParams.searchCriteria?.value;
+      if (v) {
+        this.lastParams.searchCriteria.value = COUNTRIES.find(c => c.name.toLowerCase() === (v!.toLowerCase() || ''))?.isoCode || '';
+      }
+    }
+
     this.guestService.findBy(
       this.lastParams.event,
       page,
