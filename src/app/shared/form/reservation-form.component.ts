@@ -272,13 +272,9 @@ export class ReservationFormComponent implements OnInit {
     const camperPlace = this.formGroup.get('camperPlace')!.value;
     const guest = this.formGroup.get('guest')!.value;
     const isPaid = this.formGroup.get('isPaid')!.value;
-
-    if (guest.country !== null) {
-      const rawCountry = guest.country as Country | string | null | undefined;
-      guest.country = typeof rawCountry === 'string'
-      ? rawCountry
-      : (rawCountry?.isoCode || undefined);
-      guest.country = guest.country.isoCode as Country;
+    if (guest.country) {
+      const rawCountry = guest.country as Country | string;
+      guest.country = typeof rawCountry === 'string' ? rawCountry : rawCountry.isoCode;
     }
 
     const payload: ReservationDto = {
