@@ -50,7 +50,7 @@ import {MatIconButton} from '@angular/material/button';
               <p class="description">Aktywna / Opłacona</p>
             </div>
             <div class="menuEl">
-              <div class="res-info-circle res-active blink"></div>
+              <div class="res-info-circle res-active-unpaid blink"></div>
               <p class="description">Aktywna / Nieopłacona</p>
             </div>
             <div class="menuEl">
@@ -62,7 +62,7 @@ import {MatIconButton} from '@angular/material/button';
               <p class="description">Zakończona / Opłacona</p>
             </div>
             <div class="menuEl">
-              <div class="res-info-circle res-unpaid"></div>
+              <div class="res-info-circle res-unpaid blink"></div>
               <p class="description" >Zakończona / Nieopłacona</p>
             </div>
           </div>
