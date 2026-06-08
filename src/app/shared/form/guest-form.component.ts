@@ -115,7 +115,6 @@ export class GuestFormComponent implements OnInit {
     if (!this.formGroup) {
       this.formGroup = this.factory.buildGuestForm();
       if (this.fd?.guest) {
-        console.log(this.fd.guest.country)
         this.formGroup.patchValue(this.fd.guest);
       }
     }
