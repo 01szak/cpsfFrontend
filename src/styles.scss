@@ -45,6 +45,8 @@
   /* --- Reservation Status Colors --- */
   --res-active-border: rgb(0 211 218);
   --res-active-bg: rgb(0 247 255 / 0.6);
+  --res-active-unpaid-border: rgb(98 0 218 / 0.78);
+  --res-active-unpaid-bg: rgb(174 0 255 / 0.6);
   --res-coming-border: rgb(190 206 0);
   --res-coming-bg: rgb(238 255 0 / 0.6);
   --res-expired-border: rgb(112 112 112);
@@ -71,6 +73,7 @@
 }
 
 .res-active { background-color: var(--res-active-bg); border: 2px solid var(--res-active-border); }
+.res-active-unpaid { background-color: var(--res-active-unpaid-bg); border: 2px solid var(--res-active-unpaid-border); }
 .res-coming { background-color: var(--res-coming-bg); border: 2px solid var(--res-coming-border); }
 .res-expired { background-color: var(--res-expired-bg); border: 2px solid var(--res-expired-border); }
 .res-unpaid { background-color: var(--res-unpaid-bg); border: 2px solid var(--res-unpaid-border); }

@@ -11,7 +11,7 @@ import {NgClass} from '@angular/common';
     NgClass
   ],
   template: `
-    <div [ngClass]="{'content': true, 'blink': isActiveUnpaid()}" [style]="setColor() + setParagraphPlacing()">
+    <div [ngClass]="{'content': true, 'blink': isActiveOrExpiredUnpaid()}" [style]="setColor() + setParagraphPlacing()">
       <p><strong>{{ getGuestName() }} </strong></p>
     </div>
   `,
@@ -71,7 +71,10 @@ export class ReservationCellComponent {
     const status = this.reservation.reservationStatus;
     let bgr = 'var(--res-active-bg)';
     let border = 'var(--res-active-border)';
-
+    if (!this.reservation.paid) {
+      bgr = 'var(--res-active-unpaid-bg)';
+      border = 'var(--res-active-unpaid-border)';
+    }
     if (status === 'COMING') {
       bgr = 'var(--res-coming-bg)';
       border = 'var(--res-coming-border)';
@@ -82,12 +85,12 @@ export class ReservationCellComponent {
       bgr = 'var(--res-expired-bg)';
       border = 'var(--res-expired-border)';
     }
-    
+
     return `background-color: ${bgr} !important; border: solid 5px ${border} !important;`;
   }
 
-  protected isActiveUnpaid() {
-    return this.reservation.reservationStatus === 'ACTIVE' && !this.reservation.paid;
+  protected isActiveOrExpiredUnpaid() {
+    return (this.reservation.reservationStatus === 'ACTIVE' || this.reservation.reservationStatus === 'EXPIRED') && !this.reservation.paid;
   }
 
   protected setParagraphPlacing() {
