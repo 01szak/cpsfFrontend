@@ -33,7 +33,7 @@ import {GuestDto, ReservationDto} from '../../api';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 import {GuestService} from '@features/guests/services/GuestService';
 import {Page} from '@core/models/Page';
-import {COUNTRIES, Country} from '@shared/constants/COUNTRIES';
+import {Country} from '@shared/constants/COUNTRIES';
 
 export type ReservationFormData = {
   reservation?: ReservationDto;

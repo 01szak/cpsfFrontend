@@ -44,7 +44,7 @@ export class ReservationService {
 
     return from(this.api.invoke(findBy, {
       pageable: pageable,
-      searchCriteria: searchCriteria || { key: '', value: '' }
+      searchCriteria: searchCriteria || {joinObject: undefined, key: '', value: '', secondValue: undefined, operation: "EQUALS"}
     })).pipe(
       map(p => {
         const page = p as unknown as Page<ReservationDto>;
