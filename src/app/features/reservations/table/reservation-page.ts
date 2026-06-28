@@ -7,7 +7,7 @@ import {ReservationService} from '@features/reservations/services/ReservationSer
 import {PopupFormService} from '@core/services/PopupFormService';
 import {
   DtoDisplayDataMap,
-  FetchParams,
+  FetchParams, Field,
   RegularTableComponent,
 } from '@shared/ui/data-table/regular-table.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
@@ -28,7 +28,7 @@ import {GuestDto, ReservationDto} from '../../../api';
   template: `
     <app-regular-table
       [page$]="pagedData$"
-      [tabColumns]="columns"
+      [tabColumns]="fields"
       [displayedColumns]="displayedColumns"
       [pageSize]="pageSize"
       [paginatorLength]="paginatorLength"
@@ -55,13 +55,13 @@ export class ReservationPage implements OnInit, OnDestroy {
     totalPages: 0
   });
 
-  protected columns = [
-    {type: 'date', field: 'checkin'},
-    {type: 'date', field: 'checkout'},
-    {type: 'text', field: 'stringUser'},
-    {type: 'text', field: 'camperPlaceIndex'},
-    {type: 'status', field: 'reservationStatus'},
-    {type: 'checkbox', field: 'paid'}
+  protected fields: Field[] = [
+    {name: 'checkin', type: 'DATE', value: ''},
+    {name: 'checkout', type: 'DATE', value: ''},
+    {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
+    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', value: ''}]},
+    {name: 'reservationStatus', type: 'STATUS', value: ''},
+    {name: 'paid', type: 'BOOLEAN', value: ''}
   ];
   protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
 
@@ -73,12 +73,12 @@ export class ReservationPage implements OnInit, OnDestroy {
   private sub?: Subscription;
   private lastParams = {} as FetchParams
 
-  ngOnInit() {
+  public ngOnInit() {
     this.sub = this.reservationService.reservationDtos$.subscribe();
     this.fetchData({});
 }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.sub?.unsubscribe();
   }
 
@@ -102,8 +102,8 @@ export class ReservationPage implements OnInit, OnDestroy {
         return {
           checkin: res.checkin,
           checkout: res.checkout,
-          stringUser: `${res.guest?.firstname || ''} ${res.guest?.lastname || ''}`.trim(),
-          camperPlaceIndex: res.camperPlace?.index ?? '',
+          guest: `${res.guest?.firstname || ''} ${res.guest?.lastname || ''}`.trim(),
+          camperPlace: res.camperPlace?.index ?? '',
           reservationStatus: res.reservationStatus!,
           paid: res.paid
         } as ReservationDisplayData;
@@ -144,8 +144,8 @@ export class ReservationPage implements OnInit, OnDestroy {
 export type ReservationDisplayData = {
   checkin: string,
   checkout: string,
-  stringUser: string,
-  camperPlaceIndex: string,
+  guest: string,
+  camperPlace: string,
   reservationStatus: string,
   paid: boolean
 }

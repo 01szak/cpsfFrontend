@@ -2,7 +2,12 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
-import {DtoDisplayDataMap, FetchParams, RegularTableComponent} from '@shared/ui/data-table/regular-table.component';
+import {
+  DtoDisplayDataMap,
+  FetchParams,
+  Field,
+  RegularTableComponent
+} from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {GuestFormData} from '@shared/form/guest-form.component';
 import {GuestDto} from '../../../api';
@@ -49,13 +54,13 @@ export class GuestPage implements OnInit, OnDestroy {
     totalPages: 0
   });
 
-  protected columns = [
-    {type: 'text', field: 'firstname'},
-    {type: 'text', field: 'lastname'},
-    {type: 'text', field: 'email'},
-    {type: 'text', field: 'phoneNumber'},
-    {type: 'text', field: 'carRegistration'},
-    {type: 'text', field: 'country'},
+  protected columns: Field[] = [
+    {name: 'firstname', type: 'TEXT', value: ''},
+    {name: 'lastname', type: 'TEXT', value: ''},
+    {name: 'email', type: 'TEXT', value: ''},
+    {name: 'phoneNumber', type: 'TEXT', value: ''},
+    {name: 'carRegistration', type: 'TEXT', value: ''},
+    {name: 'country', type: 'TEXT', value: ''},
   ];
   protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja', 'Narodowość'];
 
@@ -85,10 +90,13 @@ export class GuestPage implements OnInit, OnDestroy {
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
 
-    if (this.lastParams.searchCriteria?.key === 'country') {
-      let v = this.lastParams.searchCriteria?.value;
-      if (v) {
-        this.lastParams.searchCriteria.value = COUNTRIES.find(c => c.name.toLowerCase() === (v!.toLowerCase() || ''))?.isoCode || '';
+    if (this.lastParams.searchCriteria) {
+      const countryCriteria = this.lastParams.searchCriteria.find(c => c.key === 'country');
+      if (countryCriteria) {
+        let v = countryCriteria.value;
+        if (v) {
+          countryCriteria.value = COUNTRIES.find(c => c.name.toLowerCase() === (v.toLowerCase() || ''))?.isoCode || '';
+        }
       }
     }
 

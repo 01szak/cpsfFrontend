@@ -21,7 +21,42 @@ import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.comp
 import {fromEvent, Observable} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {SearchCriteria} from '../../../api';
+import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import {Moment} from 'moment';
 
+export interface DtoDisplayDataMap {
+  dto: any,
+  displayData: any
+}
+
+export interface Sort {
+  columnName: string,
+  direction: 'asc' | 'desc'
+}
+
+export interface FetchParams {
+  event?: PageEvent,
+  sort?: Sort,
+  searchCriteria?: SearchCriteria[]
+}
+
+export interface SearchDialogData {
+  label: string,
+  by: string,
+  field: Field,
+  service: any
+}
+
+export interface Field {
+  name: string,
+  type: FieldType,
+  value?: string | '', //there should be only one per instance, for inner fields one per field
+  secondValue?: string, //used for operation: BETWEEN
+  displayName?: string, //it is used for inner fields
+  innerFields?: Field[] //for type object fields can be nested
+}
+
+export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER';
 
 @Component({
   selector: 'app-regular-table',
@@ -43,74 +78,6 @@ import {SearchCriteria} from '../../../api';
     NgClass,
     AsyncPipe,
   ],
-  template: `
-    @if ((page$ | async)?.content; as content) {
-      <div class="tableDiv">
-        <div class="tableContent">
-          <table class="content" mat-table [dataSource]="content">
-            <ng-container matColumnDef="no">
-              <th mat-header-cell *matHeaderCellDef> Nr.</th>
-              <td mat-cell *matCellDef="let column; let i = index">
-                {{ i + 1 }}
-              </td>
-            </ng-container>
-
-            @for (column of tabColumns; track column) {
-
-              <ng-container [matColumnDef]="column.field">
-                <th mat-header-cell *matHeaderCellDef
-                    (click)="openSearchDialog($event, displayedColumns[$index], column.field, column.type)">
-                  <div class="headerDiv">
-                    <i class="fa-regular fa-circle-up"
-                       [ngClass]="{
-                        'ascArrow' : isArrowAsc,
-                        'descArrow' : !isArrowAsc,
-                        'arrowClicked' : isClicked && clickedColumn === column.field
-                        }"
-                       (click)="click(column.field);$event.stopPropagation()"></i>
-                    <p class="sortingButton">{{ displayedColumns[$index] }}</p>
-                  </div>
-                </th>
-                <td mat-cell *matCellDef="let element">
-
-                  @if (column.type === 'checkbox') {
-                    <mat-checkbox (change)=" additionalFunc?.(element.dto)" [checked]="element.dto[column.field]"
-                                  (click)="$event.stopPropagation()"></mat-checkbox>
-                  } @else if (column.type === 'status') {
-                    <app-status [status]="element.displayData[column.field]"></app-status>
-                  } @else {
-                    {{ element.displayData[column.field] }}
-                  }
-                </td>
-              </ng-container>
-            }
-            <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
-            <tr mat-row
-                (click)="onClickFunc(row.dto)"
-                [ngClass]="{
-            'row': true
-            }"
-                *matRowDef="let row; let i = index; columns: columnFields">
-            </tr>
-
-          </table>
-        </div>
-
-        <div class="tableFooter">
-          <div class="funcButtons">
-            <i class="fa-solid fa-plus funcIcon" (click)="createFunc()"></i>
-            <i class="fa-solid fa-arrow-rotate-left funcIcon" (click)="reset()"></i>
-          </div>
-          <mat-paginator
-            [length]="paginatorLength"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            (page)="fetchFuncWithEvent($event)">
-          </mat-paginator>
-        </div>
-
-      </div>
-    }`,
   styles: `
     .tableDiv {
       margin: 1rem auto;
@@ -263,12 +230,95 @@ import {SearchCriteria} from '../../../api';
     }
 
   `,
+  template: `
+    @if ((page$ | async)?.content; as content) {
+      <div class="tableDiv">
+        <div class="tableContent">
+          <table class="content" mat-table [dataSource]="content">
+
+            <ng-container matColumnDef="no">
+              <th mat-header-cell *matHeaderCellDef> Nr.</th>
+              <td mat-cell *matCellDef="let column; let i = index">
+                {{ i + 1 }}
+              </td>
+            </ng-container>
+
+            @for (field of tabColumns; track field) {
+              <ng-container [matColumnDef]="field.name">
+
+                <th mat-header-cell *matHeaderCellDef
+                    (click)="openSearchDialog($event, displayedColumns[$index], field.name, field)">
+                  <div class="headerDiv">
+                    <i class="fa-regular fa-circle-up"
+                       [ngClass]="{
+                        'ascArrow' : isArrowAsc,
+                        'descArrow' : !isArrowAsc,
+                        'arrowClicked' : isClicked && clickedColumn === (field.name)
+                        }"
+                       (click)="click(field.name);$event.stopPropagation()"></i>
+                    <p class="sortingButton">{{ displayedColumns[$index] }}</p>
+                  </div>
+                </th>
+
+                <td mat-cell *matCellDef="let element">
+                  @switch (field.type) {
+                    @case ('BOOLEAN') {
+                      <mat-checkbox
+                        (change)=" additionalFunc?.(element.dto)"
+                        [checked]="element.dto[field.name || '']"
+                        (click)="$event.stopPropagation()">
+                      </mat-checkbox>
+                    }
+                    @case ('STATUS') {
+                      <app-status [status]="element.displayData[field.name]"></app-status>
+                    }
+                    @case ('OBJECT') {
+                      {{ getObjectDisplayValue(element.displayData, field) }}
+                    }
+                    @case ('DATE') {
+                      {{ getDateDisplayValue(element.displayData[field.name]) }}
+                    }
+                    @default {
+                      {{ element.displayData[field.name] }}
+                    }
+                  }
+                </td>
+
+              </ng-container>
+            }
+            <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+            <tr mat-row
+                (click)="onClickFunc(row.dto)"
+                [ngClass]="{'row': true}"
+                *matRowDef="let row; let i = index; columns: columnFields"
+            >
+            </tr>
+
+          </table>
+        </div>
+
+        <div class="tableFooter">
+          <div class="funcButtons">
+            <i class="fa-solid fa-plus funcIcon" (click)="createFunc()"></i>
+            <i class="fa-solid fa-arrow-rotate-left funcIcon" (click)="reset()"></i>
+          </div>
+          <mat-paginator
+            [length]="paginatorLength"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="fetchFuncWithEvent($event)">
+          </mat-paginator>
+        </div>
+
+      </div>
+    }`,
 })
 export class RegularTableComponent implements AfterViewInit {
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   @Input() public page$!: Observable<Page<DtoDisplayDataMap>>;
-  @Input() public tabColumns: Column[] = [];
+  @Input() public tabColumns: Field[] = [];
   @Input() public displayedColumns: string[] = [];
   @Input() public pageSize: number = 0;
   @Input() public pageSizeOptions: number[] = [];
@@ -280,7 +330,7 @@ export class RegularTableComponent implements AfterViewInit {
   @Input() public additionalFunc?: (t: any) => any;
 
   @Output() public sortInfo = new EventEmitter<Sort>();
-  @Output() public filterInfo = new EventEmitter<SearchCriteria>();
+  @Output() public filterInfo = new EventEmitter<SearchCriteria[]>();
   @Output() paginatorReady = new EventEmitter<MatPaginator>();
 
   private readonly dialog = inject(MatDialog)
@@ -290,7 +340,7 @@ export class RegularTableComponent implements AfterViewInit {
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.paginatorReady.emit(this.paginator);
   }
 
@@ -299,7 +349,7 @@ export class RegularTableComponent implements AfterViewInit {
   }
 
   protected get columnFields(): string[] {
-    return this.tabColumns.map(col => col.field);
+    return this.tabColumns.map(field => field.name);
   }
 
   protected click(columnField: string) {
@@ -328,15 +378,19 @@ export class RegularTableComponent implements AfterViewInit {
     }
   }
 
-  protected sendFilterInfo(criteria?: SearchCriteria) {
+  protected sendFilterInfo(criteria?: SearchCriteria[]) {
     this.filterInfo.emit(criteria);
     if (this.paginator) {
       this.paginator.firstPage();
     }
-    this.fetchFunc({searchCriteria: criteria});
+    this.fetchFunc({searchCriteria: criteria ? criteria : undefined});
   }
 
-  protected openSearchDialog(event: MouseEvent, label: string, by: string, type: string) {
+  protected getObjectDisplayValue(displayData: any, field: Field): string {
+    return displayData[field.name];
+  }
+
+  protected openSearchDialog(event: MouseEvent, label: string, by: string, field: Field) {
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const service = this.serviceInstance;
@@ -348,10 +402,10 @@ export class RegularTableComponent implements AfterViewInit {
       },
       panelClass: 'searchDialog',
       hasBackdrop: false,
-      data: { label, by, type, service },
+      data: { label, by, field, service },
     });
 
-    const popupSub = dialogRef.componentInstance.criteriaEmitter.subscribe((criteria: SearchCriteria) => {
+    const popupSub = dialogRef.componentInstance.criteriaEmitter.subscribe((criteria: SearchCriteria[]) => {
       this.sendFilterInfo(criteria);
     });
 
@@ -382,8 +436,10 @@ export class RegularTableComponent implements AfterViewInit {
     }
     this.fetchFunc({event: undefined, sort: undefined, searchCriteria: undefined});
   }
+
+  protected getDateDisplayValue(date: Moment) {
+    return DateFormater.DDMMYYYY(date, DateDelimiter.DOT);
+  }
+
 }
-export type DtoDisplayDataMap = {dto: any, displayData: any}
-export type Column = { type: string, field: string }
-export interface Sort {columnName: string, direction: 'asc' | 'desc' }
-export type FetchParams = {event?: PageEvent, sort?: Sort, searchCriteria?: SearchCriteria}
+

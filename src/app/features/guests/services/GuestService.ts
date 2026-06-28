@@ -7,7 +7,7 @@ import {Api} from '../../../api/api';
 import {GuestDto} from '../../../api/models/guest-dto';
 import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
-import {create1, deleteGuest, findBy1, update1} from '../../../api';
+import {create1, deleteGuest, findBy1, SearchRequest, update1} from '../../../api';
 
 // TODO meaby there is a way to have one facade for all dtos? eventually override if needed
 @Injectable({providedIn: "root"})
@@ -23,10 +23,10 @@ export class GuestService {
     page?: number,
     size?: number,
     sort?: Sort,
-    searchCriteria?: SearchCriteria
+    searchCriteria?: SearchCriteria[]
   } = {};
 
-  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<GuestDto>> {
+  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria[]): Observable<Page<GuestDto>> {
     this.lastQueryParams = {
       event: event,
       page: page,
@@ -41,21 +41,24 @@ export class GuestService {
       sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
     };
 
-    return from(this.api.invoke(findBy1, {
+    const body = {
       pageable: pageable,
-      searchCriteria: searchCriteria || {joinObject: undefined, key: '', value: '', secondValue: undefined, operation: "EQUALS"}
-    })).pipe(
-      map(p => {
-        const page = p as unknown as Page<GuestDto>;
-        return page;
-      }),
-      tap(p => {
-        this.guestSubject.next(p);
-      })
-    );
+      searchCriteria: searchCriteria || []
+    } as SearchRequest
+
+    return from(this.api.invoke(findBy1, { body: body}))
+      .pipe(
+        map(p => {
+          const page = p as unknown as Page<GuestDto>;
+          return page;
+        }),
+        tap(p => {
+          this.guestSubject.next(p);
+        })
+      );
   }
 
-  public findByUnpaged(searchCriteria?: SearchCriteria): Observable<Page<GuestDto>> {
+  public findByUnpaged(searchCriteria?: SearchCriteria[]): Observable<Page<GuestDto>> {
     return this.findBy(undefined, 0, 1000, undefined, searchCriteria);
   }
 

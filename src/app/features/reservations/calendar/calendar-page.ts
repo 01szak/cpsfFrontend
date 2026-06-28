@@ -289,12 +289,12 @@ export class CalendarPage implements OnInit, OnDestroy {
     const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month - 1, day: 1}).startOf('month');
     const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month + 1, day: 1}).endOf('month');
 
-    this.sub.add(this.reservationService.findByUnpaged({
+    this.sub.add(this.reservationService.findByUnpaged([{
       key: 'checkin',
       operation: 'BETWEEN',
       value: DateFormater.YYYYMMDD(startOfMonth, DateDelimiter.DASH),
       secondValue: DateFormater.YYYYMMDD(endOfMonth, DateDelimiter.DASH)
-    } as SearchCriteria).subscribe());
+    }]).subscribe());
   }
 
   changeMonth(event: number) {
