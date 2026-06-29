@@ -42,11 +42,10 @@ export class GuestService {
     };
 
     const body = {
-      pageable: pageable,
       searchCriteria: searchCriteria || []
     } as SearchRequest
 
-    return from(this.api.invoke(findBy1, { body: body}))
+    return from(this.api.invoke(findBy1, {pageable: pageable, body: body}))
       .pipe(
         map(p => {
           const page = p as unknown as Page<GuestDto>;

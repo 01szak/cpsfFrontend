@@ -1,11 +1,7 @@
-import {Component, EventEmitter, inject, Output} from '@angular/core';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogActions, MatDialogRef,
-  MatDialogTitle
-} from '@angular/material/dialog';
-import {Field, FieldType, SearchDialogData} from '@shared/ui/data-table/regular-table.component';
-import {MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
+import {ChangeDetectionStrategy, Component, EventEmitter, inject, Output} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {FieldType, SearchDialogData} from '@shared/ui/data-table/regular-table.component';
+import {MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormButtonsComponent} from '@shared/ui/buttons/form-buttons.component';
 import {SearchCriteria} from '../../../api';
@@ -16,6 +12,8 @@ import {
   MatDatepickerToggleIcon
 } from '@angular/material/datepicker';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
+import {MatOption, MatSelect} from '@angular/material/select';
+import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 
 @Component({
   selector: 'app-search-by-popup',
@@ -32,7 +30,11 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
     MatDatepicker,
     MatDatepickerToggleIcon,
     MatSuffix,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSelect,
+    MatOption,
+    MatRadioGroup,
+    MatRadioButton
   ],
   styles: `
     matInput {
@@ -109,52 +111,92 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
       <mat-dialog-actions>
         <div class="searchDialogAction">
           <mat-label>{{ data.label }}</mat-label>
-          @switch (data.field.type) {
-            @case ('BOOLEAN') {
-              <input matInput type="text" placeholder="Wpisz 'tak' lub 'nie'" [(ngModel)]="data.field.value">
-            }
-            @case ('DATE') {
-              <div class="dateFilter">
-                <div class="datepickerWrapper">
-                  <mat-form-field class="dateInput">
-                    <input matInput [matDatepicker]="from" placeholder="Od" [(ngModel)]="data.field.value">
-                    <mat-datepicker #from></mat-datepicker>
-                    <mat-datepicker-toggle matIconSuffix [for]="from">
-                      <i class="fa-solid fa-calendar" style="font-size: large" matDatepickerToggleIcon></i>
-                    </mat-datepicker-toggle>
-                  </mat-form-field>
-                </div>
-                <div class="datepickerWrapper">
+
+          @if (data.field.selectOption) {
+
+            <mat-form-field>
+              <mat-select [(ngModel)]="data.field.value" placeholder="Kliknij aby wybrać">
+                @for (option of data.field.selectOption; track option) {
+                  <mat-option (click)="$event.stopPropagation()" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+          } @else {
+
+            @switch (data.field.type) {
+              @case ('BOOLEAN') {
+                <mat-radio-group [(ngModel)]="data.field.value" >
+                  <mat-radio-button value="true">Opłacone</mat-radio-button>
+                  <mat-radio-button value="false">Nie opłacone</mat-radio-button>
+                </mat-radio-group>
+              }
+              @case ('DATE') {
+
+                <div class="dateFilter">
                   <div class="datepickerWrapper">
                     <mat-form-field class="dateInput">
-                      <input matInput [matDatepicker]="to" placeholder="Do" [(ngModel)]="data.field.secondValue!">
-                      <mat-datepicker #to></mat-datepicker>
-                      <mat-datepicker-toggle matIconSuffix [for]="to">
+                      <input matInput [matDatepicker]="from" placeholder="Od" [(ngModel)]="data.field.value">
+                      <mat-datepicker #from></mat-datepicker>
+                      <mat-datepicker-toggle matIconSuffix [for]="from">
                         <i class="fa-solid fa-calendar" style="font-size: large" matDatepickerToggleIcon></i>
                       </mat-datepicker-toggle>
                     </mat-form-field>
                   </div>
+
+                  <div class="datepickerWrapper">
+                    <div class="datepickerWrapper">
+                      <mat-form-field class="dateInput">
+                        <input matInput [matDatepicker]="to" placeholder="Do" [(ngModel)]="data.field.secondValue!">
+                        <mat-datepicker #to></mat-datepicker>
+                        <mat-datepicker-toggle matIconSuffix [for]="to">
+                          <i class="fa-solid fa-calendar" style="font-size: large" matDatepickerToggleIcon></i>
+                        </mat-datepicker-toggle>
+                      </mat-form-field>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            }
-            @case ('OBJECT') {
-              @for (field of data.field.innerFields; track field) {
+
+              }
+              @case ('OBJECT') {
+                @for (field of data.field.innerFields; track field) {
+                  @if (field.selectOption) {
+
+                    <mat-form-field>
+                      <mat-select [(ngModel)]="field.value" placeholder="Kliknij aby wybrać">
+                        @for (option of field.selectOption; track option) {
+                          <mat-option (click)="$event.stopPropagation()" [value]="option">
+                            {{ option }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+
+                  } @else {
+
+                    <mat-form-field>
+                      <input matInput
+                             type="text"
+                             [placeholder]="field.displayName || '' "
+                             [(ngModel)]="field.value"
+                      >
+                    </mat-form-field>
+
+                  }
+                }
+              }
+              @default {
+
                 <mat-form-field>
                   <input matInput
                          type="text"
-                         [placeholder]="field.displayName || '' "
-                         [(ngModel)]="field.value"
+                         [(ngModel)]="data.field.value"
                   >
                 </mat-form-field>
+
               }
-            }
-            @default {
-              <mat-form-field>
-                <input matInput
-                       type="text"
-                       [(ngModel)]="data.field.value"
-                >
-              </mat-form-field>
             }
           }
           <app-form-buttons
@@ -166,6 +208,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
       </mat-dialog-actions>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchByPopupComponent {
 
@@ -178,15 +221,7 @@ export class SearchByPopupComponent {
   protected secondAction = () => this.searchBy();
 
   protected close() {
-    const field = this.data.field;
-    if (field.innerFields) {
-      field.innerFields.forEach(f => {f.value = ''})
-    } else {
-      field.value = '';
-      if (field.secondValue) {
-        field.secondValue = '';
-      }
-    }
+    this.clearForm();
     this.dialogRef.close();
   }
 
@@ -207,6 +242,22 @@ export class SearchByPopupComponent {
       criterias.push({key: this.data.field.name, value: this.data.field.value, secondValue: this.data.field.secondValue, operation: this.pickOperation(this.data.field.type)} as SearchCriteria);
     }
     this.criteriaEmitter.emit(criterias);
+    this.clearForm();
+    this.dialogRef.close();
+  }
+
+  private clearForm() {
+    const field = this.data.field;
+    if (field.innerFields) {
+      field.innerFields.forEach(f => {
+        f.value = ''
+      })
+    } else {
+      field.value = '';
+      if (field.secondValue) {
+        field.secondValue = '';
+      }
+    }
   }
 
   private pickOperation(type: FieldType): Operation {

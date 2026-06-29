@@ -1,19 +1,21 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
-import {ReservationService} from '@features/reservations/services/ReservationService';
+import {ReservationService, ReservationStatus} from '@features/reservations/services/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {
   DtoDisplayDataMap,
-  FetchParams, Field,
+  FetchParams,
+  Field,
   RegularTableComponent,
 } from '@shared/ui/data-table/regular-table.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
-import {BehaviorSubject, Subscription} from 'rxjs';
+import {BehaviorSubject, map, Subscription, take} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {GuestDto, ReservationDto} from '../../../api';
+import {ReservationDto} from '../../../api';
+import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
 
 @Component({
   selector: 'reservations',
@@ -43,9 +45,11 @@ import {GuestDto, ReservationDto} from '../../../api';
   `,
   styles: ``,
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReservationPage implements OnInit, OnDestroy {
   private reservationService = inject(ReservationService);
+  private camperPlaceService = inject(CamperPlaceService);
   private formService = inject(PopupFormService);
   protected pagedData$ = new BehaviorSubject<Page<DtoDisplayDataMap>>({
     content: [],
@@ -59,8 +63,8 @@ export class ReservationPage implements OnInit, OnDestroy {
     {name: 'checkin', type: 'DATE', value: ''},
     {name: 'checkout', type: 'DATE', value: ''},
     {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
-    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', value: ''}]},
-    {name: 'reservationStatus', type: 'STATUS', value: ''},
+    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.getCamperPlaceIndexesForOptions(), value: ''}]},
+    {name: 'reservationStatus', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
     {name: 'paid', type: 'BOOLEAN', value: ''}
   ];
   protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
@@ -140,6 +144,18 @@ export class ReservationPage implements OnInit, OnDestroy {
       error: () => r.paid = previousPaidStaus
     });
   };
+
+  private getCamperPlaceIndexesForOptions(): string[] {
+    const indexes: string[] = [];
+    this.camperPlaceService.getCamperPlaces()
+      .pipe(
+        map(camperPlaces => camperPlaces.map(c => c.index!)),
+        take(1)
+      ).subscribe(c => {
+          indexes.push(...c)
+    });
+    return indexes;
+  }
 }
 export type ReservationDisplayData = {
   checkin: string,

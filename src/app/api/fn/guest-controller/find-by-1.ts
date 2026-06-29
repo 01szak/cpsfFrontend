@@ -7,16 +7,19 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { Pageable } from '../../models/pageable';
 import { PageGuestDto } from '../../models/page-guest-dto';
 import { SearchRequest } from '../../models/search-request';
 
 export interface FindBy1$Params {
+  pageable: Pageable;
       body: SearchRequest
 }
 
 export function findBy1(http: HttpClient, rootUrl: string, params: FindBy1$Params, context?: HttpContext): Observable<StrictHttpResponse<PageGuestDto>> {
   const rb = new RequestBuilder(rootUrl, findBy1.PATH, 'post');
   if (params) {
+    rb.query('pageable', params.pageable, {});
     rb.body(params.body, 'application/json');
   }
 

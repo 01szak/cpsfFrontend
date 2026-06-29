@@ -7,16 +7,19 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { Pageable } from '../../models/pageable';
 import { PageReservationDto } from '../../models/page-reservation-dto';
 import { SearchRequest } from '../../models/search-request';
 
 export interface FindBy$Params {
+  pageable: Pageable;
       body: SearchRequest
 }
 
 export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params, context?: HttpContext): Observable<StrictHttpResponse<PageReservationDto>> {
   const rb = new RequestBuilder(rootUrl, findBy.PATH, 'post');
   if (params) {
+    rb.query('pageable', params.pageable, {});
     rb.body(params.body, 'application/json');
   }
 

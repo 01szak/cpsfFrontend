@@ -31,7 +31,7 @@ export interface DtoDisplayDataMap {
 
 export interface Sort {
   columnName: string,
-  direction: 'asc' | 'desc'
+  direction: SortDirection
 }
 
 export interface FetchParams {
@@ -53,10 +53,12 @@ export interface Field {
   value?: string | '', //there should be only one per instance, for inner fields one per field
   secondValue?: string, //used for operation: BETWEEN
   displayName?: string, //it is used for inner fields
-  innerFields?: Field[] //for type object fields can be nested
+  innerFields?: Field[], //for type object fields can be nested
+  selectOption?: any[]
 }
 
 export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER';
+export type SortDirection = 'ASC' | 'DESC';
 
 @Component({
   selector: 'app-regular-table',
@@ -121,7 +123,7 @@ export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUM
     .headerDiv {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      justify-content: space-between;
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -206,12 +208,15 @@ export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUM
     /* Arrows */
     .ascArrow, .descArrow {
       font-size: 0.875rem;
-      color: var(--text-muted);
+      color: var(--primary);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .arrowClicked {
-      color: var(--primary);
+    .ascArow {
+      transform: rotate(180deg);
+    }
+    .descArrow {
+      transform: rotate(180deg);
     }
 
     th {
@@ -229,6 +234,9 @@ export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUM
       gap: 10px;
     }
 
+    i {
+      margin: 3px;
+    }
   `,
   template: `
     @if ((page$ | async)?.content; as content) {
@@ -246,17 +254,25 @@ export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUM
             @for (field of tabColumns; track field) {
               <ng-container [matColumnDef]="field.name">
 
-                <th mat-header-cell *matHeaderCellDef
-                    (click)="openSearchDialog($event, displayedColumns[$index], field.name, field)">
+                <th mat-header-cell *matHeaderCellDef>
                   <div class="headerDiv">
-                    <i class="fa-regular fa-circle-up"
-                       [ngClass]="{
-                        'ascArrow' : isArrowAsc,
-                        'descArrow' : !isArrowAsc,
-                        'arrowClicked' : isClicked && clickedColumn === (field.name)
+                    <div (click)="clickSort(field.name);$event.stopPropagation()" class="sortingButton"
+                         style="display: flex; flex-direction: row; gap: 0.75rem; align-items: center ">
+
+                      @if(isClicked && clickedColumn === (field.name)) {
+
+                        <i class="fa-regular fa-circle-up"
+                           [ngClass]="{
+                            'ascArrow' : isArrowAsc,
+                            'descArrow' : !isArrowAsc,
                         }"
-                       (click)="click(field.name);$event.stopPropagation()"></i>
-                    <p class="sortingButton">{{ displayedColumns[$index] }}</p>
+                        > </i>
+
+                      }
+                      <p> {{ displayedColumns[$index] }}</p>
+                    </div>
+                    <i (click)="openSearchDialog($event, displayedColumns[$index], field.name, field)"
+                       class="fa-solid fa-filter"></i>
                   </div>
                 </th>
 
@@ -352,29 +368,29 @@ export class RegularTableComponent implements AfterViewInit {
     return this.tabColumns.map(field => field.name);
   }
 
-  protected click(columnField: string) {
+  protected clickSort(columnField: string) {
      this.isArrowAsc = !this.isArrowAsc;
      this.clickedColumn = columnField;
-
+     let direction: SortDirection | undefined = this.isArrowAsc ? 'ASC' : 'DESC';
      if (this.clickCount++ > 3) {
        this.clickCount = 0;
        this.isClicked = false;
-       this.sendSortInfo();
+       direction = undefined;
      } else {
-       this.sendSortInfo(columnField, this.isArrowAsc);
        this.clickCount = this.clickCount + 1;
        this.isClicked = true;
      }
+    this.sendSortInfo(columnField, direction);
   }
 
-  protected sendSortInfo(columnName?: string, directionB?: boolean) {
-    if (columnName === undefined || directionB === undefined) {
-      this.sortInfo.emit();
-      this.fetchFunc({sort: undefined});
-    } else {
-      const sort: Sort = {columnName: columnName, direction: directionB ? 'asc' : 'desc'}
+  protected sendSortInfo(columnName?: string, direction?: SortDirection) {
+    if (columnName && direction) {
+      const sort: Sort = {columnName: columnName, direction: direction}
       this.sortInfo.emit(sort);
       this.fetchFunc({sort});
+    } else {
+      this.sortInfo.emit();
+      this.fetchFunc({sort: undefined});
     }
   }
 
@@ -402,6 +418,7 @@ export class RegularTableComponent implements AfterViewInit {
       },
       panelClass: 'searchDialog',
       hasBackdrop: false,
+      disableClose: true,
       data: { label, by, field, service },
     });
 

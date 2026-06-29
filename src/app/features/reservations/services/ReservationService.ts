@@ -10,6 +10,7 @@ import {ReservationDto} from '../../../api/models/reservation-dto';
 import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
 
+export type ReservationStatus = 'EXPIRED' | 'ACTIVE' | 'COMING';
 
 @Injectable({providedIn: "root"})
 export class ReservationService {
@@ -43,11 +44,10 @@ export class ReservationService {
     };
 
     const body = {
-      pageable: pageable,
       searchCriteria: searchCriteria || []
     } as SearchRequest
 
-    return from(this.api.invoke(findBy, { body: body}))
+    return from(this.api.invoke(findBy, {pageable: pageable, body: body}))
       .pipe(
         map(p => {
           const page = p as unknown as Page<ReservationDto>;
