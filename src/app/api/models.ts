@@ -13,5 +13,6 @@ export type { PageReservationDto } from './models/page-reservation-dto';
 export type { ReservationDto } from './models/reservation-dto';
 export type { Revenue } from './models/revenue';
 export type { SearchCriteria } from './models/search-criteria';
+export type { SearchRequest } from './models/search-request';
 export type { Sortnull } from './models/sortnull';
 export type { UserDto } from './models/user-dto';

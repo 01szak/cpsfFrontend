@@ -5,11 +5,12 @@ import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
 import {Sort} from '@shared/ui/data-table/regular-table.component';
 import {Api} from '../../../api/api';
-import {findBy, create, update, delete$ as deleteReservationFn} from '../../../api';
+import {findBy, create, update, delete$ as deleteReservationFn, SearchRequest} from '../../../api';
 import {ReservationDto} from '../../../api/models/reservation-dto';
 import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
 
+export type ReservationStatus = 'EXPIRED' | 'ACTIVE' | 'COMING';
 
 @Injectable({providedIn: "root"})
 export class ReservationService {
@@ -24,10 +25,10 @@ export class ReservationService {
     page?: number,
     size?: number,
     sort?: Sort,
-    searchCriteria?: SearchCriteria
+    searchCriteria?: SearchCriteria[]
   } = {};
 
-  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+  public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria[]): Observable<Page<ReservationDto>> {
     this.lastQueryParams = {
       event: event,
       page: page,
@@ -42,21 +43,23 @@ export class ReservationService {
       sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
     };
 
-    return from(this.api.invoke(findBy, {
-      pageable: pageable,
-      searchCriteria: searchCriteria || { key: '', value: '' }
-    })).pipe(
-      map(p => {
-        const page = p as unknown as Page<ReservationDto>;
-        return page;
-      }),
-      tap(p => {
-        this.reservationSubject.next(p);
-      })
-    );
+    const body = {
+      searchCriteria: searchCriteria || []
+    } as SearchRequest
+
+    return from(this.api.invoke(findBy, {pageable: pageable, body: body}))
+      .pipe(
+        map(p => {
+          const page = p as unknown as Page<ReservationDto>;
+          return page;
+        }),
+        tap(p => {
+          this.reservationSubject.next(p);
+        })
+      );
   }
 
-  public findByUnpaged(searchCriteria?: SearchCriteria): Observable<Page<ReservationDto>> {
+  public findByUnpaged(searchCriteria?: SearchCriteria[]): Observable<Page<ReservationDto>> {
     return this.findBy(undefined, 0, 1000, undefined, searchCriteria);
   }
 

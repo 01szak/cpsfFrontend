@@ -9,18 +9,18 @@ import { RequestBuilder } from '../../request-builder';
 
 import { Pageable } from '../../models/pageable';
 import { PageReservationDto } from '../../models/page-reservation-dto';
-import { SearchCriteria } from '../../models/search-criteria';
+import { SearchRequest } from '../../models/search-request';
 
 export interface FindBy$Params {
   pageable: Pageable;
-  searchCriteria: SearchCriteria;
+      body: SearchRequest
 }
 
 export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params, context?: HttpContext): Observable<StrictHttpResponse<PageReservationDto>> {
-  const rb = new RequestBuilder(rootUrl, findBy.PATH, 'get');
+  const rb = new RequestBuilder(rootUrl, findBy.PATH, 'post');
   if (params) {
     rb.query('pageable', params.pageable, {});
-    rb.query('searchCriteria', params.searchCriteria, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(
@@ -33,4 +33,4 @@ export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params,
   );
 }
 
-findBy.PATH = '/reservation';
+findBy.PATH = '/reservation/findBy';

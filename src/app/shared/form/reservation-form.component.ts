@@ -33,7 +33,7 @@ import {GuestDto, ReservationDto} from '../../api';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 import {GuestService} from '@features/guests/services/GuestService';
 import {Page} from '@core/models/Page';
-import {COUNTRIES, Country} from '@shared/constants/COUNTRIES';
+import {Country} from '@shared/constants/COUNTRIES';
 
 export type ReservationFormData = {
   reservation?: ReservationDto;
@@ -209,7 +209,7 @@ export class ReservationFormComponent implements OnInit {
       filter((v): v is string => typeof v === 'string' && v.length > 1),
       switchMap((v: string) => this.guestService.findBy(
         undefined, 0, 50, undefined,
-        { key: 'lastname', value: v, operation: 'LIKE' }
+        [{ key: 'lastname', value: v, operation: 'LIKE' }]
       )),
       map((res: Page<GuestDto>) => (res.content || []).map((g: GuestDto) => ({ name: `${g.firstname || ''} ${g.lastname || ''}`.trim(), guest: g })))
     );
