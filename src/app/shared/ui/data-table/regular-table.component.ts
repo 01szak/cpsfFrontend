@@ -370,6 +370,11 @@ export class RegularTableComponent implements AfterViewInit {
 
   protected clickSort(columnField: string) {
      this.isArrowAsc = !this.isArrowAsc;
+     if (columnField !== this.clickedColumn) {
+       this.isArrowAsc = true;
+       this.clickCount = 0;
+       this.isClicked = true;
+     }
      this.clickedColumn = columnField;
      let direction: SortDirection | undefined = this.isArrowAsc ? 'ASC' : 'DESC';
      if (this.clickCount++ > 3) {

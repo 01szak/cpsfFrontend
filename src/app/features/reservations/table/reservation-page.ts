@@ -58,17 +58,16 @@ export class ReservationPage implements OnInit, OnDestroy {
     totalElements: 0,
     totalPages: 0
   });
-
+  protected camperPlaceIndexForOptions: string[] = [];
   protected fields: Field[] = [
     {name: 'checkin', type: 'DATE', value: ''},
     {name: 'checkout', type: 'DATE', value: ''},
     {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
-    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.getCamperPlaceIndexesForOptions(), value: ''}]},
+    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceIndexForOptions, value: ''}]},
     {name: 'reservationStatus', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
     {name: 'paid', type: 'BOOLEAN', value: ''}
   ];
   protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
-
   protected paginatorLength = 0;
   protected pageSize = 10;
   protected pageSizeOptions = [10, 20, 50, 100];
@@ -78,6 +77,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   private lastParams = {} as FetchParams
 
   public ngOnInit() {
+    this.camperPlaceIndexForOptions = this.getCamperPlaceIndexesForOptions();
     this.sub = this.reservationService.reservationDtos$.subscribe();
     this.fetchData({});
 }

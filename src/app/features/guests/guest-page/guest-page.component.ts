@@ -10,7 +10,7 @@ import {
 } from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {GuestFormData} from '@shared/form/guest-form.component';
-import {GuestDto} from '../../../api';
+import {GuestDto, SearchCriteria} from '../../../api';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {GuestService} from '@features/guests/services/GuestService';
@@ -89,23 +89,21 @@ export class GuestPage implements OnInit, OnDestroy {
 
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
-
-    if (this.lastParams.searchCriteria) {
-      const countryCriteria = this.lastParams.searchCriteria.find(c => c.key === 'country');
-      if (countryCriteria) {
-        let v = countryCriteria.value;
-        if (v) {
-          countryCriteria.value = COUNTRIES.find(c => c.name.toLowerCase() === (v.toLowerCase() || ''))?.isoCode || '';
-        }
-      }
-    }
+    const searchCriteria = this.lastParams.searchCriteria?.map(sc => {
+      if (sc.key !== 'country' || !sc.value) return sc;
+      const value = sc.value.toLowerCase();
+      const country = COUNTRIES.find(c =>
+        c.name.toLowerCase() === value || c.isoCode.toLowerCase() === value
+      )
+      return {...sc, value: country?.isoCode || sc.value } as SearchCriteria;
+    }) || []
 
     this.guestService.findBy(
       this.lastParams.event,
       page,
       size,
       this.lastParams.sort,
-      this.lastParams.searchCriteria
+      searchCriteria
     ).subscribe();
   }
 

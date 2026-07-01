@@ -128,7 +128,7 @@ import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 
             @switch (data.field.type) {
               @case ('BOOLEAN') {
-                <mat-radio-group [(ngModel)]="data.field.value" >
+                <mat-radio-group [(ngModel)]="data.field.value">
                   <mat-radio-button value="true">Opłacone</mat-radio-button>
                   <mat-radio-button value="false">Nie opłacone</mat-radio-button>
                 </mat-radio-group>
