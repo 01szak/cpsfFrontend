@@ -9,11 +9,11 @@ import { RequestBuilder } from '../../request-builder';
 
 import { UserDto } from '../../models/user-dto';
 
-export interface GetEmployee$Params {
+export interface GetUser$Params {
 }
 
-export function getEmployee(http: HttpClient, rootUrl: string, params?: GetEmployee$Params, context?: HttpContext): Observable<StrictHttpResponse<UserDto>> {
-  const rb = new RequestBuilder(rootUrl, getEmployee.PATH, 'get');
+export function getUser(http: HttpClient, rootUrl: string, params?: GetUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserDto>> {
+  const rb = new RequestBuilder(rootUrl, getUser.PATH, 'get');
   if (params) {
   }
 
@@ -27,4 +27,4 @@ export function getEmployee(http: HttpClient, rootUrl: string, params?: GetEmplo
   );
 }
 
-getEmployee.PATH = '/user';
+getUser.PATH = '/user';

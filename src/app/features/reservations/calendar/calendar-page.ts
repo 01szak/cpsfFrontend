@@ -6,13 +6,14 @@ import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
-import {CamperPlaceDto, ReservationDto, SearchCriteria} from '../../../api';
+import {ReservationDto} from '../../../api';
 import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell.component';
 import {ReservationService} from '@features/reservations/services/ReservationService';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import moment from 'moment';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
 import {MatIconButton} from '@angular/material/button';
+import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
 
 @Component({
   selector: 'calendar',

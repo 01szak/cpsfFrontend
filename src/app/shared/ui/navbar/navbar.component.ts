@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.service.getEmployee().subscribe();
+    this.service.getAppUser().subscribe();
     this.applyPersistedTheme();
   }
 

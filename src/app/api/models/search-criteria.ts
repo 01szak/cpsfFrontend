@@ -3,6 +3,7 @@
 
 export interface SearchCriteria {
   joinObject?: string;
+  joinOperator?: 'AND' | 'OR';
   key: string;
   operation: 'EQUALS' | 'NOT_EQUALS' | 'LESS_THEN' | 'GREATER_THEN' | 'BETWEEN' | 'LIKE';
   secondValue?: string;
