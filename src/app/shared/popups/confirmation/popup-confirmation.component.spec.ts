@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { PopupConfirmationComponent } from './popup-confirmation.component';
+import {PopupConfirmationComponent} from './popup-confirmation.component';
 
 describe('PopupConfirmationComponent', () => {
   let component: PopupConfirmationComponent;

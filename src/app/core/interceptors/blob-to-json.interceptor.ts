@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -8,7 +8,7 @@ import {
   HttpResponse
 } from '@angular/common/http';
 import {catchError, from, Observable, of, switchMap, throwError} from 'rxjs';
-import { map } from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 /**
  * Interceptor to automatically convert Blobs with 'application/json' type back to JSON objects.

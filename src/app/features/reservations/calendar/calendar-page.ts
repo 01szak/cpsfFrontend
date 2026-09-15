@@ -231,7 +231,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
       text-align: center;
       align-items: center;
       justify-content: center;
-    }   
+    }
 
     .weekday {
       width: 100%;

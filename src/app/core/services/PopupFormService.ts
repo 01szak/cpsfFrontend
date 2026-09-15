@@ -1,9 +1,9 @@
-import { inject, Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ReservationFormComponent, ReservationFormData } from '@shared/form/reservation-form.component';
-import { GuestFormComponent, GuestFormData } from '@shared/form/guest-form.component';
-import { CamperPlaceFormComponent, CamperPlaceFormData } from '@shared/form/camper-place-form.component';
-import { CamperPlaceTypeFormComponent, CamperPlaceTypeFormData } from '@shared/form/camper-place-type-form.component';
+import {inject, Injectable} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
+import {ReservationFormComponent, ReservationFormData} from '@shared/form/reservation-form.component';
+import {GuestFormComponent, GuestFormData} from '@shared/form/guest-form.component';
+import {CamperPlaceFormComponent, CamperPlaceFormData} from '@shared/form/camper-place-form.component';
+import {CamperPlaceTypeFormComponent, CamperPlaceTypeFormData} from '@shared/form/camper-place-type-form.component';
 
 @Injectable({ providedIn: 'root' })
 export class PopupFormService {
