@@ -1,11 +1,10 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, from, map, Observable, switchMap, tap} from 'rxjs';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
 import {Sort} from '@shared/ui/data-table/regular-table.component';
-import {Api} from '../../../api/api';
-import {findBy, create, update, delete$ as deleteReservationFn, SearchRequest} from '../../../api';
+import {Api} from '../../../api';
+import {create, delete$ as deleteReservationFn, findBy, SearchRequest, update} from '../../../api';
 import {ReservationDto} from '../../../api/models/reservation-dto';
 import {SearchCriteria} from '../../../api/models/search-criteria';
 import {NotificationService} from '@core/services/NotificationService';
@@ -43,8 +42,26 @@ export class ReservationService {
       sort: sort ? [sort.columnName + ',' + sort.direction] : undefined
     };
 
+    const unverifiedReservationsSearchCriteria =  {
+      key: "reservationStatus",
+      operation: "NOT_EQUALS",
+      value: 'UNVERIFIED',
+      joinOperator: "AND"
+    } as SearchCriteria;
+
+    const verifiedReservationsSearchCriteria =  {
+      key: "reservationStatus",
+      operation: "NOT_EQUALS",
+      value: 'VERIFIED',
+      joinOperator: "AND"
+    } as SearchCriteria;
+
+    if (!searchCriteria) searchCriteria = [];
+
+    searchCriteria.push(verifiedReservationsSearchCriteria, unverifiedReservationsSearchCriteria);
+
     const body = {
-      searchCriteria: searchCriteria || []
+      searchCriteria: searchCriteria
     } as SearchRequest
 
     return from(this.api.invoke(findBy, {pageable: pageable, body: body}))

@@ -65,9 +65,10 @@ export class ReservationPage implements OnInit, OnDestroy {
     {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
     {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceIndexForOptions, value: ''}]},
     {name: 'reservationStatus', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
-    {name: 'paid', type: 'BOOLEAN', value: ''}
+    {name: 'paid', type: 'BOOLEAN', value: ''},
+    {name: 'creator', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
   ];
-  protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone'];
+  protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone', 'Twórca'];
   protected paginatorLength = 0;
   protected pageSize = 10;
   protected pageSizeOptions = [10, 20, 50, 100];
@@ -80,7 +81,7 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.camperPlaceIndexForOptions = this.getCamperPlaceIndexesForOptions();
     this.sub = this.reservationService.reservationDtos$.subscribe();
     this.fetchData({});
-}
+  }
 
   public ngOnDestroy() {
     this.sub?.unsubscribe();
@@ -91,7 +92,6 @@ export class ReservationPage implements OnInit, OnDestroy {
 
     const page = this.lastParams.event?.pageIndex || 0;
     const size = this.lastParams.event?.pageSize || 10;
-
 
     this.sub?.unsubscribe();
     this.sub = this.reservationService.findBy(
@@ -109,7 +109,8 @@ export class ReservationPage implements OnInit, OnDestroy {
           guest: `${res.guest?.firstname || ''} ${res.guest?.lastname || ''}`.trim(),
           camperPlace: res.camperPlace?.index ?? '',
           reservationStatus: res.reservationStatus!,
-          paid: res.paid
+          paid: res.paid,
+          creator: `${res.creator?.username || ''}`
         } as ReservationDisplayData;
       }
 
@@ -163,5 +164,6 @@ export type ReservationDisplayData = {
   guest: string,
   camperPlace: string,
   reservationStatus: string,
-  paid: boolean
+  paid: boolean,
+  creator: string
 }
