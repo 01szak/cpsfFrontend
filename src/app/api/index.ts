@@ -5,6 +5,7 @@ export { ApiConfiguration } from './api-configuration';
 export { RequestBuilder } from './request-builder';
 export type { StrictHttpResponse } from './strict-http-response';
 export { Api } from './api';
+export type { CamperPlaceDto } from './models/camper-place-dto';
 export type { CamperPlaceTypeDto } from './models/camper-place-type-dto';
 export type { CountryDistribution } from './models/country-distribution';
 export type { GuestDto } from './models/guest-dto';
