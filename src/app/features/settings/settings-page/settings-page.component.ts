@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
-import {CamperPlaceTypeService} from '@features/settings/services/CamperPlaceTypeService';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
+import {CamperPlaceTypeService} from '@core/services/openApiWrappers/CamperPlaceTypeService';
 import {CamperPlaceSettingsComponent} from './settings-form-component/form-component/camper-place-settings.component';
 import {MatCard} from '@angular/material/card';
 import {CamperPlaceTypeSettingsComponent} from './settings-form-component/form-component/camper-place-type-settings.component';

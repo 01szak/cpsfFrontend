@@ -1,6 +1,6 @@
 import {Component, inject, Input, OnInit} from '@angular/core';
 import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.component';
-import {StatisticsService} from '@features/statistics/services/StatisticsService';
+import {StatisticsService} from '@core/services/openApiWrappers/StatisticsService';
 import {
   StatColumnConfig,
 } from '@features/statistics/statistics-page/statistic-panel/statistics-panel.component';

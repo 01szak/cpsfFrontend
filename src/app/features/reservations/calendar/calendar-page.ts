@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, HostListener, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {map, Observable, Subscription, of} from 'rxjs';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {MatCard} from '@angular/material/card';
 import {AsyncPipe, NgClass} from '@angular/common';
@@ -8,7 +8,7 @@ import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.com
 import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {ReservationDto} from '../../../api';
 import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell.component';
-import {ReservationService} from '@features/reservations/services/ReservationService';
+import {ReservationService} from '@core/services/openApiWrappers/ReservationService';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import moment from 'moment';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';

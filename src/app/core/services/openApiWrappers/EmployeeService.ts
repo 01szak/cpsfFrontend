@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Employee} from '@core/models/Employee';
 import {BehaviorSubject, from, Observable, tap} from 'rxjs';
-import {Api, getUser} from '../../api';
+import {Api, getUser} from '../../../api';
 
 
 @Injectable({providedIn: "root"})

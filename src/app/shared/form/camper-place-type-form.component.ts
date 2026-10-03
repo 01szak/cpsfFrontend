@@ -5,7 +5,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { NgTemplateOutlet } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
-import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
+import { CamperPlaceTypeService } from '@core/services/openApiWrappers/CamperPlaceTypeService';
 import { CamperPlaceTypeDto } from '../../api/models/camper-place-type-dto';
 import { FormFactoryService } from '@shared/form/FormFactoryService';
 

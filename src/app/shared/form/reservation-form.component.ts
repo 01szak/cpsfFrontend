@@ -3,9 +3,9 @@ import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/d
 import {MatIconModule} from '@angular/material/icon';
 import {debounceTime, distinctUntilChanged, filter, from, map, Observable, of, switchMap} from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
-import {ReservationService} from '@features/reservations/services/ReservationService';
+import {ReservationService} from '@core/services/openApiWrappers/ReservationService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {PopupFormContainer} from './popup-form-container.component';
 import {GuestFormComponent} from './guest-form.component';
@@ -31,7 +31,7 @@ import {MatButton} from '@angular/material/button';
 import {Api} from '../../api/api';
 import {GuestDto, ReservationDto} from '../../api';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
-import {GuestService} from '@features/guests/services/GuestService';
+import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {Page} from '@core/models/Page';
 import {Country} from '@shared/constants/COUNTRIES';
 

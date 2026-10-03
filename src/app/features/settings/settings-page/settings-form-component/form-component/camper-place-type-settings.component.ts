@@ -1,13 +1,13 @@
 import {Component, inject, Input, ViewChild} from '@angular/core';
 import { CamperPlaceTypeDto } from '../../../../../api/models/camper-place-type-dto';
 import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
-import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
+import { CamperPlaceTypeService } from '@core/services/openApiWrappers/CamperPlaceTypeService';
 import {forkJoin, map, Observable, take} from 'rxjs';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 import {CamperPlaceDto} from '../../../../../api/models/camper-place-dto';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 import {MatCheckbox} from '@angular/material/checkbox';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
 
 @Component({

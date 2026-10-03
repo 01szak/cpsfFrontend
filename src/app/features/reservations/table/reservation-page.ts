@@ -3,7 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
-import {ReservationService, ReservationStatus} from '@features/reservations/services/ReservationService';
+import {ReservationService, ReservationStatus} from '@core/services/openApiWrappers/ReservationService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {
   DtoDisplayDataMap,
@@ -15,7 +15,7 @@ import {ReservationFormData} from '@shared/form/reservation-form.component';
 import {BehaviorSubject, map, Subscription, take} from 'rxjs';
 import {Page} from '@core/models/Page';
 import {ReservationDto} from '../../../api';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 
 @Component({
   selector: 'reservations',

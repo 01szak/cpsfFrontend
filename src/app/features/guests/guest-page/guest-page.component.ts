@@ -13,7 +13,7 @@ import {GuestFormData} from '@shared/form/guest-form.component';
 import {GuestDto, SearchCriteria} from '../../../api';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {Page} from '@core/models/Page';
-import {GuestService} from '@features/guests/services/GuestService';
+import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {COUNTRIES} from '@shared/constants/COUNTRIES';
 
 @Component({

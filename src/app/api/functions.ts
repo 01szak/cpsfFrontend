@@ -31,8 +31,8 @@ export type { Update2$Params as Update2$Params } from './fn/camper-place-control
 export { update2 as update2 } from './fn/camper-place-controller/update-2';
 export type { GetCamperPlacesWithUniquePriceAndCamperTypeId$Params as GetCamperPlacesWithUniquePriceAndCamperTypeId$Params } from './fn/camper-place-controller/get-camper-places-with-unique-price-and-camper-type-id';
 export { getCamperPlacesWithUniquePriceAndCamperTypeId as getCamperPlacesWithUniquePriceAndCamperTypeId } from './fn/camper-place-controller/get-camper-places-with-unique-price-and-camper-type-id';
-export type { GetOccupiedDate$Params as GetOccupiedDate$Params } from './fn/camper-place-controller/get-occupied-date';
-export { getOccupiedDate as getOccupiedDate } from './fn/camper-place-controller/get-occupied-date';
+export type { GetOccupiedDates$Params as GetOccupiedDates$Params } from './fn/camper-place-controller/get-occupied-dates';
+export { getOccupiedDates as getOccupiedDates } from './fn/camper-place-controller/get-occupied-dates';
 export type { GetCalculatedReservationPrice$Params as GetCalculatedReservationPrice$Params } from './fn/camper-place-controller/get-calculated-reservation-price';
 export { getCalculatedReservationPrice as getCalculatedReservationPrice } from './fn/camper-place-controller/get-calculated-reservation-price';
 export type { Delete2$Params as Delete2$Params } from './fn/camper-place-controller/delete-2';

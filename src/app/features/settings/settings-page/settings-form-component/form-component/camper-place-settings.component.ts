@@ -1,7 +1,7 @@
 import { Component, Input, inject, ViewChild } from '@angular/core';
 import { CamperPlaceDto } from '../../../../../api/models/camper-place-dto';
 import { CamperPlaceTypeDto } from '../../../../../api/models/camper-place-type-dto';
-import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
+import { CamperPlaceService } from '@core/services/openApiWrappers/CamperPlaceService';
 import { FormFieldDeclaration, RowChange, SettingsGenericComponent } from '../settings-generic-component';
 import { PopupConfirmationService } from '@core/services/PopupConfirmationService';
 import { take } from 'rxjs';

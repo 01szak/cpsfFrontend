@@ -5,11 +5,11 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { NgTemplateOutlet, CommonModule } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
-import { CamperPlaceService } from '@features/settings/services/CamperPlaceService';
+import { CamperPlaceService } from '@core/services/openApiWrappers/CamperPlaceService';
 import { FormFactoryService } from '@shared/form/FormFactoryService';
 import { CamperPlaceDto } from '../../api/models/camper-place-dto';
 import { MatSelectModule } from '@angular/material/select';
-import { CamperPlaceTypeService } from '@features/settings/services/CamperPlaceTypeService';
+import { CamperPlaceTypeService } from '@core/services/openApiWrappers/CamperPlaceTypeService';
 
 export type CamperPlaceFormData = { camperPlace?: CamperPlaceDto };
 

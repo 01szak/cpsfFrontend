@@ -10,7 +10,7 @@ import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from '@angular/material/autocomplete';
 import {map, Observable, startWith} from 'rxjs';
 import { COUNTRIES, Country } from '@shared/constants/COUNTRIES';
-import {GuestService} from '@features/guests/services/GuestService';
+import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
 import {ConfirmationData} from '@shared/popups/confirmation/popup-confirmation.component';
 
