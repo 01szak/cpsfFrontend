@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, inject, Input, Output, ResourceRef, ViewChild} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -239,7 +239,7 @@ export type SortDirection = 'ASC' | 'DESC';
     }
   `,
   template: `
-    @if ((page$ | async)?.content; as content) {
+    @if (page$.value()?.content; as content) {
       <div class="tableDiv">
         <div class="tableContent">
           <table class="content" mat-table [dataSource]="content">
@@ -319,7 +319,7 @@ export type SortDirection = 'ASC' | 'DESC';
             <i class="fa-solid fa-arrow-rotate-left funcIcon" (click)="reset()"></i>
           </div>
           <mat-paginator
-            [length]="paginatorLength"
+            [length]="page$.value()?.totalElements ?? 0"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
             (page)="fetchFuncWithEvent($event)">
@@ -333,7 +333,7 @@ export class RegularTableComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  @Input() public page$!: Observable<Page<DtoDisplayDataMap>>;
+  @Input() public page$!: ResourceRef<any>;
   @Input() public tabColumns: Field[] = [];
   @Input() public displayedColumns: string[] = [];
   @Input() public pageSize: number = 0;

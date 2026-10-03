@@ -1,9 +1,8 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import {
-  DtoDisplayDataMap,
   FetchParams,
   Field,
   RegularTableComponent
@@ -11,8 +10,6 @@ import {
 import {PopupFormService} from '@core/services/PopupFormService';
 import {GuestFormData} from '@shared/form/guest-form.component';
 import {GuestDto, SearchCriteria} from '../../../api';
-import {BehaviorSubject, Subscription} from 'rxjs';
-import {Page} from '@core/models/Page';
 import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {COUNTRIES} from '@shared/constants/COUNTRIES';
 
@@ -26,11 +23,10 @@ import {COUNTRIES} from '@shared/constants/COUNTRIES';
   ],
   template:  `
     <app-regular-table
-      [page$]="pagedData$"
+      [page$]="guestService.guestDtoPage"
       [tabColumns]="columns"
       [displayedColumns]="displayedColumns"
       [pageSize]="pageSize"
-      [paginatorLength]="paginatorLength"
       [pageSizeOptions]="pageSizeOptions"
       [serviceInstance]="null"
       [fetchFunc]="fetchData.bind(this)"
@@ -42,17 +38,9 @@ import {COUNTRIES} from '@shared/constants/COUNTRIES';
   styles:  ``,
   standalone: true
 })
-export class GuestPage implements OnInit, OnDestroy {
+export class GuestPage implements OnInit {
   private formService = inject(PopupFormService);
-  private guestService = inject(GuestService);
-
-  protected pagedData$ = new BehaviorSubject<Page<DtoDisplayDataMap>>({
-    content: [],
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0
-  });
+  protected guestService = inject(GuestService);
 
   protected columns: Field[] = [
     {name: 'firstname', type: 'TEXT', value: ''},
@@ -64,71 +52,24 @@ export class GuestPage implements OnInit, OnDestroy {
   ];
   protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja', 'Narodowość'];
 
-  protected paginatorLength = 0;
   protected pageSize = 10;
   protected pageSizeOptions = [10, 20, 50, 100];
   protected paginator?: MatPaginator;
 
-  private dataSub?: Subscription;
-  private lastParams = {} as FetchParams;
-
   ngOnInit() {
-    this.dataSub = this.guestService.guestDtos$.subscribe((p: Page<GuestDto>) => {
-      this.mapAndPushData(p);
-    });
-
-    this.fetchData({});
-  }
-
-  ngOnDestroy() {
-    this.dataSub?.unsubscribe();
+    this.guestService.findBy();
   }
 
   protected fetchData(params: FetchParams) {
-    this.lastParams = { ...this.lastParams, ...params };
-
-    const page = this.lastParams.event?.pageIndex || 0;
-    const size = this.lastParams.event?.pageSize || 10;
-    const searchCriteria = this.lastParams.searchCriteria?.map(sc => {
+    const searchCriteria = params.searchCriteria?.map(sc => {
       if (sc.key !== 'country' || !sc.value) return sc;
       const value = sc.value.toLowerCase();
       const country = COUNTRIES.find(c =>
         c.name.toLowerCase() === value || c.isoCode.toLowerCase() === value
-      )
-      return {...sc, value: country?.isoCode || sc.value } as SearchCriteria;
-    }) || []
-
-    this.guestService.findBy(
-      this.lastParams.event,
-      page,
-      size,
-      this.lastParams.sort,
-      searchCriteria
-    ).subscribe();
-  }
-
-  private mapAndPushData(p: Page<GuestDto>) {
-    const mapDtoToDisplayData = (dto: GuestDto) => ({
-      carRegistration: dto.carRegistration || '',
-      email: dto.email || '',
-      firstname: dto.firstname || '',
-      lastname: dto.lastname || '',
-      phoneNumber: dto.phoneNumber || '',
-      country: COUNTRIES.find(c => c.isoCode.toLowerCase() === (dto.country?.toLowerCase() || ''))?.name || '',
-    } as GuestDisplayData);
-
-    const mappedContent: DtoDisplayDataMap[] = p.content.map(g => ({
-      dto: g,
-      displayData: mapDtoToDisplayData(g)
-    } as DtoDisplayDataMap));
-
-    const displayPage: Page<DtoDisplayDataMap> = {
-      ...p,
-      content: mappedContent
-    };
-
-    this.pagedData$.next(displayPage);
-    this.paginatorLength = displayPage.totalElements;
+      );
+      return {...sc, value: country?.isoCode || sc.value} as SearchCriteria;
+    });
+    this.guestService.findBy(params.event, undefined, undefined, params.sort, searchCriteria);
   }
 
   protected getPaginator(paginator: MatPaginator) {

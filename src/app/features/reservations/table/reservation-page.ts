@@ -28,20 +28,20 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
     RegularTableComponent,
   ],
   template: `
-    <app-regular-table
-      [page$]="pagedData$"
-      [tabColumns]="fields"
-      [displayedColumns]="displayedColumns"
-      [pageSize]="pageSize"
-      [paginatorLength]="paginatorLength"
-      [pageSizeOptions]="pageSizeOptions"
-      [serviceInstance]="null"
-      [fetchFunc]="fetchData.bind(this)"
-      [onClickFunc]="openFormPopup.bind(this)"
-      [createFunc]="openFormPopup.bind(this)"
-      [additionalFunc]="additionalFunc"
-      (paginatorReady)="getPaginator($event)">
-    </app-regular-table>
+<!--    <app-regular-table-->
+<!--      [page$]="pagedData$"-->
+<!--      [tabColumns]="fields"-->
+<!--      [displayedColumns]="displayedColumns"-->
+<!--      [pageSize]="pageSize"-->
+<!--      [paginatorLength]="paginatorLength"-->
+<!--      [pageSizeOptions]="pageSizeOptions"-->
+<!--      [serviceInstance]="null"-->
+<!--      [fetchFunc]="fetchData.bind(this)"-->
+<!--      [onClickFunc]="openFormPopup.bind(this)"-->
+<!--      [createFunc]="openFormPopup.bind(this)"-->
+<!--      [additionalFunc]="additionalFunc"-->
+<!--      (paginatorReady)="getPaginator($event)">-->
+<!--    </app-regular-table>-->
   `,
   styles: ``,
   standalone: true,

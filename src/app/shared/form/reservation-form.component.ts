@@ -203,16 +203,16 @@ export class ReservationFormComponent implements OnInit {
   }
 
   private setupGuestSearch() {
-    this.guests$ = this.formGroup.get('guestSearch')!.valueChanges.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      filter((v): v is string => typeof v === 'string' && v.length > 1),
-      switchMap((v: string) => this.guestService.findBy(
-        undefined, 0, 50, undefined,
-        [{ key: 'lastname', value: v, operation: 'LIKE' }]
-      )),
-      map((res: Page<GuestDto>) => (res.content || []).map((g: GuestDto) => ({ name: `${g.firstname || ''} ${g.lastname || ''}`.trim(), guest: g })))
-    );
+    // this.guests$ = this.formGroup.get('guestSearch')!.valueChanges.pipe(
+    //   debounceTime(200),
+    //   distinctUntilChanged(),
+    //   filter((v): v is string => typeof v === 'string' && v.length > 1),
+    //   switchMap((v: string) => this.guestService.findBy(
+    //     undefined, 0, 50, undefined,
+    //     [{ key: 'lastname', value: v, operation: 'LIKE' }]
+    //   )),
+    //   map((res: Page<GuestDto>) => (res.content || []).map((g: GuestDto) => ({ name: `${g.firstname || ''} ${g.lastname || ''}`.trim(), guest: g })))
+    // );
   }
 
   private initialPatch() {
