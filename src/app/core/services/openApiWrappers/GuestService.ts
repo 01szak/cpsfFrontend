@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable, ResourceRef, signal} from '@angular/core';
 import {BehaviorSubject, from, map, tap} from 'rxjs';
 import {PageEvent} from '@angular/material/paginator';
 import {Page} from '@core/models/Page';
@@ -12,11 +12,45 @@ import {create1, deleteGuest, findBy1, SearchRequest, update1} from '../../../ap
 import {DataFetchFacade, ResourceType} from '@core/services/openApiWrappers/DataFetchFacade';
 import {rxResource} from '@angular/core/rxjs-interop';
 
+@Injectable({providedIn: "root"})
+export abstract class AbstractService {
+  private readonly dataFetchFacade = inject(DataFetchFacade);
+  public readonly pageable = signal<Pageable | undefined>(undefined);
+  public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
+
+  public abstract getType(): ResourceType;
+
+  public pageResource: ResourceRef<Page<any>> = rxResource({
+    defaultValue: {content: [], number: 0, size: 0, totalElements: 0, totalPages: 0} as Page<any>,
+    params: () => {return {pageable: this.pageable(), searchCriteria: this.searchCriteria()}},
+    stream: ({params}) => {
+      return this.dataFetchFacade.findByBasedOnType(this.getType(), params.pageable, params.searchCriteria)
+    }
+  })
+
+}
+
+interface DisplayData {
+  content: any,
+  totalElements: number
+}
+
+export interface DataService {
+  getDisplayData(): DisplayData[];
+}
+
 // TODO meaby there is a way to have one facade for all dtos? eventually override if needed
 @Injectable({providedIn: "root"})
-export class GuestService {
+export class GuestService extends AbstractService implements DataService {
+
+  public getDisplayData(): DisplayData[] {
+    return this.pageResource.value().content.map(c => c as DisplayData);
+  }
+
+  public override getType(): ResourceType {
+      return "GUEST" as ResourceType;
+  }
   private api = inject(Api);
-  private readonly dataFetchFacade = inject(DataFetchFacade);
   private notification = inject(NotificationService);
 
   private guestSubject = new BehaviorSubject<Page<GuestDto>>({content: [], number: 0, size: 0, totalElements: 0, totalPages: 0});
@@ -29,24 +63,24 @@ export class GuestService {
     sort?: Sort,
     searchCriteria?: SearchCriteria[]
   } = {};
-
-  public readonly pageable = signal<Pageable | undefined>(undefined);
-  public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
-
-  public guestDtoPage = rxResource({
-    params: () => {
-      const pageable = this.pageable();
-      const searchRequest = this.searchCriteria();
-      return pageable && searchRequest ? {pageable, searchRequest} : undefined;
-    },
-    stream: ({params}) =>
-      this.dataFetchFacade.findByBasedOnType(ResourceType.GUEST, params.pageable, params.searchRequest).pipe(
-        map((p: Page<GuestDto>): Page<DtoDisplayDataMap> => ({
-          ...p,
-          content: p.content.map(dto => ({dto, displayData: this.toDisplayData(dto)}))
-        }))
-      )
-  });
+  //
+  // public readonly pageable = signal<Pageable | undefined>(undefined);
+  // public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
+  //
+  // public guestDtoPage = rxResource({
+  //   params: () => {
+  //     const pageable = this.pageable();
+  //     const searchRequest = this.searchCriteria();
+  //     return pageable && searchRequest ? {pageable, searchRequest} : undefined;
+  //   },
+  //   stream: ({params}) =>
+  //     this.dataFetchFacade.findByBasedOnType(ResourceType.GUEST, params.pageable, params.searchRequest).pipe(
+  //       map((p: Page<GuestDto>): Page<DtoDisplayDataMap> => ({
+  //         ...p,
+  //         content: p.content.map(dto => ({dto, displayData: this.toDisplayData(dto)}))
+  //       }))
+  //     )
+  // });
 
   private toDisplayData(dto: GuestDto) {
     return {
@@ -72,38 +106,38 @@ export class GuestService {
 
   public findByUnpaged(searchCriteria?: SearchCriteria[]): void {
     this.findBy(undefined, 0, 1000, undefined, searchCriteria);
-  }
-
-  public delete(id: number) {
-    return from(this.api.invoke(deleteGuest, { id: id }))
-      .pipe(
-        tap({
-          next: (response: any) => this.notification.success(response),
-          error: (error) => this.notification.error(error)
-        }),
-        tap(() => this.guestDtoPage.reload())
-      );
-  }
-
-  public create(g: GuestDto) {
-    return from(this.api.invoke(create1, { body: g as unknown as GuestDto }))
-      .pipe(
-        tap({
-          next: (response: any) => this.notification.success(response),
-          error: (error) => this.notification.error(error)
-        }),
-        tap(() => this.guestDtoPage.reload())
-      );
-  }
-
-  public update(g: GuestDto) {
-    return from(this.api.invoke(update1, { body: g as unknown as GuestDto }))
-      .pipe(
-        tap({
-          next: (response: any) => this.notification.success(response),
-          error: (error) => this.notification.error(error)
-        }),
-        tap(() => this.guestDtoPage.reload())
-      );
-  }
-}
+  // }
+  //
+  // public delete(id: number) {
+  //   return from(this.api.invoke(deleteGuest, { id: id }))
+  //     .pipe(
+  //       tap({
+  //         next: (response: any) => this.notification.success(response),
+  //         error: (error) => this.notification.error(error)
+  //       }),
+  //       tap(() => this.guestDtoPage.reload())
+  //     );
+  // }
+  //
+  // public create(g: GuestDto) {
+  //   return from(this.api.invoke(create1, { body: g as unknown as GuestDto }))
+  //     .pipe(
+  //       tap({
+  //         next: (response: any) => this.notification.success(response),
+  //         error: (error) => this.notification.error(error)
+  //       }),
+  //       tap(() => this.guestDtoPage.reload())
+  //     );
+  // }
+  //
+  // public update(g: GuestDto) {
+  //   return from(this.api.invoke(update1, { body: g as unknown as GuestDto }))
+  //     .pipe(
+  //       tap({
+  //         next: (response: any) => this.notification.success(response),
+  //         error: (error) => this.notification.error(error)
+  //       }),
+  //       tap(() => this.guestDtoPage.reload())
+  //     );
+  // }
+}}

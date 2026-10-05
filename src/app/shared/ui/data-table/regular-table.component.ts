@@ -1,4 +1,14 @@
-import {AfterViewInit, Component, EventEmitter, inject, Input, Output, ResourceRef, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  ResourceRef,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -19,10 +29,10 @@ import {AsyncPipe, NgClass, CommonModule} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.component';
 import {fromEvent, Observable} from 'rxjs';
-import {Page} from '@core/models/Page';
-import {SearchCriteria} from '../../../api';
+import {Pageable, SearchCriteria, SearchRequest} from '../../../api';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Moment} from 'moment';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 export interface DtoDisplayDataMap {
   dto: any,
@@ -50,11 +60,16 @@ export interface SearchDialogData {
 export interface Field {
   name: string,
   type: FieldType,
+  displayName: string, //it is used for inner fields
   value?: string | '', //there should be only one per instance, for inner fields one per field
   secondValue?: string, //used for operation: BETWEEN
-  displayName?: string, //it is used for inner fields
   innerFields?: Field[], //for type object fields can be nested
   selectOption?: any[]
+}
+
+export interface PaginatorData {
+  pageSize: number,
+  totalElements: number
 }
 
 export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER';
@@ -79,6 +94,7 @@ export type SortDirection = 'ASC' | 'DESC';
     StatusComponent,
     NgClass,
     AsyncPipe,
+    MatProgressSpinner,
   ],
   styles: `
     .tableDiv {
@@ -153,9 +169,11 @@ export type SortDirection = 'ASC' | 'DESC';
       .tableDiv {
         background: var(--bg-inner) !important;
       }
+
       .row {
         background-color: var(--bg-card) !important;
       }
+
       .tableFooter {
         background: var(--bg-inner) !important;
       }
@@ -215,6 +233,7 @@ export type SortDirection = 'ASC' | 'DESC';
     .ascArow {
       transform: rotate(180deg);
     }
+
     .descArrow {
       transform: rotate(180deg);
     }
@@ -237,12 +256,26 @@ export type SortDirection = 'ASC' | 'DESC';
     i {
       margin: 3px;
     }
+
+    .spinnerContainer {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-content: center;
+    }
+
   `,
   template: `
-    @if (page$.value()?.content; as content) {
-      <div class="tableDiv">
+    @let data = displayData || dtoData;
+    <div class="tableDiv">
+
+      @if (isLoading) {
+        <div class="spinnerContainer">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
         <div class="tableContent">
-          <table class="content" mat-table [dataSource]="content">
+          <table class="content" mat-table [dataSource]="data">
 
             <ng-container matColumnDef="no">
               <th mat-header-cell *matHeaderCellDef> Nr.</th>
@@ -259,19 +292,19 @@ export type SortDirection = 'ASC' | 'DESC';
                     <div (click)="clickSort(field.name);$event.stopPropagation()" class="sortingButton"
                          style="display: flex; flex-direction: row; gap: 0.75rem; align-items: center ">
 
-                      @if(isClicked && clickedColumn === (field.name)) {
+                      @if (isClicked && clickedColumn === (field.name)) {
 
                         <i class="fa-regular fa-circle-up"
                            [ngClass]="{
-                            'ascArrow' : isArrowAsc,
-                            'descArrow' : !isArrowAsc,
-                        }"
+                          'ascArrow' : isArrowAsc,
+                          'descArrow' : !isArrowAsc,
+                      }"
                         > </i>
 
                       }
-                      <p> {{ displayedColumns[$index] }}</p>
+                      <p> {{ field.displayName }}</p>
                     </div>
-                    <i (click)="openSearchDialog($event, displayedColumns[$index], field.name, field)"
+                    <i (click)="openSearchDialog($event, field.displayName, field.name, field)"
                        class="fa-solid fa-filter"></i>
                   </div>
                 </th>
@@ -280,22 +313,24 @@ export type SortDirection = 'ASC' | 'DESC';
                   @switch (field.type) {
                     @case ('BOOLEAN') {
                       <mat-checkbox
-                        (change)=" additionalFunc?.(element.dto)"
-                        [checked]="element.dto[field.name || '']"
+                        (change)="checkboxChangeFunc?.(element.dto)"
+                        [checked]="element.dto[field.name]"
                         (click)="$event.stopPropagation()">
                       </mat-checkbox>
                     }
                     @case ('STATUS') {
-                      <app-status [status]="element.displayData[field.name]"></app-status>
+                      <app-status
+                        [status]="displayData ? element.displayData[field.name] : element[field.name]"></app-status>
                     }
                     @case ('OBJECT') {
+                      <!--this will always be a display data-->
                       {{ getObjectDisplayValue(element.displayData, field) }}
                     }
                     @case ('DATE') {
-                      {{ getDateDisplayValue(element.displayData[field.name]) }}
+                      {{ getDateDisplayValue(displayData ? element.displayData[field.name] : element[field.name]) }}
                     }
                     @default {
-                      {{ element.displayData[field.name] }}
+                      {{ displayData ? element.displayData[field.name] : element[field.name] }}
                     }
                   }
                 </td>
@@ -304,7 +339,7 @@ export type SortDirection = 'ASC' | 'DESC';
             }
             <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
             <tr mat-row
-                (click)="onClickFunc(row.dto)"
+                (click)="onRowClickFunc?.(row.dto)"
                 [ngClass]="{'row': true}"
                 *matRowDef="let row; let i = index; columns: columnFields"
             >
@@ -312,42 +347,52 @@ export type SortDirection = 'ASC' | 'DESC';
 
           </table>
         </div>
-
-        <div class="tableFooter">
-          <div class="funcButtons">
-            <i class="fa-solid fa-plus funcIcon" (click)="createFunc()"></i>
-            <i class="fa-solid fa-arrow-rotate-left funcIcon" (click)="reset()"></i>
-          </div>
-          <mat-paginator
-            [length]="page$.value()?.totalElements ?? 0"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            (page)="fetchFuncWithEvent($event)">
-          </mat-paginator>
+      }
+      <div class="tableFooter">
+        <div class="funcButtons">
+          @if (createFunc) {
+            <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()" [disabled]="isLoading">
+              <i class="fa-solid fa-plus funcIcon"  ></i>
+            </button>
+          }
+          <button style="background: inherit; border: inherit; padding: 0" (click)="reset()" [disabled]="isLoading">
+            <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
+          </button>
         </div>
-
+        <!--          @if (paginatorData) {-->
+        <mat-paginator
+          [length]="totalElements"
+          [pageSize]="pageableSignal()?.size"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="changePage($event)"
+          [disabled]="isLoading"
+        >
+        </mat-paginator>
+        <!--          }-->
       </div>
-    }`,
+    </div>
+  `,
 })
-export class RegularTableComponent implements AfterViewInit {
+export class RegularTableComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  @Input() public page$!: ResourceRef<any>;
+  @Input() public dtoData: any[] = [];
+  @Input() public isLoading: boolean = false;
   @Input() public tabColumns: Field[] = [];
-  @Input() public displayedColumns: string[] = [];
-  @Input() public pageSize: number = 0;
-  @Input() public pageSizeOptions: number[] = [];
-  @Input() public serviceInstance: any = {};
-  @Input() public paginatorLength: number = 0;
-  @Input() public fetchFunc!: (params: FetchParams) => any;
-  @Input() public onClickFunc!: (t: any) => any;
-  @Input() public createFunc!: () => any;
-  @Input() public additionalFunc?: (t: any) => any;
+  @Input() public totalElements: number = 0;
+  @Input() searchCriteriaSignal!: WritableSignal<SearchRequest | undefined>;
+  @Input() pageableSignal!: WritableSignal<Pageable | undefined>;
+  @Input() public displayData?: any[];
+  @Input() public paginatorData?: PaginatorData;
+  @Input() public deleteFunc?: () => any;
+  @Input() public createFunc?: () => any;
+  @Input() public onRowClickFunc?: (dto: any) => any;
+  @Input() public checkboxChangeFunc?: (a: any) => any;
+
 
   @Output() public sortInfo = new EventEmitter<Sort>();
   @Output() public filterInfo = new EventEmitter<SearchCriteria[]>();
-  @Output() paginatorReady = new EventEmitter<MatPaginator>();
 
   private readonly dialog = inject(MatDialog)
 
@@ -355,14 +400,6 @@ export class RegularTableComponent implements AfterViewInit {
   protected isClicked: boolean = false;
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
-
-  public ngAfterViewInit(): void {
-    this.paginatorReady.emit(this.paginator);
-  }
-
-  protected fetchFuncWithEvent(event: PageEvent) {
-    this.fetchFunc({event})
-  }
 
   protected get columnFields(): string[] {
     return this.tabColumns.map(field => field.name);
@@ -385,26 +422,16 @@ export class RegularTableComponent implements AfterViewInit {
        this.clickCount = this.clickCount + 1;
        this.isClicked = true;
      }
-    this.sendSortInfo(columnField, direction);
+     this.pageableSignal.set({...this.pageableSignal(), sort: [columnField, direction!]})
   }
 
-  protected sendSortInfo(columnName?: string, direction?: SortDirection) {
-    if (columnName && direction) {
-      const sort: Sort = {columnName: columnName, direction: direction}
-      this.sortInfo.emit(sort);
-      this.fetchFunc({sort});
-    } else {
-      this.sortInfo.emit();
-      this.fetchFunc({sort: undefined});
-    }
-  }
 
   protected sendFilterInfo(criteria?: SearchCriteria[]) {
-    this.filterInfo.emit(criteria);
+    // this.filterInfo.emit(criteria);
     if (this.paginator) {
       this.paginator.firstPage();
     }
-    this.fetchFunc({searchCriteria: criteria ? criteria : undefined});
+    // this.fetchFunc({searchCriteria: criteria ? criteria : undefined});
   }
 
   protected getObjectDisplayValue(displayData: any, field: Field): string {
@@ -414,7 +441,6 @@ export class RegularTableComponent implements AfterViewInit {
   protected openSearchDialog(event: MouseEvent, label: string, by: string, field: Field) {
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
-    const service = this.serviceInstance;
 
     const dialogRef = this.dialog.open(SearchByPopupComponent, {
       position: {
@@ -424,7 +450,7 @@ export class RegularTableComponent implements AfterViewInit {
       panelClass: 'searchDialog',
       hasBackdrop: false,
       disableClose: true,
-      data: { label, by, field, service },
+      // data: { label, by, field, service },
     });
 
     const popupSub = dialogRef.componentInstance.criteriaEmitter.subscribe((criteria: SearchCriteria[]) => {
@@ -456,12 +482,19 @@ export class RegularTableComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator.pageIndex = 0;
     }
-    this.fetchFunc({event: undefined, sort: undefined, searchCriteria: undefined});
+    this.pageableSignal.set({sort: [], size: 10, page: 0});
+    this.searchCriteriaSignal.set({searchCriteria: []});
   }
 
   protected getDateDisplayValue(date: Moment) {
     return DateFormater.DDMMYYYY(date, DateDelimiter.DOT);
   }
 
+  protected readonly console = console;
+
+  protected changePage($event: PageEvent) {
+    console.log($event)
+    this.pageableSignal.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
+  }
 }
 

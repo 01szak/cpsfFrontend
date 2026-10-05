@@ -23,42 +23,34 @@ import {COUNTRIES} from '@shared/constants/COUNTRIES';
   ],
   template:  `
     <app-regular-table
-      [page$]="guestService.guestDtoPage"
+      [dtoData]="guestService.pageResource.value().content"
+      [isLoading]="guestService.pageResource.isLoading()"
+      [totalElements]="guestService.pageResource.value().totalElements"
       [tabColumns]="columns"
-      [displayedColumns]="displayedColumns"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="pageSizeOptions"
-      [serviceInstance]="null"
-      [fetchFunc]="fetchData.bind(this)"
-      [onClickFunc]="openFormPopup.bind(this)"
+      [pageableSignal]="guestService.pageable"
+      [searchCriteriaSignal]="guestService.searchCriteria"
+      [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
-      (paginatorReady)="getPaginator($event)">
+
+    >
     </app-regular-table>
   `,
   styles:  ``,
   standalone: true
 })
-export class GuestPage implements OnInit {
+export class GuestPage {
   private formService = inject(PopupFormService);
   protected guestService = inject(GuestService);
 
   protected columns: Field[] = [
-    {name: 'firstname', type: 'TEXT', value: ''},
-    {name: 'lastname', type: 'TEXT', value: ''},
-    {name: 'email', type: 'TEXT', value: ''},
-    {name: 'phoneNumber', type: 'TEXT', value: ''},
-    {name: 'carRegistration', type: 'TEXT', value: ''},
-    {name: 'country', type: 'TEXT', value: ''},
+    {name: 'firstname', displayName: 'Imie', type: 'TEXT', value: ''},
+    {name: 'lastname', displayName: 'Nazwisko', type: 'TEXT', value: ''},
+    {name: 'email', displayName: 'Email', type: 'TEXT', value: ''},
+    {name: 'phoneNumber', displayName: 'Numer telefonu', type: 'TEXT', value: ''},
+    {name: 'carRegistration', displayName: 'Rejestracja', type: 'TEXT', value: ''},
+    {name: 'country', displayName: 'Narodowość', type: 'TEXT', value: ''},
   ];
-  protected displayedColumns = ['Imię', 'Nazwisko', 'Email', 'Numer telefonu', 'Rejestracja', 'Narodowość'];
-
-  protected pageSize = 10;
-  protected pageSizeOptions = [10, 20, 50, 100];
   protected paginator?: MatPaginator;
-
-  ngOnInit() {
-    this.guestService.findBy();
-  }
 
   protected fetchData(params: FetchParams) {
     const searchCriteria = params.searchCriteria?.map(sc => {
@@ -80,13 +72,5 @@ export class GuestPage implements OnInit {
     const guestFd: GuestFormData = {guest: guest};
     this.formService.openGuestFormPopup(guestFd);
   }
-}
 
-export type GuestDisplayData ={
-  carRegistration: string;
-  email: string;
-  firstname: string;
-  lastname: string;
-  phoneNumber: string;
-  country: string;
 }
