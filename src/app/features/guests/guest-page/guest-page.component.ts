@@ -50,23 +50,6 @@ export class GuestPage {
     {name: 'carRegistration', displayName: 'Rejestracja', type: 'TEXT', value: ''},
     {name: 'country', displayName: 'Narodowość', type: 'TEXT', value: ''},
   ];
-  protected paginator?: MatPaginator;
-
-  protected fetchData(params: FetchParams) {
-    const searchCriteria = params.searchCriteria?.map(sc => {
-      if (sc.key !== 'country' || !sc.value) return sc;
-      const value = sc.value.toLowerCase();
-      const country = COUNTRIES.find(c =>
-        c.name.toLowerCase() === value || c.isoCode.toLowerCase() === value
-      );
-      return {...sc, value: country?.isoCode || sc.value} as SearchCriteria;
-    });
-    this.guestService.findBy(params.event, undefined, undefined, params.sort, searchCriteria);
-  }
-
-  protected getPaginator(paginator: MatPaginator) {
-    this.paginator = paginator;
-  }
 
   protected openFormPopup(guest?: GuestDto) {
     const guestFd: GuestFormData = {guest: guest};

@@ -54,7 +54,7 @@ export interface SearchDialogData {
   label: string,
   by: string,
   field: Field,
-  service: any
+  searchCriteriaSignal: WritableSignal<SearchRequest>
 }
 
 export interface Field {
@@ -351,11 +351,12 @@ export type SortDirection = 'ASC' | 'DESC';
       <div class="tableFooter">
         <div class="funcButtons">
           @if (createFunc) {
-            <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()" [disabled]="isLoading">
-              <i class="fa-solid fa-plus funcIcon"  ></i>
+            <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()"
+                    [disabled]="isLoading">
+              <i class="fa-solid fa-plus funcIcon"></i>
             </button>
           }
-          <button style="background: inherit; border: inherit; padding: 0" (click)="reset()" [disabled]="isLoading">
+          <button style="background: inherit; border: inherit; padding: 0" (click)="resetAll()" [disabled]="isLoading">
             <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
           </button>
         </div>
@@ -450,11 +451,7 @@ export class RegularTableComponent {
       panelClass: 'searchDialog',
       hasBackdrop: false,
       disableClose: true,
-      // data: { label, by, field, service },
-    });
-
-    const popupSub = dialogRef.componentInstance.criteriaEmitter.subscribe((criteria: SearchCriteria[]) => {
-      this.sendFilterInfo(criteria);
+      data: { label: label, by: by, field: field, searchCriteriaSignal: this.searchCriteriaSignal},
     });
 
     const clickSub = fromEvent(document, 'click').subscribe((event: Event) => {
@@ -470,11 +467,14 @@ export class RegularTableComponent {
     });
     dialogRef.afterClosed().subscribe(() => {
       clickSub.unsubscribe();
-      popupSub.unsubscribe();
     });
   }
 
-  protected reset() {
+  protected resetPaginator() {
+    this.pageableSignal.set({sort: [], size: 10, page: 0});
+  }
+
+  protected resetSortArrow() {
     this.isArrowAsc = false;
     this.isClicked = false;
     this.clickCount = 0;
@@ -482,15 +482,21 @@ export class RegularTableComponent {
     if (this.paginator) {
       this.paginator.pageIndex = 0;
     }
-    this.pageableSignal.set({sort: [], size: 10, page: 0});
+  }
+
+  protected resetSearchCriteriaFilter() {
     this.searchCriteriaSignal.set({searchCriteria: []});
+  }
+
+  protected resetAll() {
+    this.resetSortArrow();
+    this.resetPaginator();
+    this.resetSearchCriteriaFilter();
   }
 
   protected getDateDisplayValue(date: Moment) {
     return DateFormater.DDMMYYYY(date, DateDelimiter.DOT);
   }
-
-  protected readonly console = console;
 
   protected changePage($event: PageEvent) {
     console.log($event)

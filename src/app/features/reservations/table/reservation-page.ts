@@ -60,13 +60,13 @@ export class ReservationPage implements OnInit, OnDestroy {
   });
   protected camperPlaceIndexForOptions: string[] = [];
   protected fields: Field[] = [
-    {name: 'checkin', type: 'DATE', value: ''},
-    {name: 'checkout', type: 'DATE', value: ''},
-    {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
-    {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceIndexForOptions, value: ''}]},
-    {name: 'reservationStatus', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
-    {name: 'paid', type: 'BOOLEAN', value: ''},
-    {name: 'creator', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
+    // {name: 'checkin', type: 'DATE', value: ''},
+    // {name: 'checkout', type: 'DATE', value: ''},
+    // {name: 'guest', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
+    // {name: 'camperPlace', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceIndexForOptions, value: ''}]},
+    // {name: 'reservationStatus', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
+    // {name: 'paid', type: 'BOOLEAN', value: ''},
+    // {name: 'creator', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
   ];
   protected displayedColumns = ['Wjazd', 'Wyjazd', 'Gość', 'Parcela', 'Status', 'Opłacone', 'Twórca'];
   protected paginatorLength = 0;

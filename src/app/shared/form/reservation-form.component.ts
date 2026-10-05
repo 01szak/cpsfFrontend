@@ -137,7 +137,7 @@ export type ReservationFormData = {
           <div [@expandCollapse] style="overflow: hidden;">
             <h2 mat-dialog-title
                 style="margin: 0; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary) !important; padding: 1rem !important;">{{ GuestTittle }}</h2>
-            <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>
+<!--            <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>-->
           </div>
         } @else if (isUpdate && currentGuest) {
           <div [@expandCollapse] style="overflow: hidden;">
