@@ -91,7 +91,6 @@ export type SortDirection = 'ASC' | 'DESC';
     MatCheckbox,
     StatusComponent,
     NgClass,
-    AsyncPipe,
     MatProgressSpinner,
   ],
   styles: `
@@ -311,24 +310,23 @@ export type SortDirection = 'ASC' | 'DESC';
                   @switch (field.type) {
                     @case ('BOOLEAN') {
                       <mat-checkbox
-                        (change)="checkboxChangeFunc?.(element.dto)"
-                        [checked]="element.dto[field.name]"
-                        (click)="$event.stopPropagation()">
+                        (change)="checkboxChangeFunc?.(dtoData[$index])"
+                        [checked]="element[field.name]"
+                        (click)="$event.stopPropagation()"
+                      >
                       </mat-checkbox>
                     }
                     @case ('STATUS') {
-                      <app-status
-                        [status]="displayData ? element.displayData[field.name] : element[field.name]"></app-status>
+                      <app-status [status]="element[field.name]"></app-status>
                     }
                     @case ('OBJECT') {
-                      <!--this will always be a display data-->
-                      {{ getObjectDisplayValue(element.displayData, field) }}
+                      {{ getObjectDisplayValue(element, field) }}
                     }
                     @case ('DATE') {
-                      {{ getDateDisplayValue(displayData ? element.displayData[field.name] : element[field.name]) }}
+                      {{ getDateDisplayValue(element[field.name]) }}
                     }
                     @default {
-                      {{ displayData ? element.displayData[field.name] : element[field.name] }}
+                      {{ element[field.name] }}
                     }
                   }
                 </td>
@@ -338,7 +336,7 @@ export type SortDirection = 'ASC' | 'DESC';
             <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
             <tr mat-row
                 *matRowDef="let row; let i = index; columns: columnFields"
-                (click)="onRowClickFunc?.(row)"
+                (click)="onRowClickFunc?.(dtoData[i])"
                 [ngClass]="{'row': true}"
             >
             </tr>
@@ -485,7 +483,6 @@ export class RegularTableComponent {
   }
 
   protected changePage($event: PageEvent) {
-    console.log($event)
     this.pageableSignal.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
   }
 

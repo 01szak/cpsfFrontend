@@ -7,7 +7,7 @@ import { NgTemplateOutlet, CommonModule } from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
 import { CamperPlaceService } from '@core/services/openApiWrappers/CamperPlaceService';
 import { FormFactoryService } from '@shared/form/FormFactoryService';
-import { CamperPlaceDto } from '../../api/models/camper-place-dto';
+import { CamperPlaceDto } from '../../api';
 import { MatSelectModule } from '@angular/material/select';
 import { CamperPlaceTypeService } from '@core/services/openApiWrappers/CamperPlaceTypeService';
 
@@ -85,7 +85,7 @@ export class CamperPlaceFormComponent implements OnInit {
   protected formTitle = this.isUpdate ? 'Edytuj Parcelę' : 'Nowa Parcela';
 
   protected deleteAction = this.isUpdate ? () => {
-    this.camperPlaceService.delete(this.fd.camperPlace!).subscribe(() => this.dialogRef?.close(true));
+    this.camperPlaceService.delete(this.fd.camperPlace?.id!).subscribe(() => this.dialogRef?.close(true));
   } : null;
 
   ngOnInit() {

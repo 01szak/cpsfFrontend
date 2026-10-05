@@ -22,7 +22,7 @@ export class SettingsPage {
   private camperPlaceService = inject(CamperPlaceService);
   private camperPlaceTypeService = inject(CamperPlaceTypeService);
 
-  protected camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
+  // protected camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
   protected camperPlaceTypes$ = this.camperPlaceTypeService.camperPlaceType$;
 
 }

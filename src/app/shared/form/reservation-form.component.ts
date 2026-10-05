@@ -1,7 +1,8 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
-import {debounceTime, distinctUntilChanged, filter, from, map, Observable, of, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import { trigger, style, transition, animate } from '@angular/animations';
 import {ReservationService} from '@core/services/openApiWrappers/ReservationService';
 import {PopupConfirmationService} from '@core/services/PopupConfirmationService';
@@ -15,7 +16,6 @@ import {MatInput, MatInputModule} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
-import {AsyncPipe} from '@angular/common';
 import {
   MatDatepicker,
   MatDatepickerInput,
@@ -28,12 +28,10 @@ import {
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
-import {Api} from '../../api/api';
-import {GuestDto, ReservationDto} from '../../api';
-import {CamperPlaceDto} from '../../api/models/camper-place-dto';
+import {CamperPlaceDto, GuestDto, ReservationDto} from '../../api';
 import {GuestService} from '@core/services/openApiWrappers/GuestService';
-import {Page} from '@core/models/Page';
 import {Country} from '@shared/constants/COUNTRIES';
+import {Page} from '@core/models/Page';
 
 export type ReservationFormData = {
   reservation?: ReservationDto;
@@ -49,7 +47,6 @@ export type ReservationFormData = {
     ReactiveFormsModule,
     FormsModule,
     PopupFormContainer,
-    GuestFormComponent,
     MatFormField,
     MatLabel,
     MatInput,
@@ -58,7 +55,6 @@ export type ReservationFormData = {
     MatCheckbox,
     MatAutocomplete,
     MatAutocompleteTrigger,
-    AsyncPipe,
     MatDatepickerInput,
     MatDatepickerToggle,
     MatDatepickerModule,
@@ -68,6 +64,7 @@ export type ReservationFormData = {
     MatMomentDateModule,
     MatDialogTitle,
     MatButton,
+    GuestFormComponent,
   ],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,7 +113,7 @@ export type ReservationFormData = {
             <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
           } @else {
             <mat-select formControlName="camperPlace" [compareWith]="compareFn">
-              @for (cp of (camperPlaces$ | async); track cp.id) {
+              @for (cp of camperPlaceService.pageResource.value().content; track cp.id) {
                 <mat-option [value]="cp">{{ cp.index }}</mat-option>
               }
             </mat-select>
@@ -137,7 +134,7 @@ export type ReservationFormData = {
           <div [@expandCollapse] style="overflow: hidden;">
             <h2 mat-dialog-title
                 style="margin: 0; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary) !important; padding: 1rem !important;">{{ GuestTittle }}</h2>
-<!--            <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>-->
+            <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>
           </div>
         } @else if (isUpdate && currentGuest) {
           <div [@expandCollapse] style="overflow: hidden;">
@@ -153,8 +150,8 @@ export type ReservationFormData = {
               <input type="text" matInput formControlName="guestSearch" [matAutocomplete]="auto">
               <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayGuestName"
                                 (optionSelected)="onGuestSelected($event.option.value)">
-                @for (g of (guests$ | async); track g.guest.id) {
-                  <mat-option [value]="g">{{ g.name }}</mat-option>
+                @for (g of guestService.pageResource.value().content; track g.id) {
+                  <mat-option [value]="g">{{ g.firstname }} {{ g.lastname }}</mat-option>
                 }
               </mat-autocomplete>
             </mat-form-field>
@@ -165,15 +162,16 @@ export type ReservationFormData = {
   `,
 })
 export class ReservationFormComponent implements OnInit {
-  private readonly api = inject(Api);
+  protected readonly camperPlaceService = inject(CamperPlaceService);
+  protected readonly guestService = inject(GuestService);
+
   private readonly factory = inject(FormFactoryService);
   private readonly reservationService = inject(ReservationService);
-  private readonly camperPlaceService = inject(CamperPlaceService);
-  private readonly guestService = inject(GuestService);
   private readonly confirmation = inject(PopupConfirmationService);
   private readonly dialogRef = inject(MatDialogRef<ReservationFormComponent>);
   private readonly fd: ReservationFormData = inject(MAT_DIALOG_DATA);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected selectedCpFromCalendar? = this.fd?.camperPlace;
   protected currentGuest? = this.fd?.reservation?.guest;
@@ -182,8 +180,6 @@ export class ReservationFormComponent implements OnInit {
   protected formTitle = this.isUpdate ? 'Edycja Rezerwacji' : 'Nowa Rezerwacja';
   protected GuestTittle = this.isUpdate ? 'Edycja Gościa' : 'Nowy Gość';
   protected isNewGuest = false;
-  protected camperPlaces$: Observable<CamperPlaceDto[]> = this.camperPlaceService.camperPlacesForTable$;
-  protected guests$: Observable<{ name: string; guest: GuestDto }[]> = of([]);
   protected checkinCalendarStart: moment.Moment | null = null;
   protected checkoutCalendarStart: moment.Moment | null = null;
   protected animationsEnabled = false;
@@ -193,6 +189,8 @@ export class ReservationFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.camperPlaceService.pageResource.reload();
+    this.guestService.pageResource.reload();
     this.setupGuestSearch();
     this.initialPatch();
 
@@ -203,16 +201,12 @@ export class ReservationFormComponent implements OnInit {
   }
 
   private setupGuestSearch() {
-    // this.guests$ = this.formGroup.get('guestSearch')!.valueChanges.pipe(
-    //   debounceTime(200),
-    //   distinctUntilChanged(),
-    //   filter((v): v is string => typeof v === 'string' && v.length > 1),
-    //   switchMap((v: string) => this.guestService.findBy(
-    //     undefined, 0, 50, undefined,
-    //     [{ key: 'lastname', value: v, operation: 'LIKE' }]
-    //   )),
-    //   map((res: Page<GuestDto>) => (res.content || []).map((g: GuestDto) => ({ name: `${g.firstname || ''} ${g.lastname || ''}`.trim(), guest: g })))
-    // );
+    this.formGroup.get('guestSearch')!.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      filter((v): v is string => typeof v === 'string' && v.length > 1),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(v => this.guestService.searchCriteria.set({searchCriteria: [{key: 'lastname', value: v, operation: 'LIKE'}]}));
   }
 
   private initialPatch() {
@@ -226,7 +220,10 @@ export class ReservationFormComponent implements OnInit {
 
       if (this.fd.reservation.guest) {
         const g = this.fd.reservation.guest;
+        console.log(g)
+        console.log(this.formGroup.get(`${g.firstname || ''} ${g.lastname || ''}`.trim())?.value)
         this.formGroup.get('guestSearch')?.setValue(`${g.firstname || ''} ${g.lastname || ''}`.trim());
+        console.log(this.formGroup.get('guestSearch')?.value)
       }
 
       if (this.fd?.reservation.camperPlace) {
@@ -248,21 +245,21 @@ export class ReservationFormComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  protected displayGuestName(val: any) { return val?.name ?? ''; }
+  protected displayGuestName(val: any) { return val ? `${val.firstname ?? ''} ${val.lastname ?? ''}`.trim() : ''; }
 
   protected compareFn(o1: any, o2: any): boolean {
     return (o1 && o2) ? (o1.id == o2.id) : (o1 === o2);
   }
 
   protected onGuestSelected(val: any) {
-    this.factory.patchGuest(this.formGroup, val.guest);
+    this.factory.patchGuest(this.formGroup, val);
   }
 
   protected deleteAction = this.isUpdate ? () => {
     this.confirmation.openConfirmationPopup({
       title: 'Usuwanie',
       message: 'Czy na pewno usunąć tę rezerwację?',
-      action: () => this.reservationService.deleteReservation(this.fd.reservation!).subscribe(() => this.dialogRef.close())
+      action: () => this.reservationService.delete(this.fd.reservation?.id!).subscribe(() => this.dialogRef.close())
     });
   } : null;
 
@@ -308,6 +305,7 @@ export class ReservationFormComponent implements OnInit {
   }
 
   get guestFullName() {
+    console.log(this.formGroup.get('guestSearch'))
     return this.formGroup.get('guestSearch')?.value;
   }
 }

@@ -29,7 +29,6 @@ import {GuestService} from '@core/services/openApiWrappers/GuestService';
       [searchCriteriaSignal]="guestService.searchCriteria"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
-
     >
     </app-regular-table>
   `,

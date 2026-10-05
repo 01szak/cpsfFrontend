@@ -269,10 +269,10 @@ export class CalendarPage implements OnInit, OnDestroy {
   private reservationService = inject(ReservationService);
 
   constructor() {
-    this.camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
-    this.reservations$ = this.reservationService.reservationDtos$.pipe(
-      map(page => page.content || [])
-    );
+    // this.camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
+    // this.reservations$ = this.reservationService.reservationDtos$.pipe(
+    //   map(page => page.content || [])
+    // );
   }
 
   ngOnInit(): void {
@@ -285,17 +285,17 @@ export class CalendarPage implements OnInit, OnDestroy {
   }
 
   private fetchData() {
-    this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
+    // this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
 
     const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month - 1, day: 1}).startOf('month');
     const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month + 1, day: 1}).endOf('month');
-
-    this.sub.add(this.reservationService.findByUnpaged([{
-      key: 'checkin',
-      operation: 'BETWEEN',
-      value: DateFormater.YYYYMMDD(startOfMonth, DateDelimiter.DASH),
-      secondValue: DateFormater.YYYYMMDD(endOfMonth, DateDelimiter.DASH)
-    }]).subscribe());
+    //
+    // this.sub.add(this.reservationService.findByUnpaged([{
+    //   key: 'checkin',
+    //   operation: 'BETWEEN',
+    //   value: DateFormater.YYYYMMDD(startOfMonth, DateDelimiter.DASH),
+    //   secondValue: DateFormater.YYYYMMDD(endOfMonth, DateDelimiter.DASH)
+    // }]).subscribe());
   }
 
   changeMonth(event: number) {

@@ -164,9 +164,9 @@ export class CamperPlacesWithUniquePricesComponent {
       [displayedColumns]="dispColumns"
       [formDeclaration]="formFieldsDeclaration"
       [data]="camperPlaceTypes"
-      [deleteFunc]="deleteFunc"
-      (saveRequest)="onSave($any($event))"
-    />
+      [deleteFunc]="deleteFunc"/>
+<!--      (saveRequest)="onSave($any($event))"-->
+<!--    />-->
   `
 })
 export class CamperPlaceTypeSettingsComponent {
@@ -197,67 +197,69 @@ export class CamperPlaceTypeSettingsComponent {
     });
   }
 
-  onSave(changes: RowChange<CamperPlaceTypeDto>[]) {
-    const priceChanged: number[] = changes
-      .filter(c => c.original.price !== c.updated.price)
-      .map(c => c.updated.id!);
+  // onSave(changes: RowChange<CamperPlaceTypeDto>[]) {
+  //   const priceChanged: number[] = changes
+  //     .filter(c => c.original.price !== c.updated.price)
+  //     .map(c => c.updated.id!);
+  //
+  //   const updatedRows = changes.map(c => c.updated);
+  //
+  //   if (priceChanged.length > 0) {
+  //     this.priceChangedData(updatedRows, priceChanged).pipe(take(1)).subscribe(data => {
+  //       this.popupService.openConfirmationPopup(data);
+  //     });
+  //   } else {
+  //     this.popupService.openConfirmationPopup(this.defaultChangeData(updatedRows));
+  //   }
+  // }
 
-    const updatedRows = changes.map(c => c.updated);
+  // private priceChangedData(updatedRows: CamperPlaceTypeDto[], priceChangedIds: number[]):
+    // Observable<ConfirmationData>
+  // {
+    // const selectedIds: number[] = [];
 
-    if (priceChanged.length > 0) {
-      this.priceChangedData(updatedRows, priceChanged).pipe(take(1)).subscribe(data => {
-        this.popupService.openConfirmationPopup(data);
-      });
-    } else {
-      this.popupService.openConfirmationPopup(this.defaultChangeData(updatedRows));
-    }
-  }
+    // return forkJoin(
+    //   priceChangedIds.map(id =>
+    //     this.camperPlaceService
+    //       .getCamperPlacesWithUniquePriceAndCamperTypeId(id)
+    //       .pipe(
+    //         map(cp => ({ id, cp }))
+    //       )
+    //   )
+    // ).pipe(
+    //   map(results => {
+    //     const camperPlacesPerType: Record<number, CamperPlaceDto[]> = {};
+    //     results.forEach(r => camperPlacesPerType[r.id] = r.cp);
+    //
+    //     return {
+    //       title: 'Zmiana Ceny',
+    //       message: 'Zmiana ceny typu spowoduje nadpisanie wszystkich parcel, które ten typ posiadają. Jeżeli chcesz nadpisać również te z własną ceną, zaznacz je poniżej:',
+    //       component: CamperPlacesWithUniquePricesComponent,
+    //       componentData: {
+    //         rows: camperPlacesPerType,
+    //         selectedIds: selectedIds,
+    //         updatedTypes: updatedRows
+    //       },
+    //       action: () => {
+    //         this.camperPlaceTypeService.update(updatedRows, selectedIds).pipe(take(1)).subscribe({
+    //           error: () => this.settingsForm.reset()
+    //         });
+    //       }
+    //     };
+    //   })
+    // );
+  // }
 
-  private priceChangedData(updatedRows: CamperPlaceTypeDto[], priceChangedIds: number[]): Observable<ConfirmationData> {
-    const selectedIds: number[] = [];
-
-    return forkJoin(
-      priceChangedIds.map(id =>
-        this.camperPlaceService
-          .getCamperPlacesWithUniquePriceAndCamperTypeId(id)
-          .pipe(
-            map(cp => ({ id, cp }))
-          )
-      )
-    ).pipe(
-      map(results => {
-        const camperPlacesPerType: Record<number, CamperPlaceDto[]> = {};
-        results.forEach(r => camperPlacesPerType[r.id] = r.cp);
-
-        return {
-          title: 'Zmiana Ceny',
-          message: 'Zmiana ceny typu spowoduje nadpisanie wszystkich parcel, które ten typ posiadają. Jeżeli chcesz nadpisać również te z własną ceną, zaznacz je poniżej:',
-          component: CamperPlacesWithUniquePricesComponent,
-          componentData: {
-            rows: camperPlacesPerType,
-            selectedIds: selectedIds,
-            updatedTypes: updatedRows
-          },
-          action: () => {
-            this.camperPlaceTypeService.update(updatedRows, selectedIds).pipe(take(1)).subscribe({
-              error: () => this.settingsForm.reset()
-            });
-          }
-        };
-      })
-    );
-  }
-
-  private defaultChangeData (updatedRows: CamperPlaceTypeDto[]): ConfirmationData {
-    return {
-      title: 'Zmiana Nazwy',
-      message: 'Zmiana nazwy spowoduje zmianę dla wszystkich parcel przypisanych do tego typu. Czy chcesz kontynuować?',
-      action: () => {
-        this.camperPlaceTypeService.update(updatedRows).pipe(take(1)).subscribe({
-          error: () => this.settingsForm.reset()
-        });
-      }
-    };
-  }
+  // private defaultChangeData (updatedRows: CamperPlaceTypeDto[]): ConfirmationData {
+  //   return {
+  //     title: 'Zmiana Nazwy',
+  //     message: 'Zmiana nazwy spowoduje zmianę dla wszystkich parcel przypisanych do tego typu. Czy chcesz kontynuować?',
+  //     action: () => {
+  //       this.camperPlaceTypeService.update(updatedRows).pipe(take(1)).subscribe({
+  //         error: () => this.settingsForm.reset()
+  //       });
+  //     }
+  //   };
+  // }
 
 }

@@ -6,15 +6,15 @@ import {
   create1,
   create2,
   create3, delete$, delete1, delete2, deleteGuest,
+  getCamperPlaces,
   GuestDto,
   Pageable,
   ReservationDto,
   SearchRequest, update, update1, update2, update3
 } from '../../../api';
 import {findBy, findBy1} from '../../../api';
-import {from, Observable} from 'rxjs';
+import {from, map, Observable} from 'rxjs';
 
-/** Odpowiedź backendu dla create/update/delete, np. {success: "..."} */
 export type ApiResponse = { [key: string]: string };
 
 export enum ResourceType {
@@ -37,6 +37,9 @@ export class ServiceFacade {
     switch (type) {
       case ResourceType.RESERVATION: return from(this.api.invoke(findBy, params));
       case ResourceType.GUEST: return from(this.api.invoke(findBy1, params));
+      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(getCamperPlaces)).pipe(
+        map((content: CamperPlaceDto[]) => ({content, number: 0, size: content.length, totalElements: content.length, totalPages: 1}))
+      );
       default: throw new Error(`Provided incorrect resource type: ${type}`);
     }
   }

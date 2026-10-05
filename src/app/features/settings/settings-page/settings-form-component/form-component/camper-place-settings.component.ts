@@ -56,11 +56,11 @@ export class CamperPlaceSettingsComponent {
   }
 
   protected deleteFunc = (camperPlace: CamperPlaceDto) => {
-    this.popupService.openConfirmationPopup({
-        title: 'Usuwanie',
-        message: "Usunięcie parceli, spowoduje trwałe usunięcie wszystkich rezerwacji, które były na niej zrobione. Czy chcesz kontynuowć? (nie zalecane!)",
-        action: () => this.camperPlaceService.delete(camperPlace).pipe(take(1)).subscribe()
-    });
+    // this.popupService.openConfirmationPopup({
+    //     title: 'Usuwanie',
+    //     message: "Usunięcie parceli, spowoduje trwałe usunięcie wszystkich rezerwacji, które były na niej zrobione. Czy chcesz kontynuowć? (nie zalecane!)",
+    //     action: () => this.camperPlaceService.delete(camperPlace).pipe(take(1)).subscribe()
+    // });
   }
 
   onSave(changes: RowChange<CamperPlaceDto>[]) {
