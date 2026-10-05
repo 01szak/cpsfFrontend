@@ -1,11 +1,9 @@
 import {
-  AfterViewInit,
   Component,
   EventEmitter,
   inject,
   Input,
   Output,
-  ResourceRef,
   ViewChild,
   WritableSignal
 } from '@angular/core';
@@ -28,7 +26,7 @@ import {StatusComponent} from '@shared/ui/data-table/status/status.component';
 import {AsyncPipe, NgClass, CommonModule} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.component';
-import {fromEvent, Observable} from 'rxjs';
+import {fromEvent} from 'rxjs';
 import {Pageable, SearchCriteria, SearchRequest} from '../../../api';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Moment} from 'moment';
@@ -60,7 +58,7 @@ export interface SearchDialogData {
 export interface Field {
   name: string,
   type: FieldType,
-  displayName: string, //it is used for inner fields
+  displayName: string, //it is used for headers display
   value?: string | '', //there should be only one per instance, for inner fields one per field
   secondValue?: string, //used for operation: BETWEEN
   innerFields?: Field[], //for type object fields can be nested
@@ -339,9 +337,9 @@ export type SortDirection = 'ASC' | 'DESC';
             }
             <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
             <tr mat-row
-                (click)="onRowClickFunc?.(row.dto)"
-                [ngClass]="{'row': true}"
                 *matRowDef="let row; let i = index; columns: columnFields"
+                (click)="onRowClickFunc?.(row)"
+                [ngClass]="{'row': true}"
             >
             </tr>
 
@@ -360,7 +358,6 @@ export type SortDirection = 'ASC' | 'DESC';
             <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
           </button>
         </div>
-        <!--          @if (paginatorData) {-->
         <mat-paginator
           [length]="totalElements"
           [pageSize]="pageableSignal()?.size"
@@ -369,7 +366,6 @@ export type SortDirection = 'ASC' | 'DESC';
           [disabled]="isLoading"
         >
         </mat-paginator>
-        <!--          }-->
       </div>
     </div>
   `,
@@ -386,7 +382,6 @@ export class RegularTableComponent {
   @Input() pageableSignal!: WritableSignal<Pageable | undefined>;
   @Input() public displayData?: any[];
   @Input() public paginatorData?: PaginatorData;
-  @Input() public deleteFunc?: () => any;
   @Input() public createFunc?: () => any;
   @Input() public onRowClickFunc?: (dto: any) => any;
   @Input() public checkboxChangeFunc?: (a: any) => any;
@@ -424,15 +419,6 @@ export class RegularTableComponent {
        this.isClicked = true;
      }
      this.pageableSignal.set({...this.pageableSignal(), sort: [columnField, direction!]})
-  }
-
-
-  protected sendFilterInfo(criteria?: SearchCriteria[]) {
-    // this.filterInfo.emit(criteria);
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    // this.fetchFunc({searchCriteria: criteria ? criteria : undefined});
   }
 
   protected getObjectDisplayValue(displayData: any, field: Field): string {
@@ -502,5 +488,6 @@ export class RegularTableComponent {
     console.log($event)
     this.pageableSignal.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
   }
+
 }
 

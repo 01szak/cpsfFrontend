@@ -1,0 +1,75 @@
+import {inject, Injectable} from '@angular/core';
+import {
+  Api,
+  CamperPlaceDto, CamperPlaceTypeDto,
+  create,
+  create1,
+  create2,
+  create3, delete$, delete1, delete2, deleteGuest,
+  GuestDto,
+  Pageable,
+  ReservationDto,
+  SearchRequest, update, update1, update2, update3
+} from '../../../api';
+import {findBy, findBy1} from '../../../api';
+import {from, Observable} from 'rxjs';
+
+/** Odpowiedź backendu dla create/update/delete, np. {success: "..."} */
+export type ApiResponse = { [key: string]: string };
+
+export enum ResourceType {
+  RESERVATION = 'RESERVATION',
+  GUEST = 'GUEST',
+  CAMPER_PLACE = "CAMPER_PLACE",
+  CAMPER_PLACE_TYPE = "CAMPER_PLACE_TYPE",
+}
+
+@Injectable({providedIn: "root"})
+export class ServiceFacade {
+  private readonly api = inject(Api)
+
+  public findBy(type: ResourceType, pageable?: Pageable, body?: SearchRequest): Observable<any> {
+    //TODO this should be a static default value
+    if (!pageable) pageable = {page: 0, size: 10, sort: []} as Pageable
+    if (!body) body = {searchCriteria: []} as SearchRequest
+
+    const params = {pageable, body};
+    switch (type) {
+      case ResourceType.RESERVATION: return from(this.api.invoke(findBy, params));
+      case ResourceType.GUEST: return from(this.api.invoke(findBy1, params));
+      default: throw new Error(`Provided incorrect resource type: ${type}`);
+    }
+  }
+
+  create(type: ResourceType, body: GuestDto | ReservationDto | CamperPlaceDto | CamperPlaceTypeDto ): Observable<ApiResponse> {
+    switch (type) {
+      case ResourceType.RESERVATION: return from(this.api.invoke(create,  {body: body as ReservationDto}))
+      case ResourceType.GUEST: return from(this.api.invoke(create1, {body: body as GuestDto}));
+      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(create2, {body: body as CamperPlaceDto}));
+      case ResourceType.CAMPER_PLACE_TYPE: return from(this.api.invoke(create3,  {body: body as CamperPlaceTypeDto}))
+      default: throw new Error(`Provided incorrect resource type: ${type}`);
+    }
+  }
+
+  update(type: ResourceType, body: GuestDto | ReservationDto | CamperPlaceDto | CamperPlaceTypeDto | CamperPlaceDto[] | CamperPlaceTypeDto[], cpIdToOverride?: number[]): Observable<ApiResponse> {
+    const asArray = <T>(b: T | T[]): T[] => Array.isArray(b) ? b : [b];
+    switch (type) {
+      case ResourceType.RESERVATION: return from(this.api.invoke(update, {body: body as ReservationDto}))
+      case ResourceType.GUEST: return from(this.api.invoke(update1, {body: body as GuestDto}));
+      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(update2, {body: asArray(body as CamperPlaceDto | CamperPlaceDto[])}));
+      case ResourceType.CAMPER_PLACE_TYPE: return from(this.api.invoke(update3, {body: asArray(body as CamperPlaceTypeDto | CamperPlaceTypeDto[]), cpIdToOverride}))
+      default: throw new Error(`Provided incorrect resource type: ${type}`);
+    }
+  }
+
+  delete(type: ResourceType, id: number): Observable<ApiResponse> {
+    switch (type) {
+      case ResourceType.RESERVATION: return from(this.api.invoke(delete$, {id}))
+      case ResourceType.CAMPER_PLACE_TYPE: return from(this.api.invoke(delete1, {cpTypeId: id}));
+      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(delete2, {campPlaceId: id}));
+      case ResourceType.GUEST: return from(this.api.invoke(deleteGuest, {id}))
+      default: throw new Error(`Provided incorrect resource type: ${type}`);
+    }
+  }
+
+}

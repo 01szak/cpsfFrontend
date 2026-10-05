@@ -1,17 +1,15 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import {
-  FetchParams,
   Field,
   RegularTableComponent
 } from '@shared/ui/data-table/regular-table.component';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {GuestFormData} from '@shared/form/guest-form.component';
-import {GuestDto, SearchCriteria} from '../../../api';
+import {GuestDto} from '../../../api';
 import {GuestService} from '@core/services/openApiWrappers/GuestService';
-import {COUNTRIES} from '@shared/constants/COUNTRIES';
 
 @Component({
   selector: 'users',
@@ -55,5 +53,6 @@ export class GuestPage {
     const guestFd: GuestFormData = {guest: guest};
     this.formService.openGuestFormPopup(guestFd);
   }
+
 
 }
