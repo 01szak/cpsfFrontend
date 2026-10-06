@@ -367,7 +367,7 @@ export class RegularTableComponent implements OnInit {
   @Input() public tabColumns: Field[] = [];
   @Input() public totalElements: number = 0;
   @Input() searchRequestSignal!: WritableSignal<SearchRequest | undefined>;
-  @Input() pageableSignal!: WritableSignal<Pageable | undefined>;
+  @Input() pageableSignal!: WritableSignal<Pageable | undefined | null>;
   @Input() public displayData?: any[];
   @Input() public paginatorData?: PaginatorData;
   @Input() public createFunc?: () => any;

@@ -9,7 +9,7 @@ import {
   getCamperPlaces,
   GuestDto,
   Pageable,
-  ReservationDto,
+  ReservationDto, SearchCriteria,
   SearchRequest, update, update1, update2, update3
 } from '../../../api';
 import {findBy, findBy1} from '../../../api';
@@ -40,7 +40,24 @@ export class ServiceFacade {
 
     const params = {pageable, body};
     switch (type) {
-      case ResourceType.RESERVATION: return from(this.api.invoke(findBy, params));
+      case ResourceType.RESERVATION: {
+        const reservationsWithAssignedStatus = body.searchCriteria!;
+        reservationsWithAssignedStatus.push(
+          {
+            key: "reservationStatus",
+            operation: "NOT_EQUALS",
+            value: 'UNVERIFIED',
+            joinOperator: "AND"
+          } as SearchCriteria,
+          {
+            key: "reservationStatus",
+            operation: "NOT_EQUALS",
+            value: 'VERIFIED',
+            joinOperator: "AND"
+          } as SearchCriteria
+        )
+        return from(this.api.invoke(findBy, {...params, body: {searchCriteria: reservationsWithAssignedStatus}}))
+      }
       case ResourceType.GUEST: return from(this.api.invoke(findBy1, params));
       case ResourceType.CAMPER_PLACE: return from(this.api.invoke(getCamperPlaces)).pipe(
         map((content: CamperPlaceDto[]) => ({content, number: 0, size: content.length, totalElements: content.length, totalPages: 1}))
