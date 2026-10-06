@@ -1,8 +1,9 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
 import {
+  DEFAULT_PAGEABLE,
   Field,
   RegularTableComponent
 } from '@shared/ui/data-table/regular-table.component';
@@ -26,7 +27,7 @@ import {GuestService} from '@core/services/openApiWrappers/GuestService';
       [totalElements]="guestService.pageResource.value().totalElements"
       [tabColumns]="columns"
       [pageableSignal]="guestService.pageable"
-      [searchCriteriaSignal]="guestService.searchCriteria"
+      [searchRequestSignal]="guestService.searchCriteria"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
     >
@@ -35,7 +36,7 @@ import {GuestService} from '@core/services/openApiWrappers/GuestService';
   styles:  ``,
   standalone: true
 })
-export class GuestPage {
+export class GuestPage implements OnInit {
   private formService = inject(PopupFormService);
   protected guestService = inject(GuestService);
 
@@ -48,10 +49,13 @@ export class GuestPage {
     {name: 'country', displayName: 'Narodowość', type: 'TEXT', value: ''},
   ];
 
+  ngOnInit(): void {
+    this.guestService.pageable.set(DEFAULT_PAGEABLE)
+  }
+
   protected openFormPopup(guest?: GuestDto) {
     const guestFd: GuestFormData = {guest: guest};
     this.formService.openGuestFormPopup(guestFd);
   }
-
 
 }

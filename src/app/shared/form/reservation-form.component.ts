@@ -220,10 +220,7 @@ export class ReservationFormComponent implements OnInit {
 
       if (this.fd.reservation.guest) {
         const g = this.fd.reservation.guest;
-        console.log(g)
-        console.log(this.formGroup.get(`${g.firstname || ''} ${g.lastname || ''}`.trim())?.value)
         this.formGroup.get('guestSearch')?.setValue(`${g.firstname || ''} ${g.lastname || ''}`.trim());
-        console.log(this.formGroup.get('guestSearch')?.value)
       }
 
       if (this.fd?.reservation.camperPlace) {
@@ -305,7 +302,6 @@ export class ReservationFormComponent implements OnInit {
   }
 
   get guestFullName() {
-    console.log(this.formGroup.get('guestSearch'))
     return this.formGroup.get('guestSearch')?.value;
   }
 }

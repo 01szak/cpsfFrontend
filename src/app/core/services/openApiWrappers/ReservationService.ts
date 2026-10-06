@@ -11,7 +11,6 @@ export class ReservationService extends AbstractService {
       return ResourceType.RESERVATION;
   }
 
-
   // public findBy(event?: PageEvent, page?: number, size?: number, sort?: Sort, searchCriteria?: SearchCriteria[]): Observable<Page<ReservationDto>> {
   //   this.lastQueryParams = {
   //     event: event,

@@ -145,7 +145,6 @@ export class GuestFormComponent implements OnInit {
 
   protected countryDisplayFunc(c: Country | string): string {
     if (typeof c === 'string') {
-      console.log(c)
       return COUNTRIES.find(country => c.toLowerCase() === country.isoCode!.toLowerCase())!.name;
     } else  {
       return c?.name || '';

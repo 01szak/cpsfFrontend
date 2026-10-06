@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -31,7 +31,7 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
       [totalElements]="reservationService.pageResource.value().totalElements"
       [tabColumns]="fields"
       [pageableSignal]="reservationService.pageable"
-      [searchCriteriaSignal]="reservationService.searchCriteria"
+      [searchRequestSignal]="reservationService.searchCriteria"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
       [checkboxChangeFunc]="checkboxChangeFunc"
@@ -42,7 +42,7 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReservationPage {
+export class ReservationPage implements OnInit {
   protected reservationService = inject(ReservationService);
   private camperPlaceService = inject(CamperPlaceService);
   private formService = inject(PopupFormService);
@@ -57,10 +57,17 @@ export class ReservationPage {
     {name: 'creator', displayName: 'Autor', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
   ];
 
+
+  ngOnInit(): void {
+    this.reservationService.pageResource.reload();
+    this.camperPlaceService.pageResource.reload();
+  }
+
   protected mapToDisplayData() {
     return this.reservationService.pageResource.value().content.map(r  => {
       const res = r as ReservationDto;
       return {
+        id: res.id,
         checkin: res.checkin,
         checkout: res.checkout,
         guest: `${res.guest?.firstname || ''} ${res.guest?.lastname || ''}`.trim(),

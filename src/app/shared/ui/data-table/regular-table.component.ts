@@ -2,7 +2,7 @@ import {
   Component,
   EventEmitter,
   inject,
-  Input,
+  Input, OnInit,
   Output,
   ViewChild,
   WritableSignal
@@ -23,7 +23,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 
 import {MatCheckbox} from '@angular/material/checkbox';
 import {StatusComponent} from '@shared/ui/data-table/status/status.component';
-import {AsyncPipe, NgClass, CommonModule} from '@angular/common';
+import {NgClass, CommonModule} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {SearchByPopupComponent} from '@shared/popups/search/search-by-popup.component';
 import {fromEvent} from 'rxjs';
@@ -32,20 +32,9 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Moment} from 'moment';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
-export interface DtoDisplayDataMap {
-  dto: any,
-  displayData: any
-}
-
 export interface Sort {
   columnName: string,
   direction: SortDirection
-}
-
-export interface FetchParams {
-  event?: PageEvent,
-  sort?: Sort,
-  searchCriteria?: SearchCriteria[]
 }
 
 export interface SearchDialogData {
@@ -72,6 +61,15 @@ export interface PaginatorData {
 
 export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER';
 export type SortDirection = 'ASC' | 'DESC';
+
+export const DEFAULT_PAGEABLE: Pageable = {
+  page: 0,
+  size: 10,
+  sort: []
+}
+
+export const DEFAULT_SEARCH_REQUEST: SearchRequest = {searchCriteria: []}
+export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
 
 @Component({
   selector: 'app-regular-table',
@@ -310,7 +308,7 @@ export type SortDirection = 'ASC' | 'DESC';
                   @switch (field.type) {
                     @case ('BOOLEAN') {
                       <mat-checkbox
-                        (change)="checkboxChangeFunc?.(dtoData[$index])"
+                        (change)="checkboxChangeFunc?.(dtoData.filter(d => d.id === element.id)[0])"
                         [checked]="element[field.name]"
                         (click)="$event.stopPropagation()"
                       >
@@ -336,8 +334,8 @@ export type SortDirection = 'ASC' | 'DESC';
             <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
             <tr mat-row
                 *matRowDef="let row; let i = index; columns: columnFields"
-                (click)="onRowClickFunc?.(dtoData[i])"
-                [ngClass]="{'row': true}"
+                (click)="onRowClickFunc?.(dtoData.filter(d => d.id === row.id)[0])"
+                class="row}"
             >
             </tr>
 
@@ -359,7 +357,7 @@ export type SortDirection = 'ASC' | 'DESC';
         <mat-paginator
           [length]="totalElements"
           [pageSize]="pageableSignal()?.size"
-          [pageSizeOptions]="[10, 20, 50, 100]"
+          [pageSizeOptions]="PAGE_SIZE_OPTIONS"
           (page)="changePage($event)"
           [disabled]="isLoading"
         >
@@ -368,15 +366,14 @@ export type SortDirection = 'ASC' | 'DESC';
     </div>
   `,
 })
-export class RegularTableComponent {
-
+export class RegularTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   @Input() public dtoData: any[] = [];
   @Input() public isLoading: boolean = false;
   @Input() public tabColumns: Field[] = [];
   @Input() public totalElements: number = 0;
-  @Input() searchCriteriaSignal!: WritableSignal<SearchRequest | undefined>;
+  @Input() searchRequestSignal!: WritableSignal<SearchRequest | undefined>;
   @Input() pageableSignal!: WritableSignal<Pageable | undefined>;
   @Input() public displayData?: any[];
   @Input() public paginatorData?: PaginatorData;
@@ -394,6 +391,11 @@ export class RegularTableComponent {
   protected isClicked: boolean = false;
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
+
+  ngOnInit(): void {
+    this.pageableSignal.set(DEFAULT_PAGEABLE);
+    this.searchRequestSignal.set(DEFAULT_SEARCH_REQUEST);
+  }
 
   protected get columnFields(): string[] {
     return this.tabColumns.map(field => field.name);
@@ -435,7 +437,7 @@ export class RegularTableComponent {
       panelClass: 'searchDialog',
       hasBackdrop: false,
       disableClose: true,
-      data: { label: label, by: by, field: field, searchCriteriaSignal: this.searchCriteriaSignal},
+      data: { label: label, by: by, field: field, searchCriteriaSignal: this.searchRequestSignal},
     });
 
     const clickSub = fromEvent(document, 'click').subscribe((event: Event) => {
@@ -469,7 +471,7 @@ export class RegularTableComponent {
   }
 
   protected resetSearchCriteriaFilter() {
-    this.searchCriteriaSignal.set({searchCriteria: []});
+    this.searchRequestSignal.set({searchCriteria: []});
   }
 
   protected resetAll() {
@@ -486,5 +488,6 @@ export class RegularTableComponent {
     this.pageableSignal.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
   }
 
+  protected readonly PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 }
 
