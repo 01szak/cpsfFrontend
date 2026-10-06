@@ -252,13 +252,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       margin: 3px;
     }
 
-    .spinnerContainer {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      place-content: center;
-    }
-
   `,
   template: `
     @let data = displayData || dtoData;
