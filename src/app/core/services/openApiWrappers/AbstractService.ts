@@ -10,7 +10,8 @@ import {tap} from 'rxjs';
 export abstract class AbstractService {
   private readonly serviceFacade = inject(ServiceFacade);
   private readonly notification = inject(NotificationService);
-  public readonly pageable = signal<Pageable | undefined>(undefined);
+  //null is used to get unpaged data
+  public readonly pageable = signal<Pageable | undefined | null>(undefined);
   public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
 
   public abstract getType(): ResourceType;

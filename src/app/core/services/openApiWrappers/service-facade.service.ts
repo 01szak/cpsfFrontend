@@ -28,10 +28,15 @@ export enum ResourceType {
 export class ServiceFacade {
   private readonly api = inject(Api)
 
-  public findBy(type: ResourceType, pageable?: Pageable, body?: SearchRequest): Observable<any> {
+  public findBy(type: ResourceType, pageable?: Pageable | null, body?: SearchRequest): Observable<any> {
     //TODO this should be a static default value
-    if (!pageable) pageable = {page: 0, size: 10, sort: []} as Pageable
-    if (!body) body = {searchCriteria: []} as SearchRequest
+    if (pageable === undefined) {
+      pageable = {page: 0, size: 10, sort: []} as Pageable;
+    } else if (pageable === null) {
+      pageable = undefined; //open api generated the null value as an undefined thus i need to map the null to the undefined cause its easier
+    }
+
+    if (body === undefined) body = {searchCriteria: []} as SearchRequest
 
     const params = {pageable, body};
     switch (type) {

@@ -269,6 +269,9 @@ export class CalendarPage implements OnInit {
   private popupFormService = inject(PopupFormService);
 
   ngOnInit(): void {
+    //we need an unpaged data here to not miss any reservation / camper place
+    this.reservationService.pageable.set(null)
+    this.camperPlaceService.pageable.set(null)
     this.generateDays();
     this.getReservationsBetweenGivenMonths();
   }
