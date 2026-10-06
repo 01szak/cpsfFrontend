@@ -347,14 +347,16 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
             <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
           </button>
         </div>
-        <mat-paginator
-          [length]="totalElements"
-          [pageSize]="pageableSignal()?.size"
-          [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-          (page)="changePage($event)"
-          [disabled]="isLoading"
-        >
-        </mat-paginator>
+        @if (displayPaginator) {
+          <mat-paginator
+            [length]="totalElements"
+            [pageSize]="pageableSignal()?.size"
+            [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+            (page)="changePage($event)"
+            [disabled]="isLoading"
+          >
+          </mat-paginator>
+        }
       </div>
     </div>
   `,
@@ -366,6 +368,7 @@ export class RegularTableComponent implements OnInit {
   @Input() public isLoading: boolean = false;
   @Input() public tabColumns: Field[] = [];
   @Input() public totalElements: number = 0;
+  @Input() displayPaginator: boolean = true;
   @Input() searchRequestSignal!: WritableSignal<SearchRequest | undefined>;
   @Input() pageableSignal!: WritableSignal<Pageable | undefined | null>;
   @Input() public displayData?: any[];
@@ -386,7 +389,9 @@ export class RegularTableComponent implements OnInit {
   protected clickedColumn: string = '';
 
   ngOnInit(): void {
-    this.pageableSignal.set(DEFAULT_PAGEABLE);
+    if (this.pageableSignal() !== null) {
+      this.pageableSignal.set(DEFAULT_PAGEABLE);
+    }
     this.searchRequestSignal.set(DEFAULT_SEARCH_REQUEST);
   }
 
@@ -411,7 +416,9 @@ export class RegularTableComponent implements OnInit {
        this.clickCount = this.clickCount + 1;
        this.isClicked = true;
      }
-     this.pageableSignal.set({...this.pageableSignal(), sort: [columnField, direction!]})
+     if (this.pageableSignal() !== null) {
+       this.pageableSignal.set({...this.pageableSignal(), sort: [columnField, direction!]})
+     }
   }
 
   protected getObjectDisplayValue(displayData: any, field: Field): string {
@@ -450,7 +457,9 @@ export class RegularTableComponent implements OnInit {
   }
 
   protected resetPaginator() {
-    this.pageableSignal.set({sort: [], size: 10, page: 0});
+    if (this.pageableSignal() !== null) {
+      this.pageableSignal.set({sort: [], size: 10, page: 0});
+    }
   }
 
   protected resetSortArrow() {

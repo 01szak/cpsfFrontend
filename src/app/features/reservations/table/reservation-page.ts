@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -29,7 +29,7 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
       [displayData]="mapToDisplayData()"
       [isLoading]="reservationService.pageResource.isLoading()"
       [totalElements]="reservationService.pageResource.value().totalElements"
-      [tabColumns]="fields"
+      [tabColumns]="fields()"
       [pageableSignal]="reservationService.pageable"
       [searchRequestSignal]="reservationService.searchCriteria"
       [onRowClickFunc]="openFormPopup.bind(this)"
@@ -47,20 +47,19 @@ export class ReservationPage implements OnInit {
   private camperPlaceService = inject(CamperPlaceService);
   private formService = inject(PopupFormService);
 
-  protected fields: Field[] = [
+  protected fields = computed<Field[]>(() => [
     {name: 'checkin', displayName: 'Wjazd', type: 'DATE', value: ''},
     {name: 'checkout', displayName: 'Wyjazd', type: 'DATE', value: ''},
     {name: 'guest', displayName: 'Gość', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
-    {name: 'camperPlace', displayName: 'Parcela', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceService.pageResource.value().content, value: ''}]},
+    {name: 'camperPlace', displayName: 'Parcela', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceService.indexes(), value: ''}]},
     {name: 'reservationStatus', displayName: 'Status', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
     {name: 'paid', displayName: 'Opłacone', type: 'BOOLEAN', value: ''},
     {name: 'creator', displayName: 'Autor', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
-  ];
+  ]);
 
 
   ngOnInit(): void {
     this.reservationService.pageResource.reload();
-    this.camperPlaceService.pageResource.reload();
   }
 
   protected mapToDisplayData() {

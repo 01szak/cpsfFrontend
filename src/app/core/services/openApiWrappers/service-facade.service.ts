@@ -5,15 +5,15 @@ import {
   create,
   create1,
   create2,
-  create3, delete$, delete1, delete2, deleteGuest,
-  getCamperPlaces,
+  create3, delete$, delete1, delete2, deleteGuest, findBy2,
   GuestDto,
   Pageable,
   ReservationDto, SearchCriteria,
   SearchRequest, update, update1, update2, update3
 } from '../../../api';
-import {findBy, findBy1} from '../../../api';
+import {findBy, findBy1, getTypes} from '../../../api';
 import {from, map, Observable} from 'rxjs';
+import {Page} from '@core/models/Page';
 
 export type ApiResponse = { [key: string]: string };
 
@@ -42,6 +42,7 @@ export class ServiceFacade {
     switch (type) {
       case ResourceType.RESERVATION: {
         const reservationsWithAssignedStatus = body.searchCriteria!;
+        // TODO do not duplicate these, first check if already exists
         reservationsWithAssignedStatus.push(
           {
             key: "reservationStatus",
@@ -59,8 +60,12 @@ export class ServiceFacade {
         return from(this.api.invoke(findBy, {...params, body: {searchCriteria: reservationsWithAssignedStatus}}))
       }
       case ResourceType.GUEST: return from(this.api.invoke(findBy1, params));
-      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(getCamperPlaces)).pipe(
-        map((content: CamperPlaceDto[]) => ({content, number: 0, size: content.length, totalElements: content.length, totalPages: 1}))
+      case ResourceType.CAMPER_PLACE: return from(this.api.invoke(findBy2, params));
+      //the backend has no paged endpoint for the types, the whole list is wrapped into a single page
+      case ResourceType.CAMPER_PLACE_TYPE: return from(this.api.invoke(getTypes, {})).pipe(
+        map((types): Page<CamperPlaceTypeDto> => ({
+          content: types, totalElements: types.length, totalPages: 1, number: 0, size: types.length
+        }))
       );
       default: throw new Error(`Provided incorrect resource type: ${type}`);
     }

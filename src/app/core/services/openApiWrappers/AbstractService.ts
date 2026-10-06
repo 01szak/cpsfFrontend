@@ -8,8 +8,8 @@ import {tap} from 'rxjs';
 
 @Injectable({providedIn: "root"})
 export abstract class AbstractService {
-  private readonly serviceFacade = inject(ServiceFacade);
-  private readonly notification = inject(NotificationService);
+  protected readonly serviceFacade = inject(ServiceFacade);
+  protected readonly notification = inject(NotificationService);
   //null is used to get unpaged data
   public readonly pageable = signal<Pageable | undefined | null>(undefined);
   public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
@@ -36,10 +36,11 @@ export abstract class AbstractService {
     return this.serviceFacade.delete(this.getType(), id).pipe(this.notifyAndReload());
   }
 
+
   private notifyAndReload() {
     return tap<ApiResponse>({
       next: (response) => {
-        this.pageResource.reload();
+       this.pageResource.reload();
         this.notification.success(response);
       },
       error: (error) => this.notification.error(error)

@@ -1,7 +1,10 @@
-import {Injectable, inject} from '@angular/core';
-import {CamperPlaceTypeService} from './CamperPlaceTypeService';
+import {Injectable, ResourceRef, computed, inject} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {Page} from '@core/models/Page';
 import { ResourceType } from "./service-facade.service";
 import {AbstractService} from '@core/services/openApiWrappers/AbstractService';
+import {Api, CamperPlaceDto, getCamperPlacesWithUniquePriceAndCamperTypeId} from '../../../api';
+import {from, Observable} from 'rxjs';
 
 @Injectable({providedIn: "root"})
 export class CamperPlaceService extends AbstractService {
@@ -10,24 +13,20 @@ export class CamperPlaceService extends AbstractService {
       return ResourceType.CAMPER_PLACE;
   }
 
-  private typeService = inject(CamperPlaceTypeService);
+  private readonly api = inject(Api);
 
-  // private refreshTrigger$ = new BehaviorSubject<void>(undefined);
-  // public refreshed$ = this.refreshTrigger$.asObservable();
+  private readonly unpagedCamperPlaceResource: ResourceRef<Page<any>> = rxResource({
+    params: () => ({}),
+    stream: () => this.serviceFacade.findBy(this.getType(), null, {searchCriteria: []})
+  });
 
-  //
-  // public camperPlacesForTable$ = merge(
-  //   this.refreshed$,
-  //   this.typeService.refreshed$
-  // ).pipe(
-  //   switchMap(() => this.getCamperPlaces()),
-  //   shareReplay(1)
-  // );
+  public readonly indexes = computed(() =>
+    this.unpagedCamperPlaceResource.value().content.map(c => (c as CamperPlaceDto).index!)
+  );
 
-
-  //
-  // getCamperPlacesWithUniquePriceAndCamperTypeId(cptId: number): Observable<CamperPlaceDto[]> {
-  //   return from(this.api.invoke(getCamperPlacesWithUniquePriceAndCamperTypeId, { typeId: cptId })) as unknown as Observable<CamperPlaceDto[]>;
-  // }
+  // camper places of the given type which have their own price (different from the type's default)
+  public getCamperPlacesWithUniquePriceAndCamperTypeId(cptId: number): Observable<CamperPlaceDto[]> {
+    return from(this.api.invoke(getCamperPlacesWithUniquePriceAndCamperTypeId, {typeId: cptId}));
+  }
 
 }
