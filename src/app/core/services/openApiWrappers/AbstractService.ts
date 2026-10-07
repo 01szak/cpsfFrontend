@@ -42,10 +42,15 @@ export abstract class AbstractService {
     this.searchRequest.set(DEFAULT_SEARCH_REQUEST)
   }
 
+  //subclasses owning additional resources (e.g. unpaged ones) override this to refresh them as well
+  protected reloadResources() {
+    this.pageResource.reload();
+  }
+
   private notifyAndReload() {
     return tap<ApiResponse>({
       next: (response) => {
-       this.pageResource.reload();
+        this.reloadResources();
         this.notification.success(response);
       },
       error: (error) => this.notification.error(error)

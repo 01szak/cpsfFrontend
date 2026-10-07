@@ -81,14 +81,14 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
           </div>
         }
       </div>
-      @if (reservationService.pageResource.isLoading() || camperPlaceService.pageResource.isLoading()) {
+      @if (reservationService.rangeResource.isLoading() || camperPlaceService.unpagedCamperPlaceResource.isLoading()) {
         <div class="spinnerContainer">
           <mat-spinner></mat-spinner>
         </div>
       } @else {
         <div class="tableContainer">
           <div class="table">
-            @for (camperPlace of camperPlaceService.pageResource.value().content; track camperPlace.id) {
+            @for (camperPlace of camperPlaceService.camperPlaces(); track camperPlace.id) {
               <div class="row" [style.--days]="days.length">
 
                 <div class="cell camperPlaceIndex"><p>{{ camperPlace.index }}</p></div>
@@ -103,7 +103,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
                   </div>
                 }
 
-                @for (res of reservationService.pageResource.value().content; track res.id) {
+                @for (res of reservationService.reservationsInRange(); track res.id) {
                   @if (res.camperPlace.id === camperPlace.id && isResInCurrentMonth(res)) {
                     <app-reservation-cell
                       [reservation]="res"
@@ -269,11 +269,6 @@ export class CalendarPage implements OnInit {
   private popupFormService = inject(PopupFormService);
 
   ngOnInit(): void {
-    this.camperPlaceService.resetSignals();
-    this.reservationService.resetSignals()
-    //we need an unpaged data here to not miss any reservation / camper place
-    this.reservationService.pageable.set(null)
-    this.camperPlaceService.pageable.set(null)
     this.generateDays();
     this.getReservationsBetweenGivenMonths();
   }
@@ -282,18 +277,10 @@ export class CalendarPage implements OnInit {
     const currentMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1});
     const startOfPreviousMonth = currentMonth.clone().subtract(1, 'month').startOf('month');
     const endOfNextMonth = currentMonth.clone().add(1, 'month').startOf('month');
-    this.reservationService.searchRequest.set(
-      {
-        searchCriteria:
-          [
-            {
-              key: 'checkin',
-              operation: 'BETWEEN',
-              value:  DateFormater.YYYYMMDD(startOfPreviousMonth, DateDelimiter.DASH),
-              secondValue: DateFormater.YYYYMMDD(endOfNextMonth, DateDelimiter.DASH)
-            }
-          ]
-      })
+    this.reservationService.checkinRange.set({
+      from: DateFormater.YYYYMMDD(startOfPreviousMonth, DateDelimiter.DASH),
+      to: DateFormater.YYYYMMDD(endOfNextMonth, DateDelimiter.DASH)
+    });
   }
 
   changeMonth(event: number) {

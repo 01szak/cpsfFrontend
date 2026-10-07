@@ -13,14 +13,21 @@ export class CamperPlaceService extends AbstractService {
       return ResourceType.CAMPER_PLACE;
   }
 
-  private readonly unpagedCamperPlaceResource: ResourceRef<Page<any>> = rxResource({
+  //independent from the shared pageable / searchRequest signals, so it is not affected by other pages / popups resetting them
+  public readonly unpagedCamperPlaceResource: ResourceRef<Page<any>> = rxResource({
+    defaultValue: {content: [], number: 0, size: 0, totalElements: 0, totalPages: 0} as Page<any>,
     params: () => ({}),
     stream: () => this.serviceFacade.findBy(this.getType(), null, {searchCriteria: []})
   });
 
-  public readonly indexes = computed(() =>
-    (this.unpagedCamperPlaceResource.value()?.content ?? []).map(c => (c as CamperPlaceDto).index!)
-  );
+  public readonly camperPlaces = computed(() => this.unpagedCamperPlaceResource.value().content as CamperPlaceDto[]);
+
+  public readonly indexes = computed(() => this.camperPlaces().map(c => c.index!));
+
+  protected override reloadResources() {
+    super.reloadResources();
+    this.unpagedCamperPlaceResource.reload();
+  }
 
   // camper places of the given type which have their own price (different from the type's default)
   public getCamperPlacesWithUniquePriceAndCamperTypeId(cptId: number): Observable<CamperPlaceDto[]> {

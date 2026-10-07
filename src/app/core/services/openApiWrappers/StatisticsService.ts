@@ -1,43 +1,38 @@
-import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {from, Observable} from 'rxjs';
-import {Statistic} from '@core/models/Statistic';
-import {Revenue} from '@core/models/Revenue';
-import {Api} from '../../../api/api';
-import {getRevenue} from '../../../api/fn/statistics-controller/get-revenue';
-import {getUserPerCountry} from '../../../api/fn/statistics-controller/get-user-per-country';
-import {CountryDistribution} from '../../../api/models/country-distribution';
+import {computed, inject, Injectable, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {from} from 'rxjs';
+import {Api, CountryDistribution, getRevenue, getUserPerCountry, Revenue} from '../../../api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StatisticsService {
-  private apiService = inject(Api);
-  private http = inject(HttpClient);
-  private api = '/api/statistics/';
+  private readonly api = inject(Api);
 
-  getRevenue(month: number, year: number): Observable<Revenue[][]> {
-    return from(this.apiService.invoke(getRevenue, {
-        month: month + 1,
-        year: year
-    })) as unknown as Observable<Revenue[][]>;
-  }
+  //month is counted from 0 (Date, date picker), the backend counts months from 1
+  public readonly month = signal(new Date().getMonth());
+  public readonly year = signal(new Date().getFullYear());
 
-  getUserPerCountry(month: number, year: number): Observable<CountryDistribution[]> {
-    return from(this.apiService.invoke(getUserPerCountry, {
-        month: month + 1,
-        year: year
-    })) as unknown as Observable<CountryDistribution[]>;
-  }
+  private readonly period = computed(() => ({month: this.month(), year: this.year()}));
 
-  getReservationCount(month: number, year: number): Observable<Statistic[]> {
-    return this.http.get<Statistic[]>(
-      this.api
-      + 'reservationCount/'
-      + (month + 1)
-      + '/'
-      + year
-    )
-  }
+  //the result contains two lists: [0] - paid reservations, [1] - unpaid reservations
+  public readonly revenueResource = rxResource({
+    defaultValue: [] as Revenue[][],
+    params: this.period,
+    stream: ({params}) => from(this.api.invoke(getRevenue, {month: params.month + 1, year: params.year}))
+  });
 
+  public readonly countriesResource = rxResource({
+    defaultValue: [] as CountryDistribution[],
+    params: this.period,
+    stream: ({params}) => from(this.api.invoke(getUserPerCountry, {month: params.month + 1, year: params.year}))
+  });
+
+  //value() throws while a resource is in the error state, hence the hasValue() guards
+  public readonly paidRevenue = computed(() => this.revenueResource.hasValue() ? this.revenueResource.value()[0] ?? [] : []);
+  public readonly unpaidRevenue = computed(() => this.revenueResource.hasValue() ? this.revenueResource.value()[1] ?? [] : []);
+  public readonly guestsPerCountry = computed(() => this.countriesResource.hasValue() ? this.countriesResource.value() : []);
+
+  public readonly isLoading = computed(() => this.revenueResource.isLoading() || this.countriesResource.isLoading());
+  public readonly hasError = computed(() => !!this.revenueResource.error() || !!this.countriesResource.error());
 }

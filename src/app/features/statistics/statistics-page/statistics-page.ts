@@ -1,15 +1,10 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.component';
 import {StatisticsService} from '@core/services/openApiWrappers/StatisticsService';
-import {
-  StatColumnConfig,
-} from '@features/statistics/statistics-page/statistic-panel/statistics-panel.component';
-import {forkJoin, take, catchError, of} from 'rxjs';
-import {Revenue} from '@core/models/Revenue';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {RevenueStat} from '@features/statistics/statistics-page/revenue-stat';
 import {CommonModule} from '@angular/common';
 import {GuestsPerCountryStat} from '@features/statistics/statistics-page/guests-per-country-stat';
-import {CountryDistribution} from '../../../api';
 
 @Component({
   selector: 'statistics',
@@ -18,6 +13,7 @@ import {CountryDistribution} from '../../../api';
     NewDatePickerComponent,
     RevenueStat,
     GuestsPerCountryStat,
+    MatProgressSpinner,
   ],
   styles: `
     .datePicker {
@@ -36,73 +32,45 @@ import {CountryDistribution} from '../../../api';
       padding: 20px;
       gap: 50px;
     }
+    .spinnerContainer {
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
+    }
     .stat {
       width: 100%;
     }
   `,
   template: `
     <div class="datePicker">
-      <app-new-date-picker (month)="changeMonth($event)" (year)="changeYear($event)"/>
+      <app-new-date-picker (month)="statisticsService.month.set($event)" (year)="statisticsService.year.set($event)"/>
     </div>
+    @if (statisticsService.isLoading()) {
+      <div class="spinnerContainer">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
+    }
+    @if (statisticsService.hasError()) {
+      <p class="error">Nie udało się pobrać statystyk.</p>
+    }
+    <!-- the stats stay mounted while loading, otherwise they lose their state (table / graph view) -->
     <div class="tablesWrapper">
       <revenue-stat class="stat"
-                    [data]="revenueOfPaidReservations"
+                    [data]="statisticsService.paidRevenue()"
                     [title]="'Rezerwacje zrealizowane'">
       </revenue-stat>
       <revenue-stat class="stat"
-                    [data]="revenueOfUnPaidReservations"
+                    [data]="statisticsService.unpaidRevenue()"
                     [title]="'Rezerwacje nieopłacone'">
       </revenue-stat>
       <guests-per-country-stat class="stat"
-                     [data]="guestsPerCountryDistribution"
+                     [data]="statisticsService.guestsPerCountry()"
                      [title]="'Rozkład gości na kraje'">
       </guests-per-country-stat>
     </div>
   `,
   standalone: true
 })
-export class StatisticsPage implements OnInit {
-
-  @Input() month: number = new Date().getMonth();
-  @Input() year: number = new Date().getFullYear();
-
-  private statisticsService = inject(StatisticsService);
-
-  revenueOfPaidReservations: Revenue[] = [];
-  revenueOfUnPaidReservations: Revenue[] = [];
-  guestsPerCountryDistribution: CountryDistribution[] = [];
-
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  changeMonth(event: number) {
-    this.month = event;
-    this.loadData();
-  }
-
-  changeYear(event:number) {
-    this.year = event;
-    this.loadData();
-  }
-
-  loadData() {
-    forkJoin({
-      revenue: this.statisticsService.getRevenue(this.month, this.year).pipe(
-        take(1),
-        catchError(() => of([[], []]))
-      ),
-      countries: this.statisticsService.getUserPerCountry(this.month, this.year).pipe(
-        take(1),
-        catchError(() => of([]))
-      )
-    }).subscribe({
-      next: ({revenue, countries}) => {
-        this.revenueOfPaidReservations = revenue[0] || [];
-        this.revenueOfUnPaidReservations = revenue[1] || [];
-        this.guestsPerCountryDistribution = countries;
-      },
-    });
-  }
-
+export class StatisticsPage {
+  protected readonly statisticsService = inject(StatisticsService);
 }
