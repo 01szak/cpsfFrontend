@@ -44,8 +44,8 @@ export type CamperPlaceFormData = { camperPlace?: CamperPlaceDto };
 
         <mat-form-field>
           <mat-label>Rodzaj</mat-label>
-          <mat-select formControlName="type" [compareWith]="compareFn">
-            @for (type of camperPlaceTypes().content; track type.id) {
+          <mat-select formControlName="camperPlaceType" [compareWith]="compareFn">
+            @for (type of camperPlaceTypes.content; track type.id) {
               <mat-option [value]="type">{{ type.typeName }}</mat-option>
             }
           </mat-select>
@@ -82,7 +82,7 @@ export class CamperPlaceFormComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<CamperPlaceFormComponent>, { optional: true });
   private readonly fd: CamperPlaceFormData = inject<CamperPlaceFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
 
-  protected camperPlaceTypes = this.camperPlaceTypeService.pageResource.value;
+  protected camperPlaceTypes = this.camperPlaceTypeService.pageResource.value();
   protected isUpdate = !!this.fd?.camperPlace;
   protected formTitle = this.isUpdate ? 'Edytuj Parcelę' : 'Nowa Parcela';
 

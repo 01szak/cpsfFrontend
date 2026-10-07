@@ -120,7 +120,7 @@ export type ReservationFormData = {
             <input type="text" matInput [disabled]="true" [value]="camperPlaceIndex">
           } @else {
             <mat-select formControlName="camperPlace" [compareWith]="compareFn">
-              @for (cp of camperPlaceService.pageResource.value().content; track cp.id) {
+              @for (cp of camperPlaceService.unpagedCamperPlaceResource.value().content; track cp.id) {
                 <mat-option [value]="cp">{{ cp.index }}</mat-option>
               }
             </mat-select>

@@ -21,7 +21,8 @@ import {CamperPlaceTypeService} from '@core/services/openApiWrappers/CamperPlace
       [searchRequestSignal]="camperPlaceService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
-      [displayPaginator]="true"
+      [resetTableFunction]="onResetFunction"
+      [displayPaginator]="false"
     />
   `,
 })
@@ -39,8 +40,12 @@ export class CamperPlaceTable implements OnInit {
   ngOnInit(): void {
     this.camperPlaceService.resetSignals();
     this.camperPlaceTypeService.resetSignals();
-    // this.camperPlaceService.pageable.set({sort: ['index', 'DESC'], size: 30, page: 0})
+    this.camperPlaceService.pageable.set({sort: ['index', 'ASC'], size: 2147483647, page: 0})
   }
+
+  //TODO this is not triggered
+  protected onResetFunction =  () =>
+  {this.camperPlaceService.pageable.set({sort: ['index', 'ASC'], size: 2147483647, page: 0})};
 
   protected mapToDisplayData() {
     return this.camperPlaceService.pageResource.value().content.map(c => {

@@ -19,6 +19,7 @@ import {CamperPlaceTypeDto} from '../../../../api';
       [searchRequestSignal]="camperPlaceTypeService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
+      [displayPaginator]="false"
     />
   `,
 })
@@ -27,7 +28,7 @@ export class CamperPlaceTypeTable {
   private popupFormService = inject(PopupFormService);
 
   protected fields: Field[] = [
-    {name: 'typeName', displayName: 'Nazwa', type: 'TEXT', value: ''},
+    {name: 'typeName', displayName: 'Nazwa', type: 'TEXT', value: '', selectOption: this.camperPlaceTypeService.getAll()},
     {name: 'price', displayName: 'Cena', type: 'NUMBER', value: ''},
   ];
 

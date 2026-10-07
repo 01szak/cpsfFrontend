@@ -361,7 +361,7 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     </div>
   `,
 })
-export class RegularTableComponent implements OnInit {
+export class RegularTableComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   @Input() public dtoData: any[] = [];
@@ -376,6 +376,7 @@ export class RegularTableComponent implements OnInit {
   @Input() public createFunc?: () => any;
   @Input() public onRowClickFunc?: (dto: any) => any;
   @Input() public checkboxChangeFunc?: (a: any) => any;
+  @Input() resetTableFunction: any = () => this.resetAll();
 
 
   @Output() public sortInfo = new EventEmitter<Sort>();
@@ -387,13 +388,6 @@ export class RegularTableComponent implements OnInit {
   protected isClicked: boolean = false;
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
-
-  ngOnInit(): void {
-    if (this.pageableSignal() !== null) {
-      this.pageableSignal.set(DEFAULT_PAGEABLE);
-    }
-    this.searchRequestSignal.set(DEFAULT_SEARCH_REQUEST);
-  }
 
   protected get columnFields(): string[] {
     return this.tabColumns.map(field => field.name);
