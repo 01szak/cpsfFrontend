@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {MatCard} from '@angular/material/card';
@@ -231,7 +231,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
       text-align: center;
       align-items: center;
       justify-content: center;
-    }
+    }   
 
     .weekday {
       width: 100%;
@@ -269,6 +269,8 @@ export class CalendarPage implements OnInit {
   private popupFormService = inject(PopupFormService);
 
   ngOnInit(): void {
+    this.camperPlaceService.resetSignals();
+    this.reservationService.resetSignals()
     //we need an unpaged data here to not miss any reservation / camper place
     this.reservationService.pageable.set(null)
     this.camperPlaceService.pageable.set(null)
@@ -276,12 +278,11 @@ export class CalendarPage implements OnInit {
     this.getReservationsBetweenGivenMonths();
   }
 
-
   private getReservationsBetweenGivenMonths() {
     const currentMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1});
     const startOfPreviousMonth = currentMonth.clone().subtract(1, 'month').startOf('month');
     const endOfNextMonth = currentMonth.clone().add(1, 'month').startOf('month');
-    this.reservationService.searchCriteria.set(
+    this.reservationService.searchRequest.set(
       {
         searchCriteria:
           [

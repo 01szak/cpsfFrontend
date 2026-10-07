@@ -15,7 +15,7 @@ import {CamperPlaceDto, CamperPlaceTypeDto} from '../../../api';
         <mat-checkbox
           (change)="toggleAll($event.checked)"
           [checked]="isAllSelected()"
-          [indeterminate]="isSomeSelected() && !isAllSelected()" />
+          [indeterminate]="isSomeSelected() && !isAllSelected()"/>
         <strong style="color: var(--text-primary)">Zaznacz wszystko</strong>
       </div>
 
@@ -28,9 +28,9 @@ import {CamperPlaceDto, CamperPlaceTypeDto} from '../../../api';
                 <mat-checkbox
                   (change)="toggleType(e[0], $event.checked)"
                   [checked]="isTypeAllSelected(e[0])"
-                  [indeterminate]="isSomeTypeSelected(e[0]) && !isTypeAllSelected(e[0])" />
+                  [indeterminate]="isSomeTypeSelected(e[0]) && !isTypeAllSelected(e[0])"/>
                 <span style="font-weight: 600; color: var(--text-primary)">
-                  Typ: {{ e[1][0].type!.typeName }}
+                  Typ: {{ e[1][0].camperPlaceType!.typeName }}
                   <span style="font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-left: 8px;">
                     (Zmieniana na: <strong style="color: #4caf50;">{{ getNewPrice(e[0]) }} zł</strong>)
                   </span>
@@ -42,7 +42,7 @@ import {CamperPlaceDto, CamperPlaceTypeDto} from '../../../api';
                 <div style="display: flex; align-items: center; gap: 8px; padding: 2px 0 2px 52px;">
                   <mat-checkbox
                     (change)="addId(item.id!, $event.checked)"
-                    [checked]="selectedIds.includes(item.id!)" />
+                    [checked]="selectedIds.includes(item.id!)"/>
                   <span style="font-size: 0.9rem; color: var(--text-primary)">
                     Indeks: <strong>{{ item.index }}</strong>
                     <span style="font-size: 0.8rem; color: var(--text-secondary); margin-left: 8px;">

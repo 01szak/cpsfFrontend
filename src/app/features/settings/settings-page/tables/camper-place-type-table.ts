@@ -16,7 +16,7 @@ import {CamperPlaceTypeDto} from '../../../../api';
       [totalElements]="camperPlaceTypeService.pageResource.value().totalElements"
       [tabColumns]="fields"
       [pageableSignal]="camperPlaceTypeService.pageable"
-      [searchRequestSignal]="camperPlaceTypeService.searchCriteria"
+      [searchRequestSignal]="camperPlaceTypeService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
     />

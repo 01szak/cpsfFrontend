@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit} from '@angular/core';
 import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {Field, RegularTableComponent} from '@shared/ui/data-table/regular-table.component';
@@ -18,22 +18,29 @@ import {CamperPlaceTypeService} from '@core/services/openApiWrappers/CamperPlace
       [totalElements]="camperPlaceService.pageResource.value().totalElements"
       [tabColumns]="fields()"
       [pageableSignal]="camperPlaceService.pageable"
-      [searchRequestSignal]="camperPlaceService.searchCriteria"
+      [searchRequestSignal]="camperPlaceService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
+      [displayPaginator]="true"
     />
   `,
 })
-export class CamperPlaceTable {
+export class CamperPlaceTable implements OnInit {
   protected camperPlaceService = inject(CamperPlaceService);
   protected camperPlaceTypeService = inject(CamperPlaceTypeService);
   private popupFormService = inject(PopupFormService);
 
   protected fields = computed<Field[]>(() => [
     {name: 'index', displayName: 'Indeks', type: 'TEXT', value: '', selectOption: this.camperPlaceService.indexes() },
-    {name: 'type', displayName: 'Rodzaj', type: 'OBJECT', innerFields: [{type: 'TEXT', displayName: 'Rodzaj', name: 'typeName', value: '' }]},
+    {name: 'camperPlaceType', displayName: 'Rodzaj', type: 'OBJECT', innerFields: [{type: 'TEXT', displayName: 'Rodzaj', name: 'typeName', value: '', selectOption: this.camperPlaceTypeService.getAll()}]},
     {name: 'price', displayName: 'Cena', type: 'NUMBER', value: ''},
   ]);
+
+  ngOnInit(): void {
+    this.camperPlaceService.resetSignals();
+    this.camperPlaceTypeService.resetSignals();
+    // this.camperPlaceService.pageable.set({sort: ['index', 'DESC'], size: 30, page: 0})
+  }
 
   protected mapToDisplayData() {
     return this.camperPlaceService.pageResource.value().content.map(c => {
@@ -41,7 +48,7 @@ export class CamperPlaceTable {
       return {
         id: cp.id,
         index: cp.index,
-        type: cp.type?.typeName ?? '',
+        camperPlaceType: cp.camperPlaceType?.typeName ?? '',
         price: cp.price,
       };
     });

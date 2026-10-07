@@ -1,4 +1,12 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {debounceTime, distinctUntilChanged, filter} from 'rxjs';
@@ -28,10 +36,9 @@ import {
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
-import {CamperPlaceDto, GuestDto, ReservationDto} from '../../api';
+import {CamperPlaceDto, ReservationDto} from '../../api';
 import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {Country} from '@shared/constants/COUNTRIES';
-import {Page} from '@core/models/Page';
 
 export type ReservationFormData = {
   reservation?: ReservationDto;
@@ -189,8 +196,9 @@ export class ReservationFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.camperPlaceService.pageResource.reload();
-    this.guestService.pageResource.reload();
+    this.guestService.resetSignals();
+    this.reservationService.resetSignals();
+    this.camperPlaceService.resetSignals();
     this.setupGuestSearch();
     this.initialPatch();
 
@@ -206,7 +214,7 @@ export class ReservationFormComponent implements OnInit {
       distinctUntilChanged(),
       filter((v): v is string => typeof v === 'string' && v.length > 1),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(v => this.guestService.searchCriteria.set({searchCriteria: [{key: 'lastname', value: v, operation: 'LIKE'}]}));
+    ).subscribe(v => this.guestService.searchRequest.set({searchCriteria: [{key: 'lastname', value: v, operation: 'LIKE'}]}));
   }
 
   private initialPatch() {

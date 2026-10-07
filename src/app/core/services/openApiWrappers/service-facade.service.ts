@@ -26,7 +26,7 @@ export enum ResourceType {
 
 @Injectable({providedIn: "root"})
 export class ServiceFacade {
-  private readonly api = inject(Api)
+  public readonly api = inject(Api)
 
   public findBy(type: ResourceType, pageable?: Pageable | null, body?: SearchRequest): Observable<any> {
     //TODO this should be a static default value
@@ -41,9 +41,9 @@ export class ServiceFacade {
     const params = {pageable, body};
     switch (type) {
       case ResourceType.RESERVATION: {
-        const reservationsWithAssignedStatus = body.searchCriteria!;
-        // TODO do not duplicate these, first check if already exists
-        reservationsWithAssignedStatus.push(
+        //copy, the body may be a shared signal value / DEFAULT_SEARCH_REQUEST and must not be mutated
+        const reservationsWithAssignedStatus: SearchCriteria[] = [
+          ...(body.searchCriteria ?? []),
           {
             key: "reservationStatus",
             operation: "NOT_EQUALS",
@@ -56,7 +56,7 @@ export class ServiceFacade {
             value: 'VERIFIED',
             joinOperator: "AND"
           } as SearchCriteria
-        )
+        ];
         return from(this.api.invoke(findBy, {...params, body: {searchCriteria: reservationsWithAssignedStatus}}))
       }
       case ResourceType.GUEST: return from(this.api.invoke(findBy1, params));

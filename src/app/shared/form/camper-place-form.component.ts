@@ -111,7 +111,7 @@ export class CamperPlaceFormComponent implements OnInit {
       payload.id = this.fd.camperPlace?.id;
     }
 
-    const typeChanged = this.isUpdate && this.fd.camperPlace?.type?.id !== payload.type?.id;
+    const typeChanged = this.isUpdate && this.fd.camperPlace?.camperPlaceType?.id !== payload.camperPlaceType?.id;
     if (typeChanged) {
       this.confirmationService.openConfirmationPopup({
         title: 'Zmiana Typu Parceli',

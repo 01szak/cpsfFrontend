@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatNativeDateModule} from '@angular/material/core';
@@ -27,7 +27,7 @@ import {GuestService} from '@core/services/openApiWrappers/GuestService';
       [totalElements]="guestService.pageResource.value().totalElements"
       [tabColumns]="columns"
       [pageableSignal]="guestService.pageable"
-      [searchRequestSignal]="guestService.searchCriteria"
+      [searchRequestSignal]="guestService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
     >
@@ -50,6 +50,7 @@ export class GuestPage implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.guestService.resetSignals();
     this.guestService.pageable.set(DEFAULT_PAGEABLE)
   }
 

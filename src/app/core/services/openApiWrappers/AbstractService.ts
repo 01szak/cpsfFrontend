@@ -5,6 +5,7 @@ import {CamperPlaceDto, CamperPlaceTypeDto, GuestDto, Pageable, ReservationDto, 
 import {Page} from '@core/models/Page';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {tap} from 'rxjs';
+import {DEFAULT_PAGEABLE, DEFAULT_SEARCH_REQUEST} from '@shared/ui/data-table/regular-table.component';
 
 @Injectable({providedIn: "root"})
 export abstract class AbstractService {
@@ -12,13 +13,13 @@ export abstract class AbstractService {
   protected readonly notification = inject(NotificationService);
   //null is used to get unpaged data
   public readonly pageable = signal<Pageable | undefined | null>(undefined);
-  public readonly searchCriteria = signal<SearchRequest | undefined>(undefined);
+  public readonly searchRequest = signal<SearchRequest | undefined>(undefined);
 
   public abstract getType(): ResourceType;
 
   public pageResource: ResourceRef<Page<any>> = rxResource({
     defaultValue: {content: [], number: 0, size: 0, totalElements: 0, totalPages: 0} as Page<any>,
-    params: () => {return {pageable: this.pageable(), searchCriteria: this.searchCriteria()}},
+    params: () => {return {pageable: this.pageable(), searchCriteria: this.searchRequest()}},
     stream: ({params}) => {
       return this.serviceFacade.findBy(this.getType(), params.pageable, params.searchCriteria)
     }
@@ -36,6 +37,10 @@ export abstract class AbstractService {
     return this.serviceFacade.delete(this.getType(), id).pipe(this.notifyAndReload());
   }
 
+  public resetSignals() {
+    this.pageable.set(DEFAULT_PAGEABLE);
+    this.searchRequest.set(DEFAULT_SEARCH_REQUEST)
+  }
 
   private notifyAndReload() {
     return tap<ApiResponse>({

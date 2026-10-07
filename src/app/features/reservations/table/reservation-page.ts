@@ -31,7 +31,7 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
       [totalElements]="reservationService.pageResource.value().totalElements"
       [tabColumns]="fields()"
       [pageableSignal]="reservationService.pageable"
-      [searchRequestSignal]="reservationService.searchCriteria"
+      [searchRequestSignal]="reservationService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
       [createFunc]="openFormPopup.bind(this)"
       [checkboxChangeFunc]="checkboxChangeFunc"
@@ -59,7 +59,8 @@ export class ReservationPage implements OnInit {
 
 
   ngOnInit(): void {
-    this.reservationService.pageResource.reload();
+    this.reservationService.resetSignals();
+    this.camperPlaceService.resetSignals();
   }
 
   protected mapToDisplayData() {
