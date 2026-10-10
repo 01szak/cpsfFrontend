@@ -31,6 +31,7 @@ import {Pageable, SearchCriteria, SearchRequest} from '../../../api';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Moment} from 'moment';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatOption, MatSelect} from '@angular/material/select';
 
 export interface Sort {
   columnName: string,
@@ -90,45 +91,41 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     StatusComponent,
     NgClass,
     MatProgressSpinner,
+    MatSelect,
+    MatOption,
   ],
   styles: `
     .tableDiv {
       margin: 1rem auto;
-      width: calc(100% - 2rem);
-      max-width: 1400px;
-      background: var(--bg-main) !important;
-      border-radius: var(--radius-md);
+      width: 100%;
+      height: 100%;
       border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
+      /*box-shadow: var(--shadow-lg);*/
+      /*overflow: hidden;*/
       display: flex;
       flex-direction: column;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: transparent;
-    }
+    /*table {*/
+    /*  width: 100%;*/
+    /*  border-collapse: collapse;*/
+    /*  background: transparent;*/
+    /*}*/
 
     td, th {
-      padding: 0 1.5rem !important;
       height: 50px;
       text-align: left;
       color: var(--text-primary);
-      white-space: nowrap;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border-color);
     }
 
     th {
-      background: transparent;
+      background: var(--bg-card);
       cursor: pointer;
       transition: background 0.2s;
     }
 
     th:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: color-mix(in srgb, var(--bg-card), var(--text-primary) 8%);
     }
 
     .headerDiv {
@@ -139,7 +136,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
     }
 
     .sortingButton {
@@ -149,7 +145,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     .row {
       transition: all 0.2s ease;
       cursor: pointer;
-      background-color: var(--bg-inner) !important;
     }
 
     .row:hover {
@@ -160,25 +155,26 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       z-index: 5;
     }
 
-    :host-context(.light-theme) {
-      .tableDiv {
-        background: var(--bg-inner) !important;
-      }
-
-      .row {
-        background-color: var(--bg-card) !important;
-      }
-
-      .tableFooter {
-        background: var(--bg-inner) !important;
-      }
-    }
-
-    /* Scrollbar specific to table body */
-    .tableDiv {
-      height: 56vh;
+    /*
+      Table adapts to the container: on a page (auto height host) tableDiv keeps 56vh,
+      inside a fixed height container (e.g. dashboard widget) it shrinks to fit and scrolls internally.
+    */
+    :host {
       display: flex;
       flex-direction: column;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .tableDiv {
+      flex: 0 1 56vh;
+      min-height: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      margin: 0.5rem 0 0;
+      height: auto;
     }
 
     .tableContent {
@@ -188,13 +184,13 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     }
 
     .tableFooter {
-      flex-shrink: 0;
+      /*flex-shrink: 0;*/
       display: flex;
+      /*flex-direction: row;*/
       justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      background: var(--bg-main);
-      border-top: 1px solid var(--border-color);
+      padding: 5px ;
+      /*background: var(--bg-main);*/
+      /*border-top: 1px solid var(--border-color);*/
     }
 
     .funcIcon {
@@ -203,25 +199,25 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--primary);
+      /*background: var(--primary);*/
       color: white;
-      border-radius: var(--radius-sm);
+      /*border-radius: var(--radius-sm);*/
       font-size: 1.25rem;
       cursor: pointer;
       transition: all 0.2s;
-      box-shadow: var(--shadow-md);
+      /*box-shadow: var(--shadow-md);*/
     }
 
     .funcIcon:hover {
       background: var(--primary-hover);
       transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+      /*box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);*/
     }
 
     /* Arrows */
     .ascArrow, .descArrow {
       font-size: 0.875rem;
-      color: var(--primary);
+      /*color: var(--primary);*/
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -233,11 +229,18 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       transform: rotate(180deg);
     }
 
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(8px);
+    /* Header must be opaque, otherwise scrolled rows show through the sticky cells */
+    :host {
+      --mat-table-header-container-color: var(--bg-card);
+    }
+
+    tr.mat-mdc-header-row,
+    th.mat-mdc-header-cell {
+      background-color: var(--bg-card);
+    }
+
+    th.mat-mdc-header-cell:hover {
+      background-color: color-mix(in srgb, var(--bg-card), var(--text-primary) 8%);
     }
 
     .funcButtons {
@@ -246,14 +249,77 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       display: flex;
       flex-direction: row;
       gap: 10px;
+      padding-left: 10px;
     }
 
     i {
       margin: 3px;
     }
 
+    /* Select stands out from the table (overlay surface + accent border), selected value is centered */
+    .periodSelect {
+      flex: 0 0 auto;
+      width: 180px;
+      align-self: center;
+      padding: 0.4rem 0.75rem;
+      box-sizing: border-box;
+      color: var(--text-primary);
+      background: var(--bg-overlay);
+      border: 1px solid var(--primary, #8b5cf6);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .periodSelect:hover {
+      background: color-mix(in srgb, var(--bg-overlay), var(--primary, #8b5cf6) 15%);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary, #8b5cf6), transparent 70%);
+    }
+
+
+
+    .periodSelect ::ng-deep .mat-mdc-select-value {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .periodSelect ::ng-deep .mat-mdc-select-arrow,
+    .periodSelect ::ng-deep .mat-mdc-select-arrow svg {
+      color: var(--text-primary);
+      fill: var(--text-primary);
+    }
+
   `,
   template: `
+    <div class="tableFooter">
+      <div class="funcButtons">
+        @if (createFunc) {
+          <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()"
+                  [disabled]="isLoading">
+            <i class="fa-solid fa-plus funcIcon"></i>
+          </button>
+        }
+        <mat-select class="periodSelect" value="" panelClass="periodSelectPanel">
+          <mat-option value="">
+            Ostatni tydzień
+          </mat-option>
+        </mat-select>
+        <button style="background: inherit; border: inherit; padding: 0" (click)="resetAll()" [disabled]="isLoading">
+          <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
+        </button>
+      </div>
+      @if (displayPaginator) {
+        <mat-paginator
+          [length]="totalElements"
+          [pageSize]="pageableSignal()?.size"
+          [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+          (page)="changePage($event)"
+          [disabled]="isLoading"
+        >
+        </mat-paginator>
+      }
+    </div>
     @let data = displayData || dtoData;
     <div class="tableDiv">
 
@@ -324,40 +390,18 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
 
               </ng-container>
             }
-            <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+            <tr mat-header-row *matHeaderRowDef="columnFields; sticky: true"></tr>
             <tr mat-row
                 *matRowDef="let row; let i = index; columns: columnFields"
                 (click)="onRowClickFunc?.(dtoData.filter(d => d.id === row.id)[0])"
-                class="row}"
+                class="row"
             >
             </tr>
 
           </table>
         </div>
       }
-      <div class="tableFooter">
-        <div class="funcButtons">
-          @if (createFunc) {
-            <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()"
-                    [disabled]="isLoading">
-              <i class="fa-solid fa-plus funcIcon"></i>
-            </button>
-          }
-          <button style="background: inherit; border: inherit; padding: 0" (click)="resetAll()" [disabled]="isLoading">
-            <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
-          </button>
-        </div>
-        @if (displayPaginator) {
-          <mat-paginator
-            [length]="totalElements"
-            [pageSize]="pageableSignal()?.size"
-            [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-            (page)="changePage($event)"
-            [disabled]="isLoading"
-          >
-          </mat-paginator>
-        }
-      </div>
+
     </div>
   `,
 })

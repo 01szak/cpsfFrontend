@@ -1,13 +1,29 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, Type} from '@angular/core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
+import {Widget} from '@features/dashboard/widgets/widget';
+import {ReservationFormComponent} from '@shared/form/reservation-form.component';
+import {MatCard} from '@angular/material/card';
+import {ReservationTable} from '@features/reservations/table/reservation-table.component';
+import {CamperPlaceTable} from '@features/settings/settings-page/tables/camper-place-table';
+import {RevenueStat} from '@features/statistics/statistics-page/revenue-stat';
+import {TodaysRevenueWidget} from '@features/dashboard/widgets/todays-revenue-widget';
+import {
+  AvailableCamperPlacesWidget
+} from '@features/dashboard/widgets/available-camper-places-widget/available-camper-places-widget';
+import {RevenueWidget} from '@features/dashboard/widgets/revenue-widget/revenue-widget';
+import {
+  UnpaidReservationsWidget
+} from '@features/dashboard/widgets/unpaid-reservations-widget/unpaid-reservations-widget';
+import {RecentActionsWidget} from '@features/dashboard/widgets/recent-actions-widget/recent-actions-widget';
 
 @Component({
   imports: [
     MatGridList,
-    MatGridTile
+    MatGridTile,
+    Widget,
   ],
   selector: 'app-dashboard',
   styles: `
@@ -18,14 +34,21 @@ import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 
     mat-grid-list {
       height: 100%;
-    }`,
+    }
+
+    mat-grid-tile {
+      background-color: inherit;
+      width: 100%;
+    }
+  `,
   template: `
     <mat-grid-list [cols]="isMobile() ? 1 : 4" [rowHeight]="isMobile() ? '5:1' : 'fit'" gutterSize="20px">
-      @for (tile of tiles; track tile) {
+      @for (widget of widgets; track widget) {
         <mat-grid-tile
-          [colspan]="isMobile() ? 1 : tile.cols"
-          [rowspan]="isMobile() ? tile.mobileRows : tile.rows"
-          [style.background]="tile.color">{{tile.text}}</mat-grid-tile>
+          [colspan]="isMobile() ? 1 : widget.cols"
+          [rowspan]="isMobile() ? widget.mobileRows : widget.rows">
+          <app-widget [component]="widget.widgetComponent"/>
+        </mat-grid-tile>
       }
     </mat-grid-list>
   `,
@@ -38,20 +61,24 @@ export class Dashboard {
   );
 
   // Grid: 3 rows x 4 columns = 12 cells, 7 tiles
-  tiles: Tile[] = [
-    {text: 'Two', cols: 2, rows: 2, mobileRows: 8, color: 'lightgreen'},    // top right, 2x2
-    {text: 'Five', cols: 1, rows: 1, mobileRows: 4, color: 'lightpink'},
-    {text: 'Six', cols: 1, rows: 1, mobileRows: 4, color: '#DDBDF1'},
-    {text: 'Three', cols: 1, rows: 1, mobileRows: 4, color: 'lightpink'},
-    {text: 'Four', cols: 1, rows: 1, mobileRows: 4, color: '#DDBDF1'},
-    {text: 'One', cols: 2, rows: 1, mobileRows: 4, color: 'lightblue'},     // bottom left, 1x2
-    {text: 'Seven', cols: 2, rows: 1, mobileRows: 4, color: 'lightblue'},   // under the 2x2, 1x2
+  widgets: WidgetObject[] = [
+    {cols: 2, rows: 3, mobileRows: 8, widgetComponent: ReservationFormComponent, inputs: [{isDialog: false}]}, //form
+    {cols: 1, rows: 1, mobileRows: 4, widgetComponent: TodaysRevenueWidget}, //todays revenue
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: AvailableCamperPlacesWidget}, //available
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: RevenueWidget}, //all rev
+
+
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: UnpaidReservationsWidget}, //unpaid Res
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: RecentActionsWidget}, //logs
+    {cols: 2, rows: 2, mobileRows: 4, widgetComponent: ReservationTable}, //recent res
+
   ];
 }
-export interface Tile {
-  color: string;
+
+export interface WidgetObject {
   cols: number;
   rows: number;
   mobileRows: number;
-  text: string;
+  widgetComponent: Type<unknown>;
+  inputs?: any[];
 }

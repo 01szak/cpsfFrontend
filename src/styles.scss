@@ -167,7 +167,6 @@ form {
   content-background-color: var(--bg-overlay),
 ));
 
-
 /* --- Global Input & Select Alignment --- */
 input, .mat-mdc-input-element {
   text-align: center !important;
@@ -204,12 +203,10 @@ mat-card,
   color: var(--text-primary) !important;
 }
 
-
   /* Custom Dialog Animation */
 .mat-mdc-dialog-container .mdc-dialog__surface {
   animation: dialog-fast-enter 0.15s cubic-bezier(0, 0, 0.2, 1) forwards !important;
 }
-
 
 @keyframes dialog-fast-enter {
   from {
@@ -229,15 +226,32 @@ mat-card,
 /* --- Tables & Containers --- */
 .mat-mdc-table,
 .tableContainer .tableDiv {
-  border: 1px solid var(--border-color) !important;
-  background-color: var(--bg-inner) !important;
-  border-radius: 12px !important;
+  //border: 1px solid var(--border-color) !important;
+  background-color: inherit !important;
+  //border-radius: 12px !important;
 }
 
 .mat-mdc-paginator-container {
+  display: flex;
+  width: 100%;
   flex-direction: row !important;
-  background-color: var(--bg-inner) !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: var(--bg-card) !important;
   color: var(--text-primary) !important;
+}
+
+/* Page size select and range/navigation buttons stay in a single line */
+.mat-mdc-paginator-container {
+  .mat-mdc-paginator-page-size,
+  .mat-mdc-paginator-range-actions {
+    display: flex;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    white-space: nowrap;
+  }
 }
 
 /* --- Form Fields Overrides --- */
@@ -412,7 +426,6 @@ mat-card,
 .mat-mdc-form-field {
   margin-bottom: -1.25em;
 }
-
 
 /* =========================================================
    ACTION ROW

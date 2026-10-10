@@ -5,7 +5,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import {AsyncPipe, NgTemplateOutlet} from '@angular/common';
 import { PopupFormContainer } from './popup-form-container.component';
-import { GuestDto } from '../../api/models/guest-dto';
+import { GuestDto } from '../../api';
 import {FormFactoryService} from '@shared/form/FormFactoryService';
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from '@angular/material/autocomplete';
 import {map, Observable, startWith} from 'rxjs';
@@ -97,13 +97,13 @@ export class GuestFormComponent implements OnInit {
   private readonly factory = inject(FormFactoryService);
   private readonly fd: GuestFormData = inject<GuestFormData>(MAT_DIALOG_DATA, { optional: true }) || {};
   private readonly confirmationService = inject(PopupConfirmationService);
-  private readonly dialogRef = inject(MatDialogRef<GuestFormComponent>);
+  private readonly dialogRef = inject(MatDialogRef<GuestFormComponent>, { optional: true });
 
   protected filteredCountries!: Observable<Country[]>;
   protected isUpdate = !!this.fd?.guest;
   protected formTitle = this.isUpdate ? 'Edytuj Gościa' : 'Nowy Gość';
   protected deleteAction = () =>
-     this.guestService.delete(this.fd.guest!.id!).subscribe(() => {this.dialogRef.close()});
+     this.guestService.delete(this.fd.guest!.id!).subscribe(() => {this.dialogRef?.close()});
 
   private _filter(value: string | Country): Country[] {
     const filterValue = typeof value === 'string' ? value.toLowerCase() : value.name.toLowerCase();
@@ -138,8 +138,8 @@ export class GuestFormComponent implements OnInit {
     };
 
     const action = () => this.isUpdate
-      ? this.guestService.update(payload).subscribe(() => {this.dialogRef.close()})
-      : this.guestService.create(payload).subscribe(() => {this.dialogRef.close()});
+      ? this.guestService.update(payload).subscribe(() => {this.dialogRef?.close()})
+      : this.guestService.create(payload).subscribe(() => {this.dialogRef?.close()});
     this.confirmationService.openConfirmationPopup({action: action} as ConfirmationData)
   }
 
