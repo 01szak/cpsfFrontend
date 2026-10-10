@@ -1,19 +1,18 @@
-import {ChangeDetectionStrategy, Component, HostListener, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {map, Observable, Subscription, of} from 'rxjs';
-import {CamperPlaceService} from '@features/settings/services/CamperPlaceService';
+import {ChangeDetectionStrategy, Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceService';
 import {PopupFormService} from '@core/services/PopupFormService';
 import {MatCard} from '@angular/material/card';
-import {AsyncPipe, NgClass} from '@angular/common';
+import {NgClass} from '@angular/common';
 import {NewDatePickerComponent} from '@shared/ui/date-picker/new-date-picker.component';
 import {ReservationFormData} from '@shared/form/reservation-form.component';
-import {ReservationDto} from '../../../api';
+import {CamperPlaceDto, ReservationDto} from '../../../api';
 import {ReservationCellComponent} from '@features/reservations/calendar/reservation-cell.component';
-import {ReservationService} from '@features/reservations/services/ReservationService';
+import {ReservationService} from '@core/services/openApiWrappers/ReservationService';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import moment from 'moment';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
 import {MatIconButton} from '@angular/material/button';
-import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'calendar',
@@ -21,12 +20,12 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
   imports: [
     MatCard,
     NewDatePickerComponent,
-    AsyncPipe,
     ReservationCellComponent,
     NgClass,
     MatMenu,
     MatMenuTrigger,
     MatIconButton,
+    MatProgressSpinner,
   ],
   template: `
     <mat-card class="content">
@@ -82,10 +81,14 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
           </div>
         }
       </div>
-      <div class="tableContainer">
-        @if (camperPlaces$) {
+      @if (reservationService.rangeResource.isLoading() || camperPlaceService.unpagedCamperPlaceResource.isLoading()) {
+        <div class="spinnerContainer">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        <div class="tableContainer">
           <div class="table">
-            @for (camperPlace of camperPlaces$ | async; track camperPlace.id) {
+            @for (camperPlace of camperPlaceService.camperPlaces(); track camperPlace.id) {
               <div class="row" [style.--days]="days.length">
 
                 <div class="cell camperPlaceIndex"><p>{{ camperPlace.index }}</p></div>
@@ -100,7 +103,7 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
                   </div>
                 }
 
-                @for (res of (reservations$ | async); track res.id) {
+                @for (res of reservationService.reservationsInRange(); track res.id) {
                   @if (res.camperPlace.id === camperPlace.id && isResInCurrentMonth(res)) {
                     <app-reservation-cell
                       [reservation]="res"
@@ -116,8 +119,8 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
               </div>
             }
           </div>
-        }
-      </div>
+        </div>
+      }
     </mat-card>
   `,
   styles: `
@@ -228,7 +231,7 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
       text-align: center;
       align-items: center;
       justify-content: center;
-    }
+    }   
 
     .weekday {
       width: 100%;
@@ -253,61 +256,43 @@ import {CamperPlaceDto} from '../../../api/models/camper-place-dto';
   `,
   standalone: true,
 })
-export class CalendarPage implements OnInit, OnDestroy {
+export class CalendarPage implements OnInit {
   @Input() month: number = new Date().getMonth();
   @Input() year: number = new Date().getFullYear();
 
-  weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
-  days: (number)[] = [];
-  private sub = new Subscription();
+  protected readonly camperPlaceService = inject(CamperPlaceService);
+  protected readonly reservationService = inject(ReservationService);
 
-  protected camperPlaces$!: Observable<CamperPlaceDto[]>;
-  protected reservations$: Observable<ReservationDto[]> = of([]);
+  protected readonly weekDays: string[] = [ "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+  protected days: (number)[] = [];
 
   private popupFormService = inject(PopupFormService);
-  private camperPlaceService = inject(CamperPlaceService);
-  private reservationService = inject(ReservationService);
-
-  constructor() {
-    this.camperPlaces$ = this.camperPlaceService.camperPlacesForTable$;
-    this.reservations$ = this.reservationService.reservationDtos$.pipe(
-      map(page => page.content || [])
-    );
-  }
 
   ngOnInit(): void {
     this.generateDays();
-    this.fetchData();
+    this.getReservationsBetweenGivenMonths();
   }
 
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
-  private fetchData() {
-    this.sub.add(this.camperPlaceService.getCamperPlaces().subscribe());
-
-    const startOfMonth = DateFormater.MOMENT({year: this.year, month: this.month - 1, day: 1}).startOf('month');
-    const endOfMonth = DateFormater.MOMENT({year: this.year, month: this.month + 1, day: 1}).endOf('month');
-
-    this.sub.add(this.reservationService.findByUnpaged([{
-      key: 'checkin',
-      operation: 'BETWEEN',
-      value: DateFormater.YYYYMMDD(startOfMonth, DateDelimiter.DASH),
-      secondValue: DateFormater.YYYYMMDD(endOfMonth, DateDelimiter.DASH)
-    }]).subscribe());
+  private getReservationsBetweenGivenMonths() {
+    const currentMonth = DateFormater.MOMENT({year: this.year, month: this.month, day: 1});
+    const startOfPreviousMonth = currentMonth.clone().subtract(1, 'month').startOf('month');
+    const endOfNextMonth = currentMonth.clone().add(1, 'month').startOf('month');
+    this.reservationService.checkinRange.set({
+      from: DateFormater.YYYYMMDD(startOfPreviousMonth, DateDelimiter.DASH),
+      to: DateFormater.YYYYMMDD(endOfNextMonth, DateDelimiter.DASH)
+    });
   }
 
   changeMonth(event: number) {
     this.month = event;
     this.generateDays();
-    this.fetchData();
+    this.getReservationsBetweenGivenMonths();
   }
 
   changeYear(event: number) {
     this.year = event;
     this.generateDays();
-    this.fetchData();
+    this.getReservationsBetweenGivenMonths();
   }
 
   generateDays() {

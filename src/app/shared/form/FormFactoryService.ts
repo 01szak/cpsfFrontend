@@ -60,7 +60,7 @@ export class FormFactoryService {
     return this.fb.group({
       id: new FormControl<number | null>(null),
       index: new FormControl<string>('', [Validators.required]),
-      type: new FormControl<CamperPlaceTypeDto | null>(null, [Validators.required]),
+      camperPlaceType: new FormControl<CamperPlaceTypeDto | null>(null, [Validators.required]),
       price: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
     });
   }

@@ -8,16 +8,16 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { Pageable } from '../../models/pageable';
-import { PageReservationDto } from '../../models/page-reservation-dto';
+import { PageCamperPlaceDto } from '../../models/page-camper-place-dto';
 import { SearchRequest } from '../../models/search-request';
 
-export interface FindBy$Params {
+export interface FindBy2$Params {
   pageable?: Pageable;
       body: SearchRequest
 }
 
-export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params, context?: HttpContext): Observable<StrictHttpResponse<PageReservationDto>> {
-  const rb = new RequestBuilder(rootUrl, findBy.PATH, 'post');
+export function findBy2(http: HttpClient, rootUrl: string, params: FindBy2$Params, context?: HttpContext): Observable<StrictHttpResponse<PageCamperPlaceDto>> {
+  const rb = new RequestBuilder(rootUrl, findBy2.PATH, 'post');
   if (params) {
     rb.query('pageable', params.pageable, {});
     rb.body(params.body, 'application/json');
@@ -28,9 +28,9 @@ export function findBy(http: HttpClient, rootUrl: string, params: FindBy$Params,
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<PageReservationDto>;
+      return r as StrictHttpResponse<PageCamperPlaceDto>;
     })
   );
 }
 
-findBy.PATH = '/reservation/findBy';
+findBy2.PATH = '/camperPlace/findBy';

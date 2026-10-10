@@ -3,10 +3,11 @@ import {LoginComponent} from '@features/auth/login.component';
 import {RegisterComponent} from '@features/auth/register.component';
 import {StatisticsPage} from '@features/statistics/statistics-page/statistics-page';
 import {GuestPage} from '@features/guests/guest-page/guest-page.component';
-import {ReservationPage} from '@features/reservations/table/reservation-page';
+import {ReservationTable} from '@features/reservations/table/reservation-table.component';
 import {AdminPageComponent} from '@features/main-page/admin-page.component';
 import {CalendarPage} from '@features/reservations/calendar/calendar-page';
 import {SettingsPage} from '@features/settings/settings-page/settings-page.component';
+import {Dashboard} from '@features/dashboard/dashboard';
 
 export const routes: Routes = [
   {
@@ -25,17 +26,22 @@ export const routes: Routes = [
   {
     path: 'admin-page',
     component: AdminPageComponent,
-    children:[{
+    children:[
+      {
+        path: 'dashboard',
+        component: Dashboard
+      },
+      {
       path: 'calendar',
       component: CalendarPage
-    },
+      },
       {
         path: 'statistics',
         component: StatisticsPage
       },
       {
         path: 'reservations',
-        component: ReservationPage
+        component: ReservationTable
       },
       {
         path: 'users',
