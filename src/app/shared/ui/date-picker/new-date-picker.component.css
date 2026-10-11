@@ -1,10 +1,15 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .content {
   display: flex;
   width: 100%;
   max-width: 300px;
   border-radius: 30px;
   font-size: small;
-  gap: 20px;
+  gap: 6px;
 }
 
 button {
@@ -31,7 +36,7 @@ mat-card {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 15px;
+  padding: 0 6px;
   width: 100%;
   max-width: 135px;
   height: 40px;
@@ -41,16 +46,16 @@ mat-card {
 }
 
 .yearSelect {
-  min-width: 100px;
+  min-width: 64px;
 }
 
 .monthSelect {
-  min-width: 135px;
+  min-width: 72px;
 }
 
 .selectors{
   display: flex;
-  gap: 5px;
+  gap: 4px;
 }
 
 .fa-arrow-rotate-left {

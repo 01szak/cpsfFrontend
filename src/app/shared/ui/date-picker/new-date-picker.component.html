@@ -3,9 +3,9 @@
   <div class="selectors">
     <mat-card class="monthSelect">
         <mat-select (selectionChange)="changeMonth(currentMonth)" [(value)]="currentMonth">
-          @for (month of months; track month) {
+          @for (month of months; track month; let i = $index) {
             <mat-option [value]="month">
-              {{month}}
+              {{shortMonths[i]}}
             </mat-option>
           }
         </mat-select>

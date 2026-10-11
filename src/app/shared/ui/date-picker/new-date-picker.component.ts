@@ -42,6 +42,9 @@ export class NewDatePickerComponent implements OnInit {
       "Listopad",
       "Grudzień"
     ];
+  //displayed in the selects, same order as months (the full names are still the values)
+  shortMonths: string[] =
+    ["Wszystkie", "Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
   years: number[] = []
   currentMonth: string = this.months[new Date().getMonth() + 1];
   currentYear: number = new Date().getFullYear();
