@@ -32,6 +32,7 @@ import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {Moment} from 'moment';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatOption, MatSelect} from '@angular/material/select';
+import {MatButton} from '@angular/material/button';
 
 export interface Sort {
   columnName: string,
@@ -52,7 +53,9 @@ export interface Field {
   value?: string | '', //there should be only one per instance, for inner fields one per field
   secondValue?: string, //used for operation: BETWEEN
   innerFields?: Field[], //for type object fields can be nested
-  selectOption?: any[]
+  selectOption?: any[],
+  action?: (row: any) => any, //type ACTION: function from the parent component, called with the row on button click
+  actionLabel?: string //type ACTION: button text, falls back to displayName
 }
 
 export interface PaginatorData {
@@ -60,7 +63,7 @@ export interface PaginatorData {
   totalElements: number
 }
 
-export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER';
+export type FieldType = 'DATE' | 'BOOLEAN' | 'TEXT' | 'OBJECT' | 'STATUS' | 'NUMBER' | 'ACTION';
 export type SortDirection = 'ASC' | 'DESC';
 
 export const DEFAULT_PAGEABLE: Pageable = {
@@ -93,6 +96,7 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     MatProgressSpinner,
     MatSelect,
     MatOption,
+    MatButton,
   ],
   styles: `
     .tableDiv {
@@ -256,6 +260,20 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       margin: 3px;
     }
 
+    .actionButton {
+      padding: 0.3rem 0.75rem;
+      color: var(--text-primary);
+      background: var(--bg-overlay);
+      border: 1px solid var(--primary, #8b5cf6);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .actionButton:hover {
+      background: color-mix(in srgb, var(--bg-overlay), var(--primary, #8b5cf6) 15%);
+    }
+
     /* Select stands out from the table (overlay surface + accent border), selected value is centered */
     .periodSelect {
       flex: 0 0 auto;
@@ -284,6 +302,16 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       color: var(--text-primary);
     }
 
+    /* Title select is display only: no dropdown, no arrow, just keeps the look consistent */
+    .titleSelect {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .titleSelect ::ng-deep .mat-mdc-select-arrow-wrapper {
+      display: none;
+    }
+
     .periodSelect ::ng-deep .mat-mdc-select-arrow,
     .periodSelect ::ng-deep .mat-mdc-select-arrow svg {
       color: var(--text-primary);
@@ -293,22 +321,36 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
   `,
   template: `
     <div class="tableFooter">
-      <div class="funcButtons">
-        @if (createFunc) {
-          <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()"
-                  [disabled]="isLoading">
-            <i class="fa-solid fa-plus funcIcon"></i>
+
+<!--      @if (createFunc || displayViewFilter) {-->
+        <div class="funcButtons">
+          @if (tittle) {
+            <mat-select class="periodSelect titleSelect" value="" tabindex="-1" panelClass="periodSelectPanel">
+              <mat-option value="">
+                {{tittle}}
+              </mat-option>
+            </mat-select>
+          }
+          @if (createFunc) {
+            <button style="background: inherit; border: inherit; padding: 0" (click)="createFunc()"
+                    [disabled]="isLoading">
+              <i class="fa-solid fa-plus funcIcon"></i>
+            </button>
+          }
+          @if (displayViewFilter) {
+            <mat-select class="periodSelect" value="" panelClass="periodSelectPanel">
+              <mat-option value="">
+                Ostatni tydzień
+              </mat-option>
+            </mat-select>
+          }
+          <button style="background: inherit; border: inherit; padding: 0" (click)="resetAll()" [disabled]="isLoading">
+            <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
           </button>
-        }
-        <mat-select class="periodSelect" value="" panelClass="periodSelectPanel">
-          <mat-option value="">
-            Ostatni tydzień
-          </mat-option>
-        </mat-select>
-        <button style="background: inherit; border: inherit; padding: 0" (click)="resetAll()" [disabled]="isLoading">
-          <i class="fa-solid fa-arrow-rotate-left funcIcon"></i>
-        </button>
-      </div>
+
+        </div>
+<!--      }-->
+
       @if (displayPaginator) {
         <mat-paginator
           [length]="totalElements"
@@ -358,8 +400,10 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
                       }
                       <p> {{ field.displayName }}</p>
                     </div>
-                    <i (click)="openSearchDialog($event, field.displayName, field.name, field)"
-                       class="fa-solid fa-filter"></i>
+                    @if (field.type !== 'ACTION') {
+                      <i (click)="openSearchDialog($event, field.displayName, field.name, field)"
+                         class="fa-solid fa-filter"></i>
+                    }
                   </div>
                 </th>
 
@@ -375,6 +419,11 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
                     }
                     @case ('STATUS') {
                       <app-status [status]="element[field.name]"></app-status>
+                    }
+                    @case ('ACTION') {
+                      <button  matButton="outlined" (click)="field.action?.(dtoData.filter(d => d.id === element.id)[0]); $event.stopPropagation()">
+                        {{ field.actionLabel || field.displayName }}
+                      </button>
                     }
                     @case ('OBJECT') {
                       {{ getObjectDisplayValue(element, field) }}
@@ -407,12 +456,13 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
 })
 export class RegularTableComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
+  @Input() public tittle?: string;
   @Input() public dtoData: any[] = [];
   @Input() public isLoading: boolean = false;
   @Input() public tabColumns: Field[] = [];
   @Input() public totalElements: number = 0;
   @Input() displayPaginator: boolean = true;
+  @Input() displayViewFilter: boolean = true;
   @Input() searchRequestSignal!: WritableSignal<SearchRequest | undefined>;
   @Input() pageableSignal!: WritableSignal<Pageable | undefined | null>;
   @Input() public displayData?: any[];
