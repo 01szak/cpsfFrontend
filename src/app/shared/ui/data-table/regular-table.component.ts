@@ -4,6 +4,7 @@ import {
   inject,
   Input, OnInit,
   Output,
+  TemplateRef,
   ViewChild,
   WritableSignal
 } from '@angular/core';
@@ -130,6 +131,15 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
 
     th:hover {
       background: color-mix(in srgb, var(--bg-card), var(--text-primary) 8%);
+    }
+
+    /* Without pageableSignal the headers can not sort, so they must not look clickable */
+    th.staticHeader {
+      cursor: default;
+    }
+
+    th.mat-mdc-header-cell.staticHeader:hover {
+      background-color: var(--bg-card);
     }
 
     .headerDiv {
@@ -354,12 +364,14 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
       @if (displayPaginator) {
         <mat-paginator
           [length]="totalElements"
-          [pageSize]="pageableSignal()?.size"
+          [pageSize]="pageableSignal?.()?.size"
           [pageSizeOptions]="PAGE_SIZE_OPTIONS"
           (page)="changePage($event)"
           [disabled]="isLoading"
         >
         </mat-paginator>
+      } @else if (additionalSelector) {
+        <ng-container [ngTemplateOutlet]="additionalSelector"></ng-container>
       }
     </div>
     @let data = displayData || dtoData;
@@ -383,7 +395,7 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
             @for (field of tabColumns; track field) {
               <ng-container [matColumnDef]="field.name">
 
-                <th mat-header-cell *matHeaderCellDef>
+                <th mat-header-cell *matHeaderCellDef [class.staticHeader]="!pageableSignal">
                   <div class="headerDiv">
                     <div (click)="clickSort(field.name);$event.stopPropagation()" class="sortingButton"
                          style="display: flex; flex-direction: row; gap: 0.75rem; align-items: center ">
@@ -400,7 +412,7 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
                       }
                       <p> {{ field.displayName }}</p>
                     </div>
-                    @if (field.type !== 'ACTION') {
+                    @if (field.type !== 'ACTION' && searchRequestSignal) {
                       <i (click)="openSearchDialog($event, field.displayName, field.name, field)"
                          class="fa-solid fa-filter"></i>
                     }
@@ -463,14 +475,19 @@ export class RegularTableComponent {
   @Input() public totalElements: number = 0;
   @Input() displayPaginator: boolean = true;
   @Input() displayViewFilter: boolean = true;
-  @Input() searchRequestSignal!: WritableSignal<SearchRequest | undefined>;
-  @Input() pageableSignal!: WritableSignal<Pageable | undefined | null>;
+  //content passed by the parent (e.g. a date range picker), displayed in the paginator's place so only when displayPaginator is false
+  @Input() additionalSelector?: TemplateRef<unknown>;
+  //without the searchRequestSignal the filtering is disabled (no filter icons)
+  @Input() searchRequestSignal?: WritableSignal<SearchRequest | undefined>;
+  //without the pageableSignal the sorting is disabled (headers are not clickable)
+  @Input() pageableSignal?: WritableSignal<Pageable | undefined | null>;
   @Input() public displayData?: any[];
   @Input() public paginatorData?: PaginatorData;
   @Input() public createFunc?: () => any;
   @Input() public onRowClickFunc?: (dto: any) => any;
   @Input() public checkboxChangeFunc?: (a: any) => any;
-  @Input() resetTableFunction: any = () => this.resetAll();
+  //replaces the default reset (sort arrow, paginator, search criteria) when provided
+  @Input() resetTableFunction?: () => any;
 
 
   @Output() public sortInfo = new EventEmitter<Sort>();
@@ -488,6 +505,7 @@ export class RegularTableComponent {
   }
 
   protected clickSort(columnField: string) {
+     if (!this.pageableSignal) return;
      this.isArrowAsc = !this.isArrowAsc;
      if (columnField !== this.clickedColumn) {
        this.isArrowAsc = true;
@@ -514,6 +532,7 @@ export class RegularTableComponent {
   }
 
   protected openSearchDialog(event: MouseEvent, label: string, by: string, field: Field) {
+    if (!this.searchRequestSignal) return;
     const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
 
@@ -545,7 +564,7 @@ export class RegularTableComponent {
   }
 
   protected resetPaginator() {
-    if (this.pageableSignal() !== null) {
+    if (this.pageableSignal && this.pageableSignal() !== null) {
       this.pageableSignal.set({sort: [], size: 10, page: 0});
     }
   }
@@ -561,10 +580,14 @@ export class RegularTableComponent {
   }
 
   protected resetSearchCriteriaFilter() {
-    this.searchRequestSignal.set({searchCriteria: []});
+    this.searchRequestSignal?.set({searchCriteria: []});
   }
 
   protected resetAll() {
+    if (this.resetTableFunction) {
+      this.resetTableFunction();
+      return;
+    }
     this.resetSortArrow();
     this.resetPaginator();
     this.resetSearchCriteriaFilter();
@@ -575,7 +598,7 @@ export class RegularTableComponent {
   }
 
   protected changePage($event: PageEvent) {
-    this.pageableSignal.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
+    this.pageableSignal?.set({ ...this.pageableSignal(), page: $event.pageIndex, size: $event.pageSize})
   }
 
   protected readonly PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
