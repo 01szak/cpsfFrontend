@@ -4,10 +4,10 @@ import {
   Component,
   DestroyRef,
   inject,
-  Input,
+  OnDestroy,
   OnInit
 } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {debounceTime, distinctUntilChanged, filter} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -36,8 +36,6 @@ import {
 } from '@angular/material-moment-adapter';
 import {DateDelimiter, DateFormater} from '@shared/helper/DateFormater';
 import {MatButton} from '@angular/material/button';
-import {NgTemplateOutlet} from '@angular/common';
-import {FormButtonsComponent} from '@shared/ui/buttons/form-buttons.component';
 import {CamperPlaceDto, ReservationDto} from '../../api';
 import {GuestService} from '@core/services/openApiWrappers/GuestService';
 import {Country} from '@shared/constants/COUNTRIES';
@@ -71,10 +69,9 @@ export type ReservationFormData = {
     MatIconModule,
     MatDatepicker,
     MatMomentDateModule,
+    MatDialogTitle,
     MatButton,
     GuestFormComponent,
-    NgTemplateOutlet,
-    FormButtonsComponent,
   ],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -90,33 +87,13 @@ export type ReservationFormData = {
       ])
     ])
   ],
-  styles: `
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-    }
-
-    /* Scrolls inside the widget; margin: auto centers the content when it fits */
-    .embedded {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      box-sizing: border-box;
-      padding: 15px ;
-    }
-
-    .embedded-content {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      margin: 0;
-    }
-  `,
   template: `
-    <ng-template #formFields>
+    <app-popup-form-container
+      [formTitle]="formTitle"
+      [deleteAction]="deleteAction"
+      [isUpdate]="isUpdate"
+      [proceedAction]="onSave">
+
       <form [formGroup]="formGroup" [@.disabled]="!animationsEnabled"
             style="display: flex; flex-direction: column; gap: 1rem;">
         <mat-form-field>
@@ -162,7 +139,7 @@ export type ReservationFormData = {
 
         @if (isNewGuest) {
           <div [@expandCollapse] style="overflow: hidden;">
-            <h2
+            <h2 mat-dialog-title
                 style="margin: 0; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary) !important; padding: 1rem !important;">{{ GuestTittle }}</h2>
             <app-guest-form [isDialog]="false" [formGroup]="guestSubForm"></app-guest-form>
           </div>
@@ -188,29 +165,7 @@ export type ReservationFormData = {
           </div>
         }
       </form>
-    </ng-template>
-
-    @if (isDialog) {
-      <app-popup-form-container
-        [formTitle]="formTitle"
-        [deleteAction]="deleteAction"
-        [isUpdate]="isUpdate"
-        [proceedAction]="onSave">
-        <ng-container *ngTemplateOutlet="formFields"></ng-container>
-      </app-popup-form-container>
-    } @else {
-      <div class="embedded">
-        <div class="embedded-content">
-          <h2 style="margin: 0; text-align: center;">{{ formTitle }}</h2>
-          <ng-container *ngTemplateOutlet="formFields"></ng-container>
-          <app-form-buttons
-            firstButtonText="Wyczyść"
-            secondButtonText="Zapisz"
-            [firstAction]="resetForm"
-            [secondAction]="onSave"/>
-        </div>
-      </div>
-    }
+    </app-popup-form-container>
   `,
 })
 export class ReservationFormComponent implements OnInit {
@@ -220,13 +175,10 @@ export class ReservationFormComponent implements OnInit {
   private readonly factory = inject(FormFactoryService);
   private readonly reservationService = inject(ReservationService);
   private readonly confirmation = inject(PopupConfirmationService);
-  private readonly dialogRef = inject(MatDialogRef<ReservationFormComponent>, {optional: true});
-  private readonly fd: ReservationFormData = inject<ReservationFormData>(MAT_DIALOG_DATA, {optional: true}) || {};
+  private readonly dialogRef = inject(MatDialogRef<ReservationFormComponent>);
+  private readonly fd: ReservationFormData = inject(MAT_DIALOG_DATA);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
-
-  // By default the form is a dialog only when it was opened through MatDialog
-  @Input() isDialog = !!this.dialogRef;
 
   protected selectedCpFromCalendar? = this.fd?.camperPlace;
   protected currentGuest? = this.fd?.reservation?.guest;
@@ -312,7 +264,7 @@ export class ReservationFormComponent implements OnInit {
     this.confirmation.openConfirmationPopup({
       title: 'Usuwanie',
       message: 'Czy na pewno usunąć tę rezerwację?',
-      action: () => this.reservationService.delete(this.fd.reservation?.id!).subscribe(() => this.afterSave())
+      action: () => this.reservationService.delete(this.fd.reservation?.id!).subscribe(() => this.dialogRef.close())
     });
   } : null;
 
@@ -340,23 +292,8 @@ export class ReservationFormComponent implements OnInit {
       title: 'Zapisywanie',
       message: 'Czy chcesz zapisać zmiany?',
       action: () => (this.isUpdate ? this.reservationService.update(payload) : this.reservationService.create(payload))
-        .subscribe(() => this.afterSave())
+        .subscribe(() => this.dialogRef.close())
     });
-  }
-
-  // Dialog closes itself, embedded form just goes back to its initial state
-  private afterSave() {
-    if (this.dialogRef) {
-      this.dialogRef.close();
-      return;
-    }
-    this.resetForm();
-  }
-
-  protected resetForm = () => {
-    this.formGroup.reset();
-    this.isNewGuest = false;
-    this.initialPatch();
   }
 
   protected setNewGuest() {

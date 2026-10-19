@@ -1,6 +1,7 @@
 import {Component, inject, linkedSignal} from '@angular/core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {NavbarComponent} from '@shared/ui/navbar/navbar.component';
 import {NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from '@angular/material/sidenav';
 import {AsyncPipe} from '@angular/common';
@@ -11,6 +12,7 @@ import {EmployeeService} from '@core/services/openApiWrappers/EmployeeService';
 @Component({
   selector: 'admin-page',
   imports: [
+    NavbarComponent,
     RouterOutlet,
     MatDrawerContainer,
     MatDrawer,
