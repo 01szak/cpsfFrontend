@@ -117,24 +117,7 @@ html, body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
-  overflow: hidden;
-}
-
-/* Disable vertical scrolling for the whole app (incl. Material sidenav content) */
-.mat-drawer-container,
-.mat-drawer-content {
-  overflow-y: hidden !important;
-}
-.mat-drawer-content {
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-/* Phones: allow vertical scrolling */
-@media (max-width: 599.98px) {
-  .mat-drawer-content {
-    overflow-y: auto !important;
-  }
+  overflow-x: hidden;
 }
 
 form {
@@ -153,20 +136,6 @@ form {
   background: #333;
   border-radius: 10px;
 }
-
-.spinnerContainer {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-content: center;
-}
-
-@include mat.sidenav-overrides((
-  container-width: 10%,
-  container-background-color: var(--bg-main),
-  content-background-color: var(--bg-overlay),
-));
-
 
 /* --- Global Input & Select Alignment --- */
 input, .mat-mdc-input-element {
@@ -270,6 +239,13 @@ mat-card,
     border-color: var(--mdc-outlined-text-field-disabled-outline-color) !important;
     border-width: 1px !important;
   }
+}
+
+.spinnerContainer {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
 }
 
 .mat-mdc-checkbox .mat-internal-form-field {

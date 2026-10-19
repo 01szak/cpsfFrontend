@@ -58,10 +58,10 @@ import {CamperPlaceTypeTable} from './tables/camper-place-type-table';
     }
   `,
   template: `
-      <mat-card class="settingsContainer" (click)="collapsed.set(!collapsed())">
+      <mat-card class="settingsContainer">
         <div class="header">
           <h1>Parcele</h1>
-          <button class="toggle" [class.collapsed]="collapsed()" (click)="collapsed.set(!collapsed()); $event.stopPropagation()"
+          <button class="toggle" [class.collapsed]="collapsed()" (click)="collapsed.set(!collapsed())"
                   [attr.aria-expanded]="!collapsed()" aria-label="Zwiń lub rozwiń sekcję">
             <i class="fa-solid fa-chevron-down"></i>
           </button>
@@ -74,6 +74,6 @@ import {CamperPlaceTypeTable} from './tables/camper-place-type-table';
   `,
 })
 export class SettingsPage {
-  protected collapsed = signal(true);
+  protected collapsed = signal(false);
 
 }
