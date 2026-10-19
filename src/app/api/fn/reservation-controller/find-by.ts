@@ -12,7 +12,7 @@ import { PageReservationDto } from '../../models/page-reservation-dto';
 import { SearchRequest } from '../../models/search-request';
 
 export interface FindBy$Params {
-  pageable: Pageable;
+  pageable?: Pageable;
       body: SearchRequest
 }
 

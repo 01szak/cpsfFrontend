@@ -12,7 +12,7 @@ import { PageGuestDto } from '../../models/page-guest-dto';
 import { SearchRequest } from '../../models/search-request';
 
 export interface FindBy1$Params {
-  pageable: Pageable;
+  pageable?: Pageable;
       body: SearchRequest
 }
 

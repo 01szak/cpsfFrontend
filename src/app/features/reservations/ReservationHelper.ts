@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {map, Observable, shareReplay, take} from 'rxjs';
-import {ReservationService} from '@features/reservations/services/ReservationService';
+import {ReservationService} from '@core/services/openApiWrappers/ReservationService';
 import {Reservation} from '@core/models/Reservation';
 import {
   ReservationMetadata,

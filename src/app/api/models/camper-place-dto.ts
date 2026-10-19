@@ -6,5 +6,5 @@ export interface CamperPlaceDto {
   id?: number;
   index?: string;
   price: number;
-  type: CamperPlaceTypeDto;
+  camperPlaceType: CamperPlaceTypeDto;
 }

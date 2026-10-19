@@ -8,6 +8,7 @@ export type { GuestDto } from './models/guest-dto';
 export type { LoginRequest } from './models/login-request';
 export type { Pageable } from './models/pageable';
 export type { Pageablenull } from './models/pageablenull';
+export type { PageCamperPlaceDto } from './models/page-camper-place-dto';
 export type { PageGuestDto } from './models/page-guest-dto';
 export type { PageReservationDto } from './models/page-reservation-dto';
 export type { ReservationDto } from './models/reservation-dto';

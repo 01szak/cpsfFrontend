@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {EmployeeService} from '@core/services/EmployeeService';
+import {EmployeeService} from '@core/services/openApiWrappers/EmployeeService';
 import {Observable} from 'rxjs';
 import {Employee} from '@core/models/Employee';
 import {AsyncPipe} from '@angular/common';

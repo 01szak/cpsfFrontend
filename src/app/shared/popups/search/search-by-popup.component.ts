@@ -212,7 +212,7 @@ import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 })
 export class SearchByPopupComponent {
 
-  @Output() public criteriaEmitter: EventEmitter<SearchCriteria[] | SearchCriteria> = new EventEmitter<SearchCriteria[] | SearchCriteria>();
+  // @() public criteriaEmitter: EventEmitter<SearchCriteria[] | SearchCriteria> = new EventEmitter<SearchCriteria[] | SearchCriteria>();
 
   private readonly dialogRef = inject(MatDialogRef<SearchByPopupComponent, SearchDialogData>);
 
@@ -241,7 +241,7 @@ export class SearchByPopupComponent {
       }
       criterias.push({key: this.data.field.name, value: this.data.field.value, secondValue: this.data.field.secondValue, operation: this.pickOperation(this.data.field.type)} as SearchCriteria);
     }
-    this.criteriaEmitter.emit(criterias);
+    this.data.searchCriteriaSignal.set({searchCriteria: criterias})
     this.clearForm();
     this.dialogRef.close();
   }
