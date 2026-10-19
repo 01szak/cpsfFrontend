@@ -33,6 +33,7 @@ import {CamperPlaceService} from '@core/services/openApiWrappers/CamperPlaceServ
       [pageableSignal]="reservationService.pageable"
       [searchRequestSignal]="reservationService.searchRequest"
       [onRowClickFunc]="openFormPopup.bind(this)"
+      [checkboxChangeFunc]="checkboxChangeFunc"
     >
     </app-regular-table>
 
@@ -59,6 +60,7 @@ export class ReservationTable implements OnInit {
     {name: 'guest', displayName: 'Gość', type: 'OBJECT', innerFields: [{type: "TEXT", displayName: 'Imie', name: 'firstname', value: ''}, {type: "TEXT", displayName: 'Nazwisko', name: 'lastname', value: ''}]},
     {name: 'camperPlace', displayName: 'Parcela', type: 'OBJECT', innerFields: [{type: "NUMBER", displayName: 'Indeks', name: 'index', selectOption: this.camperPlaceService.indexes(), value: ''}]},
     {name: 'reservationStatus', displayName: 'Status', type: 'STATUS', value: '', selectOption: ["ACTIVE", "COMING", "EXPIRED"] as ReservationStatus[] },
+    // {name: 'paid', displayName: 'Opłacone', type: 'BOOLEAN', value: ''},
     {name: 'creator', displayName: 'Autor', type: "OBJECT", innerFields: [{type: "TEXT", displayName: 'Nazwa użytkownika', name: 'username', value: ''}]},
   ]);
 
@@ -89,6 +91,9 @@ export class ReservationTable implements OnInit {
     this.formService.openReservationFormPopup(reservationFd);
   }
 
+  protected checkboxChangeFunc = (r: ReservationDto) => {
+    this.reservationService.update({...r, paid: !r.paid}).subscribe();
+  };
 
 }
 

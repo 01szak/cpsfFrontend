@@ -64,13 +64,13 @@ export class Dashboard {
   widgets: WidgetObject[] = [
     {cols: 2, rows: 3, mobileRows: 8, widgetComponent: ReservationFormComponent, inputs: [{isDialog: false}]}, //form
     {cols: 1, rows: 1, mobileRows: 4, widgetComponent: TodaysRevenueWidget}, //todays revenue
-    {cols: 1, rows: 1, mobileRows: 4, widgetComponent: RecentActionsWidget}, //logs
     {cols: 1, rows: 2, mobileRows: 4, widgetComponent: AvailableCamperPlacesWidget}, //available
     {cols: 1, rows: 2, mobileRows: 4, widgetComponent: RevenueWidget}, //all rev
 
 
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: UnpaidReservationsWidget}, //unpaid Res
+    {cols: 1, rows: 2, mobileRows: 4, widgetComponent: RecentActionsWidget}, //logs
     {cols: 2, rows: 2, mobileRows: 4, widgetComponent: ReservationTable}, //recent res
-    {cols: 2, rows: 2, mobileRows: 4, widgetComponent: UnpaidReservationsWidget}, //unpaid Res
 
   ];
 }
