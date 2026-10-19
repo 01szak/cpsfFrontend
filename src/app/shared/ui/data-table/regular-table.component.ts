@@ -12,10 +12,6 @@ import {
   MatCell,
   MatCellDef,
   MatColumnDef,
-  MatFooterCell,
-  MatFooterCellDef,
-  MatFooterRow,
-  MatFooterRowDef,
   MatHeaderCell,
   MatHeaderCellDef,
   MatHeaderRow,
@@ -60,8 +56,7 @@ export interface Field {
   innerFields?: Field[], //for type object fields can be nested
   selectOption?: any[],
   action?: (row: any) => any, //type ACTION: function from the parent component, called with the row on button click
-  actionLabel?: string, //type ACTION: button text, falls back to displayName
-  footer?: string | number //when any column has it the sticky footer row (e.g. sums) is displayed
+  actionLabel?: string //type ACTION: button text, falls back to displayName
 }
 
 export interface PaginatorData {
@@ -95,10 +90,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
     MatHeaderRowDef,
     MatRow,
     MatRowDef,
-    MatFooterCell,
-    MatFooterCellDef,
-    MatFooterRow,
-    MatFooterRowDef,
     MatPaginator,
     MatCheckbox,
     StatusComponent,
@@ -264,14 +255,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
 
     th.mat-mdc-header-cell:hover {
       background-color: color-mix(in srgb, var(--bg-card), var(--text-primary) 8%);
-    }
-
-    /* Sticky footer must be opaque as well, scrolled rows would show through it */
-    tr.mat-mdc-footer-row td.mat-mdc-footer-cell {
-      background-color: var(--bg-card);
-      color: var(--text-primary);
-      font-weight: 600;
-      border-top: 1px solid var(--border-color);
     }
 
     .funcButtons {
@@ -466,8 +449,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
                   }
                 </td>
 
-                <td mat-footer-cell *matFooterCellDef>{{ field.footer ?? '' }}</td>
-
               </ng-container>
             }
             <tr mat-header-row *matHeaderRowDef="columnFields; sticky: true"></tr>
@@ -477,9 +458,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50, 100];
                 class="row"
             >
             </tr>
-            @if (hasFooter) {
-              <tr mat-footer-row *matFooterRowDef="columnFields; sticky: true"></tr>
-            }
 
           </table>
         </div>
@@ -521,10 +499,6 @@ export class RegularTableComponent {
   protected isClicked: boolean = false;
   protected clickCount: number = 0;
   protected clickedColumn: string = '';
-
-  protected get hasFooter(): boolean {
-    return this.tabColumns.some(field => field.footer !== undefined);
-  }
 
   protected get columnFields(): string[] {
     return this.tabColumns.map(field => field.name);
