@@ -57,6 +57,8 @@ export type { GetOccupiedDates$Params as GetOccupiedDates$Params } from './fn/ca
 export { getOccupiedDates as getOccupiedDates } from './fn/camper-place-controller/get-occupied-dates';
 export type { GetCalculatedReservationPrice$Params as GetCalculatedReservationPrice$Params } from './fn/camper-place-controller/get-calculated-reservation-price';
 export { getCalculatedReservationPrice as getCalculatedReservationPrice } from './fn/camper-place-controller/get-calculated-reservation-price';
+export type { GetAvailableCamperPlaces$Params as GetAvailableCamperPlaces$Params } from './fn/camper-place-controller/get-available-camper-places';
+export { getAvailableCamperPlaces as getAvailableCamperPlaces } from './fn/camper-place-controller/get-available-camper-places';
 export type { Delete2$Params as Delete2$Params } from './fn/camper-place-controller/delete-2';
 export { delete2 as delete2 } from './fn/camper-place-controller/delete-2';
 export type { GetTypes$Params as GetTypes$Params } from './fn/camper-place-type-controller/get-types';
