@@ -1,9 +1,16 @@
 import {
-  Component, Input, OnChanges, OnDestroy, AfterViewInit,
-  ElementRef, ViewChild, NgZone, ChangeDetectionStrategy
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  ViewChild
 } from '@angular/core';
-import { Statistic } from '@core/models/Statistic';
-import { Chart, registerables } from 'chart.js';
+import {Statistic} from '@core/models/Statistic';
+import {Chart, registerables} from 'chart.js';
 
 Chart.register(...registerables);
 

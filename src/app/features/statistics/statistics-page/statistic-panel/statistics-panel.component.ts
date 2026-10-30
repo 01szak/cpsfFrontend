@@ -3,7 +3,6 @@ import {MatTableModule} from '@angular/material/table';
 import {CommonModule} from '@angular/common';
 import {MatCard} from '@angular/material/card';
 import {GraphComponent} from '../graph/graph.component';
-import {CountryDistribution, Revenue} from '../../../../api';
 
 export interface StatColumnConfig {
   collumnDef: string;

@@ -1,7 +1,7 @@
-import { Component, inject, Input } from '@angular/core';
-import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
-import { FormButtonsComponent } from '@shared/ui/buttons/form-buttons.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import {Component, inject, Input} from '@angular/core';
+import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {FormButtonsComponent} from '@shared/ui/buttons/form-buttons.component';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-popup-form-container',

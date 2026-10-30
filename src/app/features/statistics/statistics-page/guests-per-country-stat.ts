@@ -4,7 +4,7 @@ import {
   StatisticsPanelComponent
 } from '@features/statistics/statistics-page/statistic-panel/statistics-panel.component';
 import {CountryDistribution} from '../../../api';
-import { COUNTRIES } from '@shared/constants/COUNTRIES';
+import {COUNTRIES} from '@shared/constants/COUNTRIES';
 
 @Component({
   selector: 'guests-per-country-stat',

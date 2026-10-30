@@ -7,14 +7,15 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { UserDto } from '../../models/user-dto';
 
-export interface GetEmployee$Params {
+export interface GetOccupiedDates$Params {
+  cpId: number;
 }
 
-export function getEmployee(http: HttpClient, rootUrl: string, params?: GetEmployee$Params, context?: HttpContext): Observable<StrictHttpResponse<UserDto>> {
-  const rb = new RequestBuilder(rootUrl, getEmployee.PATH, 'get');
+export function getOccupiedDates(http: HttpClient, rootUrl: string, params: GetOccupiedDates$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Array<string>>>> {
+  const rb = new RequestBuilder(rootUrl, getOccupiedDates.PATH, 'get');
   if (params) {
+    rb.path('cpId', params.cpId, {});
   }
 
   return http.request(
@@ -22,9 +23,9 @@ export function getEmployee(http: HttpClient, rootUrl: string, params?: GetEmplo
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserDto>;
+      return r as StrictHttpResponse<Array<Array<string>>>;
     })
   );
 }
 
-getEmployee.PATH = '/user';
+getOccupiedDates.PATH = '/camperPlace/occupancy/{cpId}';

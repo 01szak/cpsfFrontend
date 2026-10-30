@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {FormControl, FormGroup, Validators, FormBuilder} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CamperPlaceDto} from '../../api/models/camper-place-dto';
 import {CamperPlaceTypeDto} from '../../api/models/camper-place-type-dto';
 import {DateFormater} from '@shared/helper/DateFormater';
@@ -60,7 +60,7 @@ export class FormFactoryService {
     return this.fb.group({
       id: new FormControl<number | null>(null),
       index: new FormControl<string>('', [Validators.required]),
-      type: new FormControl<CamperPlaceTypeDto | null>(null, [Validators.required]),
+      camperPlaceType: new FormControl<CamperPlaceTypeDto | null>(null, [Validators.required]),
       price: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
     });
   }

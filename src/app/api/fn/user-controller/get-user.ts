@@ -7,13 +7,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CamperPlaceDto } from '../../models/camper-place-dto';
+import { UserDto } from '../../models/user-dto';
 
-export interface GetCamperPlaces$Params {
+export interface GetUser$Params {
 }
 
-export function getCamperPlaces(http: HttpClient, rootUrl: string, params?: GetCamperPlaces$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CamperPlaceDto>>> {
-  const rb = new RequestBuilder(rootUrl, getCamperPlaces.PATH, 'get');
+export function getUser(http: HttpClient, rootUrl: string, params?: GetUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserDto>> {
+  const rb = new RequestBuilder(rootUrl, getUser.PATH, 'get');
   if (params) {
   }
 
@@ -22,9 +22,9 @@ export function getCamperPlaces(http: HttpClient, rootUrl: string, params?: GetC
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<CamperPlaceDto>>;
+      return r as StrictHttpResponse<UserDto>;
     })
   );
 }
 
-getCamperPlaces.PATH = '/camperPlace';
+getUser.PATH = '/user';

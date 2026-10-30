@@ -3,12 +3,15 @@
 
 import { CamperPlaceDto } from '../models/camper-place-dto';
 import { GuestDto } from '../models/guest-dto';
+import { UserDto } from '../models/user-dto';
 export interface ReservationDto {
   camperPlace: CamperPlaceDto;
   checkin: string;
   checkout: string;
+  creator?: UserDto;
   guest: GuestDto;
   id?: number;
   paid: boolean;
-  reservationStatus?: 'EXPIRED' | 'ACTIVE' | 'COMING';
+  price?: number;
+  reservationStatus?: 'EXPIRED' | 'ACTIVE' | 'COMING' | 'UNVERIFIED' | 'VERIFIED';
 }

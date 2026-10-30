@@ -3,6 +3,7 @@
 
 export interface UserDto {
   email: string;
+  id?: number;
   role: string;
   username: string;
 }

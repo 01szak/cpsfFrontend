@@ -3,8 +3,8 @@
 
 import { CamperPlaceTypeDto } from '../models/camper-place-type-dto';
 export interface CamperPlaceDto {
+  camperPlaceType: CamperPlaceTypeDto;
   id?: number;
   index?: string;
   price: number;
-  type: CamperPlaceTypeDto;
 }

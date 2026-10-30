@@ -241,6 +241,13 @@ mat-card,
   }
 }
 
+.spinnerContainer {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+}
+
 .mat-mdc-checkbox .mat-internal-form-field {
   color: var(--text-primary) !important;
 }
